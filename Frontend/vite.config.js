@@ -1,0 +1,29 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      // "@" ምልክት ወደ "src" ፎልደር እንዲያመለክት ያደርጋል
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  server: {
+    proxy: {
+      // ማንኛውም በ /api የሚጀምር ጥያቄ ወደ backend (Port 5000) እንዲሄድ ያደርጋል
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+      // በዳታቤዝህ ውስጥ ያሉ ምስሎች በFrontend ላይ እንዲታዩ
+      '/uploads': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      }
+    }
+  }
+});

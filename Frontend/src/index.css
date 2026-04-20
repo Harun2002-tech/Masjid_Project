@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0b1220;
+  --text: #e5e7eb;
+  --gold: #fbbf24;
+  --gold-dark: #d4af37;
+  --red: #ef4444;
+  --red-dark: #b91c1c;
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+@layer base {
+  body {
+    @apply min-h-screen;
+    /* Noto Sans Ethiopic ለመደበኛ ጽሁፎች */
+    font-family: "Noto Sans Ethiopic", "Inter", system-ui, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+    color: var(--text);
+    background: var(--bg);
+
+    /* ሁሉንም ጽሁፍ ቀጥ እንዲል እናደርጋለን */
+    font-style: normal !important;
+    line-height: 1.7;
+  }
+
+  /* Abyssinica SIL ለርዕሶች (Headers) - ምስሉ ላይ ላለው ትልቅ ጽሁፍ */
+  h1,
+  h2,
+  h3,
+  .hero-title {
+    font-family: "Noto Sans Ethiopic", "Inter", system-ui, sans-serif;
+    /* ርዕስ ስለሆነ አቢሲኒካ ቢሆን ያምራል */
+
+    /* መጠኑን እዚህ ጋር አስተካክለው፡ */
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    /* clamp ስክሪኑ ሲያንስ መጠኑ አብሮ እንዲያንስ ይረዳዋል */
+
+    font-weight: 800;
+    font-style: normal !important;
+    line-height: 1.2;
+    @apply mb-6;
+  }
+
+  /* Header ውስጥ ያሉ የሜኑ ጽሁፎችን ለማድመቅ */
+  nav a,
+  header a,
+  .nav-link {
+    font-family: "Noto Sans Ethiopic", sans-serif;
+    font-weight: 700; /* ጽሁፉን ወፍራም ያደርገዋል */
+    font-size: 1.1rem; /* መጠኑን ትንሽ ከፍ ያደርገዋል */
+    color: #ffffff; /* ቀለሙን ንጹህ ነጭ (ደመቅ ያለ) ያደርገዋል */
+    letter-spacing: 0.02em; /* በፊደላቱ መካከል ጥቂት ክፍተት ይሰጣል */
+    font-style: normal !important;
+    transition: all 0.3s ease;
+  }
+
+  /* ማውሱ ሲያርፍባቸው (Hover) ይበልጥ እንዲደምቁ */
+  nav a:hover,
+  header a:hover {
+    color: var(--gold); /* ወደ ወርቃማ ቀለም እንዲቀየር */
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); /* የብርሃን ነጸብራቅ (Glow) ለመጨመር */
+  }
+
+  /* 🌈 MAIN BACKGROUND GRADIENT */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: radial-gradient(
+        circle at 15% 20%,
+        rgba(239, 68, 68, 0.15),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 85% 15%,
+        rgba(251, 191, 36, 0.15),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 50% 80%,
+        rgba(99, 102, 241, 0.1),
+        transparent 55%
+      ),
+      linear-gradient(135deg, #0b1220 0%, #0f172a 40%, #111827 100%);
+  }
+
+  /* ✨ SOFT LIGHT OVERLAY */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+        600px 300px at 50% 0%,
+        rgba(255, 255, 255, 0.04),
+        transparent
+      ),
+      radial-gradient(
+        600px 300px at 50% 100%,
+        rgba(251, 191, 36, 0.05),
+        transparent
+      );
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.35);
+  }
+}
+
+.text-gold {
+  color: var(--gold);
+}
+.text-red {
+  color: var(--red);
+}
+
+.text-gold-glow {
+  color: var(--gold);
+  text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+}
+
+/* GLASS EFFECT */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* INPUT STYLES */
+.payment-input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: white;
+  transition: all 0.3s ease;
+  font-family: "Noto Sans Ethiopic", sans-serif;
+  font-style: normal !important;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), #d97706);
+  color: #0b1220;
+  font-weight: 600;
+  font-family: "Noto Sans Ethiopic", sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.btn-gold:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
