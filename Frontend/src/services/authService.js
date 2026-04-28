@@ -1,5 +1,5 @@
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://https://masjid-project.onrender.com";
+  import.meta.env.VITE_API_URL || "https://masjid-project.onrender.com";
 
 export const loginService = async (formData) => {
   try {

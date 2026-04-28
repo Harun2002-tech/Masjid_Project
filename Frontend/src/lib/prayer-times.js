@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://https://masjid-project.onrender.com/api";
+const API_BASE_URL = "https://masjid-project.onrender.com/api";
 
 /**
  * 1. ከ Backend የመስጂዱን የሶላት ሰዓት መረጃ ለማምጣት

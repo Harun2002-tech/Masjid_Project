@@ -115,7 +115,7 @@ const StudentProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_BASE_URL = "http://https://masjid-project.onrender.com";
+  const API_BASE_URL = "https://masjid-project.onrender.com";
 
   useEffect(() => {
     const fetchStudentData = async () => {

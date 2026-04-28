@@ -24,7 +24,7 @@ export default function ContactPage() {
 
     try {
       const response = await fetch(
-        "http://https://masjid-project.onrender.com/api/contact",
+        "https://masjid-project.onrender.com/api/contact",
         {
           method: "POST",
           headers: {

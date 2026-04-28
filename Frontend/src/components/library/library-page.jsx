@@ -41,7 +41,7 @@ export default function LibraryPage() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://https://masjid-project.onrender.com/api/library"
+          "https://masjid-project.onrender.com/api/library"
         );
         setItems(response.data.data || []);
       } catch (err) {

@@ -12,7 +12,7 @@ export function MasjidProvider({ children }) {
       try {
         setIsLoading(true);
         const response = await fetch(
-          "http://https://masjid-project.onrender.com/api/masjids"
+          "https://masjid-project.onrender.com/api/masjids"
         );
 
         // Response-ቱ ትክክል መሆኑን ማረጋገጥ (ለምሳሌ 404 ወይም 500 ካልሆነ)

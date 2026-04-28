@@ -87,7 +87,7 @@ export default function TeacherListPage() {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
-  const API_BASE_URL = "http://https://masjid-project.onrender.com";
+  const API_BASE_URL = "https://masjid-project.onrender.com";
 
   const fetchTeachers = async () => {
     try {

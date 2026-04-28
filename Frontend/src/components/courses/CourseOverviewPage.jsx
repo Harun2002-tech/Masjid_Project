@@ -29,7 +29,7 @@ export default function CourseOverviewPage() {
   const [loading, setLoading] = useState(true);
   const [enrollmentStatus, setEnrollmentStatus] = useState(null);
 
-  const API_BASE_URL = "http://https://masjid-project.onrender.com";
+  const API_BASE_URL = "https://masjid-project.onrender.com";
 
   useEffect(() => {
     const fetchCourseAndStatus = async () => {

@@ -24,8 +24,7 @@ export default function ManageEnrollments() {
   const token = localStorage.getItem("token");
   const config = { headers: { Authorization: `Bearer ${token}` } };
   const API_BASE_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://https://masjid-project.onrender.com";
+    import.meta.env.VITE_API_URL || "https://masjid-project.onrender.com";
 
   const fetchEnrollments = async () => {
     try {

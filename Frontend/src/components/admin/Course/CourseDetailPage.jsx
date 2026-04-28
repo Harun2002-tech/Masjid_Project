@@ -44,7 +44,7 @@ export default function CourseDetailPage() {
   });
   const [files, setFiles] = useState({ audio: null, pdf: null });
 
-  const API_BASE = "http://https://masjid-project.onrender.com";
+  const API_BASE = "https://masjid-project.onrender.com";
 
   useEffect(() => {
     if (id && id !== ":id") fetchCourseData();

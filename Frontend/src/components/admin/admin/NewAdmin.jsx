@@ -33,7 +33,7 @@ export default function AdminNewProfile() {
     role: "admin", // ✅ ወደ lowercase ቀይረነዋል
   });
 
-  const API_BASE_URL = "http://https://masjid-project.onrender.com/api/users";
+  const API_BASE_URL = "https://masjid-project.onrender.com/api/users";
   const token = localStorage.getItem("token");
 
   const config = {

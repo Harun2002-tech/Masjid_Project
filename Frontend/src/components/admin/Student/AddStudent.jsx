@@ -268,7 +268,7 @@ export default function AddStudent() {
   const [fetching, setFetching] = useState(false);
   const [msg, setMsg] = useState({ type: "", text: "" });
 
-  const API_BASE_URL = "http://https://masjid-project.onrender.com";
+  const API_BASE_URL = "https://masjid-project.onrender.com";
 
   useEffect(() => {
     if (isEditMode) {

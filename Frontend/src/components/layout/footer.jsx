@@ -56,7 +56,7 @@ export default function Footer() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://https://masjid-project.onrender.com/api/newsletter/subscribe",
+        "https://masjid-project.onrender.com/api/newsletter/subscribe",
         { email }
       );
       if (response.data.success) {

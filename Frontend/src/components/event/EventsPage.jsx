@@ -24,7 +24,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://https://masjid-project.onrender.com/api/events";
+  const API_URL = "https://masjid-project.onrender.com/api/events";
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -50,7 +50,7 @@ export default function EventsPage() {
   const handleRegister = async (eventId) => {
     try {
       await axios.post(
-        `http://https://masjid-project.onrender.com/api/events/register/${eventId}`
+        `https://masjid-project.onrender.com/api/events/register/${eventId}`
       );
       alert(
         language === "am"

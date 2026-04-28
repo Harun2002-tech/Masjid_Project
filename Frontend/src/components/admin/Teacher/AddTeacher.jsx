@@ -255,7 +255,7 @@ export default function AddTeacherPage({ editMode = false }) {
               password: "",
             });
 
-            const API_BASE = "http://https://masjid-project.onrender.com";
+            const API_BASE = "https://masjid-project.onrender.com";
             setPreviews({
               photo: data.photo
                 ? `${API_BASE}/${data.photo.replace(/\\/g, "/")}`

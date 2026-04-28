@@ -14,8 +14,7 @@ import {
   Globe,
 } from "lucide-react";
 
-export const MESSAGE_URL =
-  "http://https://masjid-project.onrender.com/api/messages";
+export const MESSAGE_URL = "https://masjid-project.onrender.com/api/messages";
 
 export default function MessageAdminForm() {
   const { language, setLanguage, t, dir } = useLanguage();

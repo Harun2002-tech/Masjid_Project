@@ -77,7 +77,7 @@ export default function StudentListPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const API_BASE_URL = "http://https://masjid-project.onrender.com";
+  const API_BASE_URL = "https://masjid-project.onrender.com";
 
   useEffect(() => {
     const fetchStudents = async () => {

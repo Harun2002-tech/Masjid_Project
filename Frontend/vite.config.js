@@ -15,13 +15,13 @@ export default defineConfig({
     proxy: {
       // ማንኛውም በ /api የሚጀምር ጥያቄ ወደ backend (Port 5000) እንዲሄድ ያደርጋል
       "/api": {
-        target: "http://https://masjid-project.onrender.com",
+        target: "https://masjid-project.onrender.com",
         changeOrigin: true,
         secure: false,
       },
       // በዳታቤዝህ ውስጥ ያሉ ምስሎች በFrontend ላይ እንዲታዩ
       "/uploads": {
-        target: "http://https://masjid-project.onrender.com",
+        target: "https://masjid-project.onrender.com",
         changeOrigin: true,
       },
     },

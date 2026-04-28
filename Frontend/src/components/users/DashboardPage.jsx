@@ -40,7 +40,7 @@ export default function DashboardPage() {
         setMsgLoading(true);
         // ማሳሰቢያ፡ የ API URL እንደ አስፈላጊነቱ ይቀይሩ
         const res = await axios.get(
-          "http://https://masjid-project.onrender.com/api/messages/random"
+          "https://masjid-project.onrender.com/api/messages/random"
         );
         setDailyMessage(res.data.data || res.data);
       } catch (err) {

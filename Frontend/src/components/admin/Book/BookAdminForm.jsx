@@ -82,7 +82,7 @@ export default function BookAdminForm() {
       data.append("file", file);
 
       const response = await axios.post(
-        "http://https://masjid-project.onrender.com/api/library",
+        "https://masjid-project.onrender.com/api/library",
         data,
         {
           headers: {

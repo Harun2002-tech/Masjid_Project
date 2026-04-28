@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api/schedules`
-  : "http://https://masjid-project.onrender.com/api/schedules";
+  : "https://masjid-project.onrender.com/api/schedules";
 
 // ከ LocalStorage ቶከን ለማምጣት የሚረዳ ረዳት
 const getAuthConfig = () => {

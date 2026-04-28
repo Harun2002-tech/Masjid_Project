@@ -34,7 +34,7 @@ export default function BlogDetail() {
       try {
         // API ጥሪውን እንደ አስፈላጊነቱ ማስተካከል ትችላለህ
         const res = await axios.get(
-          `http://https://masjid-project.onrender.com/api/news/${id}`
+          `https://masjid-project.onrender.com/api/news/${id}`
         );
         setPost(res.data.data || res.data);
       } catch (err) {

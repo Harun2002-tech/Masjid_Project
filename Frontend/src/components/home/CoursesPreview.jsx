@@ -24,7 +24,7 @@ export default function CoursesPreview() {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          "http://https://masjid-project.onrender.com/api/courses"
+          "https://masjid-project.onrender.com/api/courses"
         );
         setCourses(
           Array.isArray(response.data)
@@ -154,7 +154,7 @@ export default function CoursesPreview() {
 
                   {course.thumbnail ? (
                     <img
-                      src={`http://https://masjid-project.onrender.com/${course.thumbnail.replace(
+                      src={`https://masjid-project.onrender.com/${course.thumbnail.replace(
                         /^\/+/,
                         ""
                       )}`}
