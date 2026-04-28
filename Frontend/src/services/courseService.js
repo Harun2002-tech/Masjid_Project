@@ -1,4 +1,5 @@
-const api_url = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const api_url =
+  import.meta.env.VITE_API_URL || "http://https://masjid-project.onrender.com";
 
 // ከ LocalStorage ቶከን ለማምጣት የሚረዳ ረዳት (ለ Admin ስራዎች)
 const getAuthHeaders = () => {

@@ -23,7 +23,9 @@ export default function CoursesPreview() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/courses");
+        const response = await axios.get(
+          "http://https://masjid-project.onrender.com/api/courses"
+        );
         setCourses(
           Array.isArray(response.data)
             ? response.data
@@ -152,7 +154,7 @@ export default function CoursesPreview() {
 
                   {course.thumbnail ? (
                     <img
-                      src={`http://localhost:5000/${course.thumbnail.replace(
+                      src={`http://https://masjid-project.onrender.com/${course.thumbnail.replace(
                         /^\/+/,
                         ""
                       )}`}

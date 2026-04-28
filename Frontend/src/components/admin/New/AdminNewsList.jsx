@@ -22,7 +22,7 @@ export default function AdminNewsList() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "http://https://masjid-project.onrender.com";
 
   useEffect(() => {
     fetchNews();

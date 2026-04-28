@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "http://https://masjid-project.onrender.com/api";
 
 /**
  * 1. ከ Backend የመስጂዱን የሶላት ሰዓት መረጃ ለማምጣት
@@ -19,7 +19,12 @@ export async function fetchPrayerTimesFromBackend(masjidId) {
  * ምሳሌ፡ "12:30" + 15 = "12:45"
  */
 export function addMinutesToTime(timeString, minutes) {
-  if (!timeString || typeof timeString !== 'string' || !timeString.includes(':')) return timeString;
+  if (
+    !timeString ||
+    typeof timeString !== "string" ||
+    !timeString.includes(":")
+  )
+    return timeString;
   if (!minutes || isNaN(minutes)) return timeString;
 
   const [hours, mins] = timeString.split(":").map(Number);
@@ -29,14 +34,16 @@ export function addMinutesToTime(timeString, minutes) {
   const newHours = Math.floor(totalMinutes / 60) % 24;
   const newMins = totalMinutes % 60;
 
-  return `${newHours.toString().padStart(2, "0")}:${newMins.toString().padStart(2, "0")}`;
+  return `${newHours.toString().padStart(2, "0")}:${newMins
+    .toString()
+    .padStart(2, "0")}`;
 }
 
 /**
  * 3. ሰዓቱን ወደ 12 ወይም 24 ሰዓት ፎርማት ቀይሮ የሚያሳይ
  */
 export function formatPrayerTime(time, use24Hour = false) {
-  if (!time || typeof time !== 'string' || !time.includes(':')) return "--:--";
+  if (!time || typeof time !== "string" || !time.includes(":")) return "--:--";
 
   try {
     const parts = time.split(":");
@@ -46,7 +53,9 @@ export function formatPrayerTime(time, use24Hour = false) {
     if (isNaN(hours) || isNaN(minutes)) return "--:--";
 
     if (use24Hour) {
-      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+      return `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}`;
     }
 
     const period = hours >= 12 ? "PM" : "AM";
@@ -63,7 +72,9 @@ export function formatPrayerTime(time, use24Hour = false) {
 const getRawTime = (timings, prayer) => {
   if (!timings) return null;
   // ቅደም ተከተል፡ በእጅ የተሞላ ሰዓት -> የአዛን ሰዓት -> መደበኛ ሰዓት
-  return timings.manualTimes?.[prayer] || timings[prayer]?.azan || timings[prayer];
+  return (
+    timings.manualTimes?.[prayer] || timings[prayer]?.azan || timings[prayer]
+  );
 };
 
 /**
@@ -78,8 +89,8 @@ export function getCurrentPrayer(timings) {
   for (let i = prayers.length - 1; i >= 0; i--) {
     const p = prayers[i];
     const prayerTime = getRawTime(timings, p);
-    
-    if (typeof prayerTime !== "string" || !prayerTime.includes(':')) continue;
+
+    if (typeof prayerTime !== "string" || !prayerTime.includes(":")) continue;
 
     const [h, m] = prayerTime.split(":").map(Number);
     if (current >= h * 60 + m) return p;
@@ -98,7 +109,7 @@ export function getNextPrayer(timings) {
 
   for (const p of prayers) {
     const prayerTime = getRawTime(timings, p);
-    if (typeof prayerTime !== "string" || !prayerTime.includes(':')) continue;
+    if (typeof prayerTime !== "string" || !prayerTime.includes(":")) continue;
 
     const [h, m] = prayerTime.split(":").map(Number);
     if (h * 60 + m > current) {
@@ -113,7 +124,12 @@ export function getNextPrayer(timings) {
  * 7. ለቀጣዩ ሶላት የቀረውን ሰዓት ለመቁጠር
  */
 export function getTimeUntilPrayer(prayerTime) {
-  if (!prayerTime || typeof prayerTime !== 'string' || !prayerTime.includes(':')) return "0m";
+  if (
+    !prayerTime ||
+    typeof prayerTime !== "string" ||
+    !prayerTime.includes(":")
+  )
+    return "0m";
 
   const now = new Date();
   const current = now.getHours() * 60 + now.getMinutes();

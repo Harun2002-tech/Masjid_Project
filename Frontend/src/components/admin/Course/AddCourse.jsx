@@ -45,7 +45,7 @@ export default function AddCoursePage() {
     lessons: [],
   });
 
-  const BASE_URL = "http://localhost:5000";
+  const BASE_URL = "http://https://masjid-project.onrender.com";
 
   // ኮርስ ዳታ ከ Backend ለመሳብ (ለ Edit mode)
   useEffect(() => {

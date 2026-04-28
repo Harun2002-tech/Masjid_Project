@@ -107,7 +107,7 @@ export default function UpdatePrayertimes() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/masjids/${currentMasjid._id}`,
+        `http://https://masjid-project.onrender.com/api/masjids/${currentMasjid._id}`,
         {
           method: "PATCH",
           headers: {

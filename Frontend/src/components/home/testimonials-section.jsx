@@ -10,7 +10,7 @@ const TestimonialsSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const SERVER_URL = "http://localhost:5000";
+  const SERVER_URL = "http://https://masjid-project.onrender.com";
 
   const fetchTestimonials = useCallback(async () => {
     try {

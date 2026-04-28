@@ -10,7 +10,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../../contexts/language-context"; // 🚩 ቋንቋውን ለመቀየር
 
-const API_BASE_URL = "http://localhost:5000/api/courses";
+const API_BASE_URL = "http://https://masjid-project.onrender.com/api/courses";
 
 const EnrollmentToggle = () => {
   const [courses, setCourses] = useState([]);

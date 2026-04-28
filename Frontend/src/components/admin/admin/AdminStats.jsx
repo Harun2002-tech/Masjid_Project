@@ -546,7 +546,7 @@ function QuickLink({ to, icon: Icon, title, color }) {
 }
 
 function DataSection({ title, items, type, tViewAll, isRTL }) {
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = "http://https://masjid-project.onrender.com";
   return (
     <div className="glass p-8 rounded-[2rem] border border-white/5">
       <div

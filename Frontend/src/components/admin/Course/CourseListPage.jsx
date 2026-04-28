@@ -25,7 +25,7 @@ export default function CourseListPage() {
   const { t, dir } = useLanguage();
   const isRtl = dir === "rtl";
 
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "http://https://masjid-project.onrender.com";
 
   const getAuthConfig = () => {
     const token = localStorage.getItem("token");

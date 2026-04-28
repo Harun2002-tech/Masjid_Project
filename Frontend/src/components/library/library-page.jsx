@@ -40,7 +40,9 @@ export default function LibraryPage() {
     const fetchBooks = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5000/api/library");
+        const response = await axios.get(
+          "http://https://masjid-project.onrender.com/api/library"
+        );
         setItems(response.data.data || []);
       } catch (err) {
         console.error("Error fetching books:", err);

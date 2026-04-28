@@ -27,7 +27,7 @@ export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "http://https://masjid-project.onrender.com";
 
   useEffect(() => {
     const fetchCourses = async () => {

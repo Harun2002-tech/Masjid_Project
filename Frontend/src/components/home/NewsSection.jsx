@@ -11,7 +11,7 @@ export default function NewsSection() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "http://https://masjid-project.onrender.com";
 
   useEffect(() => {
     const fetchNews = async () => {

@@ -37,7 +37,9 @@ export default function EnrollForm() {
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [msg, setMsg] = useState({ type: "", text: "" });
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_BASE_URL =
+    import.meta.env.VITE_API_URL ||
+    "http://https://masjid-project.onrender.com";
 
   useEffect(() => {
     const fetchCourseData = async () => {

@@ -18,7 +18,7 @@ import {
   FileJson,
 } from "lucide-react";
 // ከዚህ ይልቅ (አንጻራዊ መንገድ በመጠቀም)፡
-import { useLanguage } from "../../../contexts/language-context"; 
+import { useLanguage } from "../../../contexts/language-context";
 
 // (ማሳሰቢያ፦ እንደ ፋይሉ መደራረብ የ ".." ብዛት ሊለያይ ይችላል)
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,7 +44,7 @@ export default function CourseDetailPage() {
   });
   const [files, setFiles] = useState({ audio: null, pdf: null });
 
-  const API_BASE = "http://localhost:5000";
+  const API_BASE = "http://https://masjid-project.onrender.com";
 
   useEffect(() => {
     if (id && id !== ":id") fetchCourseData();

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api", // የባክኤንድህ አድራሻ
+  baseURL: "http://https://masjid-project.onrender.com/api", // የባክኤንድህ አድራሻ
 });
 
 // 🚀 ለእያንዳንዱ ጥያቄ ቶከኑን በራስ-ሰር እንዲልክ የሚያደርግ

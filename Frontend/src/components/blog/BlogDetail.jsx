@@ -33,7 +33,9 @@ export default function BlogDetail() {
     const fetchPost = async () => {
       try {
         // API ጥሪውን እንደ አስፈላጊነቱ ማስተካከል ትችላለህ
-        const res = await axios.get(`http://localhost:5000/api/news/${id}`);
+        const res = await axios.get(
+          `http://https://masjid-project.onrender.com/api/news/${id}`
+        );
         setPost(res.data.data || res.data);
       } catch (err) {
         console.error("Error fetching news:", err);

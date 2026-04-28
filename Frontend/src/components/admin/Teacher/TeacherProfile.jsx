@@ -82,7 +82,7 @@ const TeacherProfile = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImg, setSelectedImg] = useState(null);
 
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "http://https://masjid-project.onrender.com";
 
   useEffect(() => {
     const fetchTeacher = async () => {

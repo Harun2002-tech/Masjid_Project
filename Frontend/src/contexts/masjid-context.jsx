@@ -11,8 +11,10 @@ export function MasjidProvider({ children }) {
     const fetchMasjids = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("http://localhost:5000/api/masjids");
-        
+        const response = await fetch(
+          "http://https://masjid-project.onrender.com/api/masjids"
+        );
+
         // Response-ቱ ትክክል መሆኑን ማረጋገጥ (ለምሳሌ 404 ወይም 500 ካልሆነ)
         if (!response.ok) throw new Error("Network response was not ok");
 
@@ -20,10 +22,11 @@ export function MasjidProvider({ children }) {
 
         if (result.success && result.data && result.data.length > 0) {
           setMasjids(result.data);
-          
+
           const savedMasjidId = localStorage.getItem("selectedMasjidId");
-          const initialMasjid = result.data.find(m => m._id === savedMasjidId) || result.data[0];
-          
+          const initialMasjid =
+            result.data.find((m) => m._id === savedMasjidId) || result.data[0];
+
           setCurrentMasjid(initialMasjid);
         } else {
           // ዳታው ባዶ ከሆነ Loading ማቆም አለበት
@@ -32,7 +35,7 @@ export function MasjidProvider({ children }) {
       } catch (error) {
         console.error("Error fetching masjids:", error);
       } finally {
-        // ይህ መስመር ከሁሉም በላይ ወሳኝ ነው! 
+        // ይህ መስመር ከሁሉም በላይ ወሳኝ ነው!
         // ስህተት ቢፈጠርም ባይፈጠርም Loading መቆሙን ያረጋግጣል
         setIsLoading(false);
       }
@@ -48,12 +51,14 @@ export function MasjidProvider({ children }) {
   };
 
   return (
-    <MasjidContext.Provider value={{ 
-      masjids, 
-      currentMasjid, 
-      setCurrentMasjid: changeMasjid,
-      isLoading 
-    }}>
+    <MasjidContext.Provider
+      value={{
+        masjids,
+        currentMasjid,
+        setCurrentMasjid: changeMasjid,
+        isLoading,
+      }}
+    >
       {children}
     </MasjidContext.Provider>
   );

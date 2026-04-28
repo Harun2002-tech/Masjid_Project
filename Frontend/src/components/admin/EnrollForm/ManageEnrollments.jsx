@@ -23,7 +23,9 @@ export default function ManageEnrollments() {
 
   const token = localStorage.getItem("token");
   const config = { headers: { Authorization: `Bearer ${token}` } };
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_BASE_URL =
+    import.meta.env.VITE_API_URL ||
+    "http://https://masjid-project.onrender.com";
 
   const fetchEnrollments = async () => {
     try {
@@ -45,14 +47,21 @@ export default function ManageEnrollments() {
     try {
       setActionLoading(id);
       if (action === "delete") {
-        if (!window.confirm(t("confirm_delete_enrollment") || "Are you sure?")) return;
+        if (!window.confirm(t("confirm_delete_enrollment") || "Are you sure?"))
+          return;
         await axios.delete(`${API_BASE_URL}/api/enrollments/${id}`, config);
         setEnrollments((prev) => prev.filter((item) => item._id !== id));
       } else {
         const newStatus = action === "approve" ? "approved" : "rejected";
-        await axios.patch(`${API_BASE_URL}/api/enrollments/${action}/${id}`, {}, config);
+        await axios.patch(
+          `${API_BASE_URL}/api/enrollments/${action}/${id}`,
+          {},
+          config
+        );
         setEnrollments((prev) =>
-          prev.map((item) => (item._id === id ? { ...item, applicationStatus: newStatus } : item))
+          prev.map((item) =>
+            item._id === id ? { ...item, applicationStatus: newStatus } : item
+          )
         );
       }
     } catch (err) {
@@ -69,23 +78,30 @@ export default function ManageEnrollments() {
       pending: "bg-gold/10 text-gold border-gold/20",
     };
     return (
-      <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${statusConfig[status] || statusConfig.pending}`}>
+      <span
+        className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+          statusConfig[status] || statusConfig.pending
+        }`}
+      >
         {t(`status_${status}`) || status}
       </span>
     );
   };
 
-  if (loading) return (
-    <div className="flex flex-col gap-4 justify-center items-center min-h-screen">
-      <Loader2 className="animate-spin w-10 h-10 text-gold shadow-gold-glow" />
-      <p className="text-text/40 text-[10px] font-black uppercase tracking-widest animate-pulse">
-        {t("loading_enrollments") || "Loading..."}
-      </p>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="flex flex-col gap-4 justify-center items-center min-h-screen">
+        <Loader2 className="animate-spin w-10 h-10 text-gold shadow-gold-glow" />
+        <p className="text-text/40 text-[10px] font-black uppercase tracking-widest animate-pulse">
+          {t("loading_enrollments") || "Loading..."}
+        </p>
+      </div>
+    );
 
   const filteredData = enrollments.filter(
-    (app) => app.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) || app.nationalId?.includes(searchTerm)
+    (app) =>
+      app.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.nationalId?.includes(searchTerm)
   );
 
   return (
@@ -95,19 +111,27 @@ export default function ManageEnrollments() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <header>
             <h1 className="text-3xl font-bold text-text flex items-center gap-3">
-              <UserCheck className="text-gold shadow-gold-glow" size={32} /> 
+              <UserCheck className="text-gold shadow-gold-glow" size={32} />
               {t("manage_enrollments") || "Manage Enrollments"}
             </h1>
             <p className="text-text/40 text-[10px] font-black uppercase tracking-widest mt-2 flex items-center gap-2">
-              <Sparkles size={12} className="text-gold" /> {t("total_applications")}: {enrollments.length}
+              <Sparkles size={12} className="text-gold" />{" "}
+              {t("total_applications")}: {enrollments.length}
             </p>
           </header>
 
           <div className="relative w-full md:w-96 group">
-            <Search className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-text/20 group-focus-within:text-gold transition-colors`} size={18} />
+            <Search
+              className={`absolute ${
+                isRTL ? "right-4" : "left-4"
+              } top-1/2 -translate-y-1/2 text-text/20 group-focus-within:text-gold transition-colors`}
+              size={18}
+            />
             <input
               type="text"
-              placeholder={t("search_placeholder_enroll") || "Search by name..."}
+              placeholder={
+                t("search_placeholder_enroll") || "Search by name..."
+              }
               className="input-field !p-3 !pl-12"
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -117,10 +141,15 @@ export default function ManageEnrollments() {
         {/* Desktop View: Table */}
         <div className="glass rounded-[2.5rem] overflow-hidden border-white/5 shadow-2xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse" dir={isRTL ? "rtl" : "ltr"}>
+            <table
+              className="w-full text-left border-collapse"
+              dir={isRTL ? "rtl" : "ltr"}
+            >
               <thead className="bg-white/5 text-gold uppercase text-[9px] font-black tracking-[0.2em]">
                 <tr>
-                  <th className={`p-6 ${isRTL ? 'text-right' : ''}`}>{t("student")}</th>
+                  <th className={`p-6 ${isRTL ? "text-right" : ""}`}>
+                    {t("student")}
+                  </th>
                   <th className="p-6">{t("national_id")}</th>
                   <th className="p-6">{t("contact_info")}</th>
                   <th className="p-6 text-center">{t("id_photo")}</th>
@@ -140,28 +169,46 @@ export default function ManageEnrollments() {
                       className="hover:bg-white/[0.02] transition-colors group"
                     >
                       <td className="p-6">
-                        <div className="font-bold text-text text-sm">{app.fullName}</div>
+                        <div className="font-bold text-text text-sm">
+                          {app.fullName}
+                        </div>
                         <div className="text-[10px] text-text/30 font-medium italic mt-0.5">
                           {app.course?.title || t("unknown_course")}
                         </div>
                       </td>
-                      <td className="p-6 font-mono text-xs text-text/60">{app.nationalId || "---"}</td>
+                      <td className="p-6 font-mono text-xs text-text/60">
+                        {app.nationalId || "---"}
+                      </td>
                       <td className="p-6">
-                        <div className="text-xs font-bold text-text/80">{app.phone}</div>
-                        <div className="text-[9px] text-text/30 uppercase tracking-tighter">{app.gender}</div>
+                        <div className="text-xs font-bold text-text/80">
+                          {app.phone}
+                        </div>
+                        <div className="text-[9px] text-text/30 uppercase tracking-tighter">
+                          {app.gender}
+                        </div>
                       </td>
                       <td className="p-6 text-center">
                         {app.idCardImage && (
                           <a
-                            href={app.idCardImage.startsWith("http") ? app.idCardImage : `${API_BASE_URL}/${app.idCardImage.replace(/\\/g, "/")}`}
-                            target="_blank" rel="noreferrer"
+                            href={
+                              app.idCardImage.startsWith("http")
+                                ? app.idCardImage
+                                : `${API_BASE_URL}/${app.idCardImage.replace(
+                                    /\\/g,
+                                    "/"
+                                  )}`
+                            }
+                            target="_blank"
+                            rel="noreferrer"
                             className="inline-flex items-center gap-2 bg-white/5 hover:bg-gold hover:text-bg px-4 py-2 rounded-xl transition-all text-[9px] font-black uppercase tracking-widest"
                           >
                             <FileImage size={14} /> {t("view_id")}
                           </a>
                         )}
                       </td>
-                      <td className="p-6">{getStatusBadge(app.applicationStatus)}</td>
+                      <td className="p-6">
+                        {getStatusBadge(app.applicationStatus)}
+                      </td>
                       <td className="p-6">
                         <div className="flex items-center justify-center gap-3">
                           {app.applicationStatus === "pending" && (

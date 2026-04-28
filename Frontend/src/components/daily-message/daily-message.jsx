@@ -30,7 +30,7 @@ export default function DailyMessagePage() {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/messages/random"
+        "http://https://masjid-project.onrender.com/api/messages/random"
       );
       setMessage(response.data);
     } catch (error) {

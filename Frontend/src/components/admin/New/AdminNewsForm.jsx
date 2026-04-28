@@ -42,7 +42,7 @@ export default function AdminNewsForm() {
     image: null,
   });
 
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "http://https://masjid-project.onrender.com";
 
   // Edit ወይም View ከሆነ ነባር ዳታ መጫን
   useEffect(() => {
