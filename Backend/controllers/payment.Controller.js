@@ -32,7 +32,7 @@ exports.initializePayment = async (req, res) => {
       last_name: last_name || "Donor",
       tx_ref: tx_ref,
       callback_url: "https://webhook.site/test",
-      return_url: `http://localhost:5173/donations`,
+      return_url: `https://ruhamaislamiccenter.vercel.app/donations`,
       "customization[title]": "ለሩሃማ መስጂድ ልገሳ",
     };
 
@@ -86,12 +86,11 @@ exports.verifyPayment = async (req, res) => {
         { tx_ref: tx_ref },
         { status: "success" }
       );
-      
+
       return res.json({ status: "success", message: "ክፍያው ተረጋግጧል" });
     } else {
       return res.json({ status: "failed", message: "ክፍያው አልተሳካም" });
     }
-    
   } catch (error) {
     console.error("Verification Error:", error.response?.data || error.message);
     res.status(500).json({ status: "error", message: "ማረጋገጥ አልተቻለም" });
