@@ -10,7 +10,6 @@ const formatPath = (filePath) =>
 
 // 1. ሁሉንም ተማሪዎች ማምጣት
 exports.getAllStudents = async (req, res) => {
-  
   try {
     const students = await Student.find().sort({ createdAt: -1 });
     res.status(200).json({
@@ -19,48 +18,69 @@ exports.getAllStudents = async (req, res) => {
       data: students,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "ተማሪዎችን ማምጣት አልተቻለም",
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "ተማሪዎችን ማምጣት አልተቻለም",
+      error: err.message,
+    });
   }
 };
 
 // 2. አዲስ ተማሪ መመዝገብ
 exports.createStudent = async (req, res) => {
-  console.log("የመጣው ዳታ:", req.body); // ይህ በፍሮንትኤንድ የተላከውን ያሳያል
-  console.log("የመጡት ፋይሎች:", req.files); // ፋይሎቹ በትክክል መምጣታቸውን ያሳያል
+  console.log("የመጣው ዳታ:", req.body);
   try {
+    // 1. መጀመሪያ ዳታውን ከ body ውስጥ እናውጣ
     const { subjects, email, ...rest } = req.body;
 
-    // ሀ. ኢሜይል ቀድሞ መኖሩን ማረጋገጥ
+    // 2. ኢሜይል ቀድሞ መኖሩን ማረጋገጥ
     const studentExists = await Student.findOne({ email });
     if (studentExists) {
+      // ስህተት ካለ ፋይሎቹን ማጥፋት እንዳትረሳ (Cleanup)
+      if (req.files) {
+        Object.values(req.files)
+          .flat()
+          .forEach((file) => {
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+          });
+      }
       return res
         .status(400)
         .json({ success: false, message: "ይህ ኢሜይል ቀድሞ ተመዝግቧል" });
     }
 
+    // 3. የተማሪውን ዳታ ማዘጋጀት
     const studentData = { ...rest, email };
 
-    // ፎቶዎችን ማስተካከል... (የነበረው ኮድ እንዳለ ይቀጥላል)
-    if (req.files) {
-      if (req.files.photo) studentData.photo = formatPath(req.files.photo[0].path);
-      if (req.files.studentIDPhoto) studentData.studentIDPhoto = formatPath(req.files.studentIDPhoto[0].path);
-      if (req.files.emergencyIDPhoto) studentData.emergencyIDPhoto = formatPath(req.files.emergencyIDPhoto[0].path);
-    }
-
+    // 4. የትምህርት ዝርዝርን (Subjects) ማስተካከል (ወሳኙ ክፍል)
     if (subjects) {
       try {
-        studentData.subjects = typeof subjects === "string" ? JSON.parse(subjects) : subjects;
+        // String ሆኖ ከመጣ ወደ Array መቀየር
+        studentData.subjects =
+          typeof subjects === "string" ? JSON.parse(subjects) : subjects;
       } catch (e) {
-        studentData.subjects = subjects;
+        console.log("Subject Parse Error:", e);
+        studentData.subjects = []; // ስህተት ካለ ባዶ Array
       }
+    } else {
+      studentData.subjects = []; // ዳታው ካልመጣ ባዶ Array እንዲሆን
     }
 
+    // 5. ፎቶዎችን ማስተካከል
+    if (req.files) {
+      if (req.files.photo)
+        studentData.photo = formatPath(req.files.photo[0].path);
+      if (req.files.studentIDPhoto)
+        studentData.studentIDPhoto = formatPath(
+          req.files.studentIDPhoto[0].path
+        );
+      if (req.files.emergencyIDPhoto)
+        studentData.emergencyIDPhoto = formatPath(
+          req.files.emergencyIDPhoto[0].path
+        );
+    }
+
+    // 6. ዳታቤዝ ላይ መመዝገብ
     const student = await Student.create(studentData);
 
     res.status(201).json({
@@ -68,11 +88,10 @@ exports.createStudent = async (req, res) => {
       message: `ተማሪው በቁጥር ${student.studentID} ተመዝግቧል`,
       data: student,
     });
-
   } catch (error) {
-    // === እዚህ ጋር ነው የምትቀይረው ===
-    console.error("የምዝገባ ስህተት ዝርዝር:", error); // Terminal ላይ ስህተቱን ለማየት
+    console.error("የምዝገባ ስህተት ዝርዝር:", error);
 
+    // Cleanup: ፋይሎችን ማጥፋት
     if (req.files) {
       Object.values(req.files)
         .flat()
@@ -80,11 +99,10 @@ exports.createStudent = async (req, res) => {
           if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
         });
     }
-    
-    // ስህተቱን ለ Frontend መላክ
-    res.status(400).json({ 
-      success: false, 
-      message: error.message || "ምዝገባ አልተሳካም" 
+
+    res.status(400).json({
+      success: false,
+      message: error.message || "ምዝገባ አልተሳካም",
     });
   }
 };
@@ -195,12 +213,10 @@ exports.getStudentCourses = async (req, res) => {
       .status(200)
       .json({ success: true, count: courses.length, data: courses });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "ኮርሶችን ማምጣት አልተቻለም",
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "ኮርሶችን ማምጣት አልተቻለም",
+      error: err.message,
+    });
   }
 };

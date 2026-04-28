@@ -13,6 +13,10 @@ import {
   Save,
   FileText,
   Image as ImageIcon,
+  Calendar,
+  GraduationCap,
+  Clock,
+  BookOpen,
 } from "lucide-react";
 import teacherService from "../../../services/teacherService";
 import { useLanguage } from "../../../contexts/language-context";
@@ -27,6 +31,8 @@ const translations = {
     professionalSection: "የሙያ እና የመታወቂያ መረጃ",
     addressSection: "ሙሉ አድራሻ",
     emergencySection: "የድንገተኛ አደጋ ተጠሪ",
+    educationSection: "የትምህርት መረጃ",
+    availabilitySection: "የስራ ሰዓት እና ሁኔታ",
     photo: "ፕሮፋይል ፎቶ",
     idCard: "መታወቂያ / ፓስፖርት (ID Card)",
     idUpload: "መታወቂያ ይጫኑ",
@@ -36,13 +42,27 @@ const translations = {
     password: "የይለፍ ቃል",
     phone: "ስልክ ቁጥር",
     gender: "ጾታ",
-    experience: "የስራ ልምድ",
+    experienceYears: "የስራ ልምድ (በዓመት)",
     subjects: "የሙያ ዘርፎች (በኮማ ይለዩ)",
     bio: "አጭር የህይወት ታሪክ (Bio)",
     region: "ክልል",
     subCity: "ክፍለ ከተማ",
     woreda: "ወረዳ",
+    kebele: "ቀበሌ",
     address: "ልዩ ቦታ / አድራሻ",
+    birthDate: "የትውልድ ቀን",
+    birthPlace: "የትውልድ ቦታ",
+    nationality: "ዜግነት",
+    maritalStatus: "የጋብቻ ሁኔታ",
+    disability: "አካላዊ ጉዳት", // Amharic
+    education: "የትምህርት ደረጃ",
+    institute: "የተመረቁበት ተቋም",
+    graduationYear: "የተመረቁበት ዓመት",
+    ijazah: "ኢጃዛ (ካለዎት)",
+    teachingLevel: "የማስተማር ደረጃ",
+    availableDays: "የሚሰሩባቸው ቀናት (በኮማ ይለዩ)",
+    availableTime: "የሚሰሩበት ሰዓት",
+    teachingMethod: "የማስተማር ዘዴ",
     emergencyPhoto: "የተጠሪ ፎቶ",
     emergencyName: "የተጠሪ ስም",
     relation: "ዝምድና",
@@ -61,6 +81,8 @@ const translations = {
     professionalSection: "Professional & ID Info",
     addressSection: "Full Address",
     emergencySection: "Emergency Contact",
+    educationSection: "Educational Background",
+    availabilitySection: "Availability & Methods",
     photo: "Profile Photo",
     idCard: "ID Card / Passport",
     idUpload: "Upload ID",
@@ -70,13 +92,27 @@ const translations = {
     password: "Password",
     phone: "Phone Number",
     gender: "Gender",
-    experience: "Experience",
+    experienceYears: "Experience (Years)",
     subjects: "Specialties (Comma separated)",
     bio: "Short Bio",
     region: "Region",
     subCity: "Sub City",
     woreda: "Woreda",
+    kebele: "Kebele",
     address: "Specific Address",
+    birthDate: "Birth Date",
+    birthPlace: "Birth Place",
+    nationality: "Nationality",
+    maritalStatus: "Marital Status",
+    disability: "Disability", // English
+    education: "Education Level",
+    institute: "Institute",
+    graduationYear: "Graduation Year",
+    ijazah: "Ijazah",
+    teachingLevel: "Teaching Level",
+    availableDays: "Available Days",
+    availableTime: "Available Time",
+    teachingMethod: "Teaching Method",
     emergencyPhoto: "Contact Photo",
     emergencyName: "Contact Name",
     relation: "Relationship",
@@ -95,6 +131,8 @@ const translations = {
     professionalSection: "المعلومات المهنية والهوية",
     addressSection: "العنوان الكامل",
     emergencySection: "جهة الاتصال للطوارئ",
+    educationSection: "الخلفية التعليمية",
+    availabilitySection: "التوفر والأساليب",
     photo: "الصورة الشخصية",
     idCard: "بطاقة الهوية / الجواز",
     idUpload: "تحميل الهوية",
@@ -104,13 +142,27 @@ const translations = {
     password: "كلمة المرور",
     phone: "رقم الهاتف",
     gender: "الجنس",
-    experience: "الخبرة",
+    experienceYears: "الخبرة (بالسنوات)",
     subjects: "التخصصات (مفصولة بفاصلة)",
     bio: "سيرة ذاتية قصيرة",
     region: "المنطقة",
     subCity: "المدينة الفرعية",
     woreda: "المنطقة الإدارية",
+    kebele: "ቀበሌ",
     address: "العنوان بالتفصيل",
+    birthDate: "تاريخ الميلاد",
+    birthPlace: "مكان الميلاد",
+    nationality: "الجنسية",
+    maritalStatus: "الحالة الاجتماعية",
+    disability: "الإعاقة", // Arabic
+    education: "المستوى التعليمي",
+    institute: "المعهد",
+    graduationYear: "سنة التخرج",
+    ijazah: "الإجازة",
+    teachingLevel: "مستوى التدريس",
+    availableDays: "أيام التوفر",
+    availableTime: "وقت التوفر",
+    teachingMethod: "طريقة التدريس",
     emergencyPhoto: "صورة الطوارئ",
     emergencyName: "اسم جهة الاتصال",
     relation: "صلة القرابة",
@@ -141,6 +193,7 @@ export default function AddTeacherPage({ editMode = false }) {
     idCard: null,
     emergencyPhoto: null,
   });
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -148,17 +201,33 @@ export default function AddTeacherPage({ editMode = false }) {
     password: "",
     phone: "",
     gender: language === "ar" ? "ذكر" : language === "en" ? "Male" : "ወንድ",
+    birthDate: "",
+    birthPlace: "",
+    nationality: "ኢትዮጵያዊ",
+    maritalStatus: "ያላገባ",
+    disability: "የለብኝም", // Default value
     region: "አዲስ አበባ",
     subCity: "",
     woreda: "",
+    kebele: "",
     address: "",
-    experience: "",
-    bio: "",
+    education: "",
+    institute: "",
+    graduationYear: "",
+    ijazah: "",
+    experienceYears: "",
     subjects: "",
+    teachingLevel: "All Levels",
+    availableDays: "",
+    availableTime: "",
+    teachingMethod: "",
+    bio: "",
     emergencyName: "",
     emergencyRelation: "",
     emergencyPhone: "",
     emergencyRegion: "አዲስ አበባ",
+    emergencySubCity: "",
+    emergencyWoreda: "",
     photo: null,
     idCard: null,
     emergencyPhoto: null,
@@ -177,6 +246,12 @@ export default function AddTeacherPage({ editMode = false }) {
               subjects: Array.isArray(data.subjects)
                 ? data.subjects.join(", ")
                 : data.subjects || "",
+              availableDays: Array.isArray(data.availableDays)
+                ? data.availableDays.join(", ")
+                : data.availableDays || "",
+              birthDate: data.birthDate
+                ? new Date(data.birthDate).toISOString().split("T")[0]
+                : "",
               password: "",
             });
 
@@ -227,12 +302,12 @@ export default function AddTeacherPage({ editMode = false }) {
     try {
       const data = new FormData();
       Object.keys(formData).forEach((key) => {
-        if (key === "subjects") {
-          const subs =
-            typeof formData.subjects === "string"
-              ? formData.subjects.split(",").map((s) => s.trim())
-              : formData.subjects;
-          data.append(key, JSON.stringify(subs));
+        if (key === "subjects" || key === "availableDays") {
+          const arr =
+            typeof formData[key] === "string"
+              ? formData[key].split(",").map((s) => s.trim())
+              : formData[key];
+          data.append(key, JSON.stringify(arr));
         } else if (formData[key] !== null && key !== "password") {
           data.append(key, formData[key]);
         } else if (key === "password" && formData[key]) {
@@ -366,64 +441,136 @@ export default function AddTeacherPage({ editMode = false }) {
                   }
                   disabled={isViewOnly}
                 />
+                <InputField
+                  label={t.birthDate}
+                  name="birthDate"
+                  type="date"
+                  value={formData.birthDate}
+                  onChange={handleChange}
+                  disabled={isViewOnly}
+                />
+                <InputField
+                  label={t.birthPlace}
+                  name="birthPlace"
+                  value={formData.birthPlace}
+                  onChange={handleChange}
+                  disabled={isViewOnly}
+                />
+                <InputField
+                  label={t.nationality}
+                  name="nationality"
+                  value={formData.nationality}
+                  onChange={handleChange}
+                  disabled={isViewOnly}
+                />
+                <InputField
+                  label={t.maritalStatus}
+                  name="maritalStatus"
+                  value={formData.maritalStatus}
+                  onChange={handleChange}
+                  disabled={isViewOnly}
+                />
+                {/* --- Disability Field Added Here --- */}
+                <InputField
+                  label={t.disability}
+                  name="disability"
+                  value={formData.disability}
+                  onChange={handleChange}
+                  disabled={isViewOnly}
+                />
               </div>
             </div>
           </Section>
 
-          {/* Section 2: Professional */}
-          <Section title={t.professionalSection} icon={Briefcase} isRTL={isRTL}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
-              <div className="space-y-6">
-                <InputField
-                  label={t.experience}
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleChange}
-                  disabled={isViewOnly}
-                />
-                <InputField
-                  label={t.subjects}
-                  name="subjects"
-                  placeholder="ቁርኣን, ሀዲስ"
-                  value={formData.subjects}
-                  onChange={handleChange}
-                  disabled={isViewOnly}
-                />
-              </div>
-              <div className="space-y-3">
+          {/* Section 2: Education & Professional */}
+          <Section
+            title={t.educationSection}
+            icon={GraduationCap}
+            isRTL={isRTL}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <InputField
+                label={t.education}
+                name="education"
+                value={formData.education}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <InputField
+                label={t.institute}
+                name="institute"
+                value={formData.institute}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <InputField
+                label={t.graduationYear}
+                name="graduationYear"
+                type="number"
+                value={formData.graduationYear}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <InputField
+                label={t.ijazah}
+                name="ijazah"
+                value={formData.ijazah}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <InputField
+                label={t.experienceYears}
+                name="experienceYears"
+                value={formData.experienceYears}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <SelectField
+                label={t.teachingLevel}
+                name="teachingLevel"
+                value={formData.teachingLevel}
+                onChange={handleChange}
+                options={["Beginner", "Intermediate", "Advanced", "All Levels"]}
+                disabled={isViewOnly}
+              />
+            </div>
+          </Section>
+
+          {/* Section 3: Availability & Subjects */}
+          <Section title={t.availabilitySection} icon={Clock} isRTL={isRTL}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label={t.subjects}
+                name="subjects"
+                placeholder="ቁርኣን, ሀዲስ"
+                value={formData.subjects}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <InputField
+                label={t.availableDays}
+                name="availableDays"
+                placeholder="Monday, Wednesday..."
+                value={formData.availableDays}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <InputField
+                label={t.availableTime}
+                name="availableTime"
+                value={formData.availableTime}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <InputField
+                label={t.teachingMethod}
+                name="teachingMethod"
+                value={formData.teachingMethod}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <div className="md:col-span-2 space-y-3">
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 px-2">
-                  {t.idCard}
-                </label>
-                <div className="relative h-32 glass border-dashed border-white/10 rounded-2xl flex items-center justify-center overflow-hidden group transition-all hover:border-gold/30">
-                  {previews.idCard ? (
-                    <img
-                      src={previews.idCard}
-                      alt="ID"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <FileText
-                        size={24}
-                        className="mx-auto text-white/10 mb-2"
-                      />
-                      <span className="text-[9px] font-bold uppercase text-white/20">
-                        {t.idUpload}
-                      </span>
-                    </div>
-                  )}
-                  {!isViewOnly && (
-                    <input
-                      type="file"
-                      name="idCard"
-                      onChange={handleFileChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
-                  )}
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3 px-2">
                   {t.bio}
                 </label>
                 <textarea
@@ -436,11 +583,43 @@ export default function AddTeacherPage({ editMode = false }) {
                 />
               </div>
             </div>
+            <div className="mt-8 space-y-3">
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 px-2">
+                {t.idCard}
+              </label>
+              <div className="relative h-32 glass border-dashed border-white/10 rounded-2xl flex items-center justify-center overflow-hidden group transition-all hover:border-gold/30">
+                {previews.idCard ? (
+                  <img
+                    src={previews.idCard}
+                    alt="ID"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center">
+                    <FileText
+                      size={24}
+                      className="mx-auto text-white/10 mb-2"
+                    />
+                    <span className="text-[9px] font-bold uppercase text-white/20">
+                      {t.idUpload}
+                    </span>
+                  </div>
+                )}
+                {!isViewOnly && (
+                  <input
+                    type="file"
+                    name="idCard"
+                    onChange={handleFileChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                )}
+              </div>
+            </div>
           </Section>
 
-          {/* Section 3: Address */}
+          {/* Section 4: Address */}
           <Section title={t.addressSection} icon={MapPin} isRTL={isRTL}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <InputField
                 label={t.region}
                 name="region"
@@ -462,7 +641,14 @@ export default function AddTeacherPage({ editMode = false }) {
                 onChange={handleChange}
                 disabled={isViewOnly}
               />
-              <div className="md:col-span-3">
+              <InputField
+                label={t.kebele}
+                name="kebele"
+                value={formData.kebele}
+                onChange={handleChange}
+                disabled={isViewOnly}
+              />
+              <div className="md:col-span-4">
                 <InputField
                   label={t.address}
                   name="address"
@@ -474,7 +660,7 @@ export default function AddTeacherPage({ editMode = false }) {
             </div>
           </Section>
 
-          {/* Section 4: Emergency */}
+          {/* Section 5: Emergency */}
           <Section
             title={t.emergencySection}
             icon={ShieldAlert}
@@ -555,7 +741,6 @@ export default function AddTeacherPage({ editMode = false }) {
 }
 
 // --- Helper Sub-Components ---
-
 function Section({ title, icon: Icon, children, isRTL, isRed = false }) {
   const glowClass = isRed ? "text-red-glow" : "text-gold-glow";
   return (
@@ -565,9 +750,7 @@ function Section({ title, icon: Icon, children, isRTL, isRed = false }) {
           isRTL ? "flex-row-reverse" : ""
         }`}
       >
-        <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center glass border-white/10`}
-        >
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center glass border-white/10">
           <Icon size={18} />
         </div>
         {title}

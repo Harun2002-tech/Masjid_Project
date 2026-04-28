@@ -68,25 +68,33 @@ const YouTubeGallery = () => {
             </span>
           </motion.div>
 
-          <motion.h2
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className={`text-5xl md:text-7xl font-bold text-white tracking-tighter mb-8 ${titleFont}`}
+            className="w-full flex justify-center items-center mb-12"
           >
-            {language === "am"
-              ? "የቅርብ ጊዜ "
-              : language === "ar"
-              ? "آخر "
-              : "Latest "}
-            <span className="text-gold-glow italic">
-              {language === "am"
-                ? "ትምህርቶች"
-                : language === "ar"
-                ? "الدروس"
-                : "Lessons"}
-            </span>
-          </motion.h2>
+            <h2
+              className="text-5xl md:text-7xl lg:text-[5.5rem] font-black text-white leading-none flex items-baseline gap-x-4 flex-wrap justify-center"
+              style={{ fontFamily: '"Noto Sans Ethiopic", sans-serif' }}
+            >
+              <span className="opacity-90">
+                {language === "am"
+                  ? "የቅርብ ጊዜ"
+                  : language === "ar"
+                  ? "آخر"
+                  : "Latest"}
+              </span>
+              <span className="text-gold flex items-baseline">
+                {language === "am"
+                  ? "ትምህርቶች"
+                  : language === "ar"
+                  ? "الدروس"
+                  : "Lessons"}
+                <span className="text-white"></span>
+              </span>
+            </h2>
+          </motion.div>
           <div className="w-24 h-1.5 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto rounded-full shadow-gold-glow" />
         </div>
 

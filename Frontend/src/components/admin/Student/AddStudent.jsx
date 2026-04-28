@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { useLanguage } from "../../../contexts/language-context";
 import {
   User,
@@ -21,10 +21,11 @@ import {
   ShieldAlert,
   MapPin,
   GraduationCap,
+  HelpCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// FormField Component - አሰላለፉ ከቋንቋው ጋር እንዲሄድ እና አዲሱን ስታይል እንዲይዝ
+// FormField Component
 const FormField = ({
   label,
   icon: Icon,
@@ -47,7 +48,7 @@ const FormField = ({
           size={14}
           className="group-focus-within:text-gold transition-colors"
         />
-      )}{" "}
+      )}
       {label}
     </label>
     {options ? (
@@ -55,7 +56,7 @@ const FormField = ({
         name={name}
         value={value}
         onChange={onChange}
-        className={`w-full payment-input rounded-2xl px-6 py-4 outline-none font-bold appearance-none transition-all ${
+        className={`w-full payment-input rounded-2xl px-6 py-4 outline-none font-bold appearance-none transition-all cursor-pointer ${
           isRTL ? "text-right" : "text-left"
         }`}
       >
@@ -87,11 +88,12 @@ const FormField = ({
 export default function AddStudent() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const isEditMode = !!id;
   const { language, dir } = useLanguage();
   const isRTL = dir === "rtl";
+  const isViewOnly = location.pathname.includes("/view");
 
-  // ሙሉ የትርጉም መዝገብ - እንዳልነበረው ተጠብቋል
   const translations = {
     am: {
       title: isEditMode ? "ተማሪ" : "አዲስ",
@@ -106,6 +108,14 @@ export default function AddStudent() {
       gender: "ጾታ",
       male: "ወንድ",
       female: "ሴት",
+      nationality: "ዜግነት",
+      birthDate: "የትውልድ ቀን",
+      maritalStatus: "የጋብቻ ሁኔታ",
+      disability: "አካላዊ ጉዳት",
+      single: "ያላገባ",
+      married: "ያገባ",
+      none: "የለብኝም",
+      has: "አለብኝ",
       addressTitle: "የመኖሪያ አድራሻ",
       region: "ክልል",
       subCity: "ክፍለ ከተማ",
@@ -140,6 +150,14 @@ export default function AddStudent() {
       gender: "Gender",
       male: "Male",
       female: "Female",
+      nationality: "Nationality",
+      birthDate: "BirthDate",
+      maritalStatus: "Marital Status",
+      disability: "Disability Status",
+      single: "Single",
+      married: "Married",
+      none: "None",
+      has: "Yes",
       addressTitle: "Residential Address",
       region: "Region",
       subCity: "Sub City",
@@ -174,6 +192,14 @@ export default function AddStudent() {
       gender: "الجنس",
       male: "ذكر",
       female: "أنثى",
+      nationality: "الجنسية",
+      birthDate: "تاريخ الميلاد",
+      maritalStatus: "الحالة الاجتماعية",
+      disability: "حالة الإعاقة",
+      single: "أعزب",
+      married: "متزوج",
+      none: "لا يوجد",
+      has: "يوجد",
       addressTitle: "عنوان السكن",
       region: "المنطقة",
       subCity: "المنطقة الفرعية",
@@ -207,6 +233,11 @@ export default function AddStudent() {
     password: "",
     phone: "",
     gender: "ወንድ",
+    nationality: "ኢትዮጵያዊ",
+    birthDate: "",
+    birthPlace: "",
+    maritalStatus: "ያላገባ",
+    disability: "የለብኝም",
     region: "አዲስ አበባ",
     subCity: "",
     woreda: "",
@@ -214,9 +245,6 @@ export default function AddStudent() {
     address: "",
     birthDate: "",
     birthPlace: "",
-    nationality: "ኢትዮጵያዊ",
-    maritalStatus: "ያላገባ",
-    disability: "የለብኝም",
     gradeLevel: "Beginner",
     shift: "Morning",
     emergencyName: "",
@@ -253,9 +281,13 @@ export default function AddStudent() {
             },
           });
           const data = res.data.data || res.data;
+
           setFormData((prev) => ({
             ...prev,
             ...data,
+            birthDate: data.birthDate
+              ? new Date(data.birthDate).toISOString().split("T")[0]
+              : "",
             password: "",
             subjects: Array.isArray(data.subjects) ? data.subjects : [],
             joinDate: data.joinDate
@@ -436,11 +468,10 @@ export default function AddStudent() {
           onSubmit={handleSubmit}
           className="grid grid-cols-1 lg:grid-cols-12 gap-10"
         >
-          {/* Left Column: Photo & ID Preview */}
+          {/* Left Column */}
           <div className="lg:col-span-4 space-y-6">
             <div className="glass p-8 rounded-[3.5rem] relative overflow-hidden text-center">
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-gold to-transparent opacity-50"></div>
-
               <div className="relative w-40 h-40 mx-auto mb-8">
                 <div className="w-full h-full rounded-full border-2 border-gold/30 p-1.5 shadow-[0_0_40px_rgba(251,191,36,0.15)]">
                   {photoPreview ? (
@@ -467,8 +498,6 @@ export default function AddStudent() {
                   />
                 </label>
               </div>
-
-              {/* Student ID Photo Section */}
               <div className="space-y-3 mb-8 text-left">
                 <label
                   className={`text-[10px] font-black text-gray-400 uppercase tracking-widest block ${
@@ -504,7 +533,6 @@ export default function AddStudent() {
                   </label>
                 </div>
               </div>
-
               <div className="pt-6 border-t border-white/5">
                 <h2 className="text-xl font-bold text-white tracking-tight">
                   {formData.firstName || "---"} {formData.lastName || "---"}
@@ -516,7 +544,7 @@ export default function AddStudent() {
             </div>
           </div>
 
-          {/* Right Column: All Form Sections */}
+          {/* Right Column */}
           <div className="lg:col-span-8 space-y-8">
             <div className="glass p-10 md:p-14 rounded-[3.5rem] border-white/5 space-y-12 shadow-2xl">
               {/* 1. Personal Section */}
@@ -577,6 +605,47 @@ export default function AddStudent() {
                     isRTL={isRTL}
                   />
                   <FormField
+                    label={t.nationality}
+                    name="nationality"
+                    icon={Globe}
+                    value={formData.nationality}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.birtDate}
+                    name="birtDate"
+                    type="date"
+                    value={formData.birtDate}
+                    onChange={handleChange}
+                    disable={isViewOnly}
+                  />
+
+                  <FormField
+                    label={t.maritalStatus}
+                    name="maritalStatus"
+                    icon={Heart}
+                    options={[
+                      { val: "ያላገባ", label: t.single },
+                      { val: "ያገባ", label: t.married },
+                    ]}
+                    value={formData.maritalStatus}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.disability}
+                    name="disability"
+                    icon={HelpCircle}
+                    options={[
+                      { val: "የለብኝም", label: t.none },
+                      { val: "አለብኝ", label: t.has },
+                    ]}
+                    value={formData.disability}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
                     label={t.gender}
                     name="gender"
                     options={[
@@ -590,7 +659,7 @@ export default function AddStudent() {
                 </div>
               </section>
 
-              {/* 2. Address Section */}
+              {/* 2. Residential Address Section */}
               <section className="space-y-8 pt-10 border-t border-white/5">
                 <div
                   className={`flex items-center gap-4 ${
@@ -602,7 +671,7 @@ export default function AddStudent() {
                     {t.addressTitle}
                   </h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <FormField
                     label={t.region}
                     name="region"
@@ -622,6 +691,13 @@ export default function AddStudent() {
                     label={t.woreda}
                     name="woreda"
                     value={formData.woreda}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.kebele}
+                    name="kebele"
+                    value={formData.kebele}
                     onChange={handleChange}
                     isRTL={isRTL}
                   />
@@ -697,7 +773,7 @@ export default function AddStudent() {
                 </div>
               </section>
 
-              {/* 4. Emergency Section - Red Accent */}
+              {/* 4. Emergency Contact Section */}
               <section className="p-8 glass bg-red-500/5 border border-red-500/10 rounded-[3rem] space-y-8 shadow-inner">
                 <div
                   className={`flex items-center gap-4 ${
@@ -709,6 +785,7 @@ export default function AddStudent() {
                     {t.emergency}
                   </h3>
                 </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     label={t.emergencyName}
@@ -735,6 +812,39 @@ export default function AddStudent() {
                     isRTL={isRTL}
                   />
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-red-500/10">
+                  <FormField
+                    label={t.region}
+                    name="emergencyRegion"
+                    icon={MapPin}
+                    value={formData.emergencyRegion}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.subCity}
+                    name="emergencySubCity"
+                    value={formData.emergencySubCity}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.woreda}
+                    name="emergencyWoreda"
+                    value={formData.emergencyWoreda}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.kebele}
+                    name="emergencyKebele"
+                    value={formData.emergencyKebele}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                </div>
+
                 <div className="glass bg-white/5 border border-red-500/20 rounded-[2rem] p-6 flex flex-col items-center">
                   {emergencyIdPreview && (
                     <img
@@ -764,13 +874,13 @@ export default function AddStudent() {
               <button
                 type="submit"
                 disabled={loading || fetching}
-                className="w-full btn-gold py-6 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xs flex items-center justify-center gap-4 shadow-2xl disabled:opacity-50"
+                className="w-full btn-gold py-6 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xs flex items-center justify-center gap-4 shadow-2xl disabled:opacity-50 transition-all hover:scale-[1.01]"
               >
                 {loading ? (
                   <Loader2 className="animate-spin" size={20} />
                 ) : (
                   <Save size={20} />
-                )}
+                )}{" "}
                 {t.save}
               </button>
             </div>
@@ -778,7 +888,6 @@ export default function AddStudent() {
         </form>
       </motion.div>
 
-      {/* Notifications - Glowing Style */}
       <AnimatePresence>
         {msg.text && (
           <motion.div

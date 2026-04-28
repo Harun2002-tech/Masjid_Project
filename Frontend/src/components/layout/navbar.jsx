@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useTheme } from "../theme-provider";
 import { useLanguage } from "../../contexts/language-context";
 import { useAuth } from "../../contexts/auth-context";
 import { Button } from "../ui/button";
@@ -14,7 +13,6 @@ import {
   DropdownMenuSeparator,
 } from "../ui/dropdown-menu";
 
-// ያንተን ሎጎ እዚህ ጋር ኢምፖርት አድርገናል
 import LogoImg from "../../assets/logo.jpg";
 
 import {
@@ -26,8 +24,6 @@ import {
 } from "../ui/sheet";
 
 import {
-  Moon,
-  Sun,
   Menu,
   ChevronDown,
   Globe,
@@ -42,7 +38,6 @@ import {
 } from "lucide-react";
 
 export default function Navbar() {
-  const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -67,56 +62,45 @@ export default function Navbar() {
     { code: "am", label: "አማርኛ", flag: "🇪🇹" },
   ];
 
-  const navFont = language === "am" ? "font-arefa" : "font-sans";
-
   return (
-    <header className="site-header">
-      <div className="w-full flex h-24 items-center justify-between px-4 lg:px-8">
-        {/* Logo Section - ወደ ግራ ጥግ (Home) የተጠጋ */}
-        <Link
-          to="/"
-          className="flex items-center gap-4 group shrink-0 transition-all duration-300 ml-0"
-        >
-          <div className="relative h-14 w-14 flex items-center justify-center">
-            {/* Background Frame */}
-            <div className="absolute inset-0 rounded-full border-2 border-gold/30 group-hover:border-gold transition-colors duration-500" />
-
-            {/* Inner Logo (ወደ ውስጥ ገባ የሚለው አኒሜሽን) */}
-            <div className="h-[90%] w-[90%] rounded-full overflow-hidden bg-white shadow-inner transition-all duration-500 ease-out group-hover:scale-90">
+    <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
+      <div className="w-full flex h-20 items-center justify-between px-4 lg:px-8 max-w-[1400px] mx-auto">
+        {/* Logo Section - shrink-0 ታክሎበታል እንዳይጨፈለቅ */}
+        <Link to="/" className="flex items-center gap-3 group shrink-0 mr-4">
+          <div className="relative h-12 w-12 flex items-center justify-center shrink-0">
+            <div className="absolute inset-0 rounded-full border border-gold/50 group-hover:border-gold transition-colors duration-500" />
+            <div className="h-[85%] w-[85%] rounded-full overflow-hidden bg-white shadow-lg transition-transform duration-500 group-hover:scale-95">
               <img
                 src={LogoImg}
                 alt="Ruhama Logo"
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                className="h-full w-full object-cover"
               />
             </div>
           </div>
 
-          {/* Text Part */}
-          <div className="flex flex-col border-l border-gray-200/50 pl-4 py-1">
-            <p className="text-2xl font-black leading-none tracking-tight text-emerald-deep font-display transition-colors group-hover:text-gold">
+          <div className="flex flex-col border-l border-white/20 pl-3 shrink-0">
+            <p className="text-lg md:text-xl font-black tracking-tighter text-white group-hover:text-gold transition-colors leading-none">
               Ruhama
             </p>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold mt-1.5">
+            <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.2em] text-gold/80 mt-1">
               Islamic Center
             </p>
           </div>
         </Link>
 
-        {/* ቀሪው የNavbar ክፍል (Links, Buttons...) እዚህ ይቀጥላል */}
-
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-4">
+        {/* Desktop Navigation - ክፍተቶች (gap) ተስተካክለዋል */}
+        <nav className="hidden lg:flex items-center gap-x-1 flex-nowrap overflow-hidden">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
-              className="relative px-4 py-2 group"
+              className="relative px-3 py-2 group shrink-0"
             >
               <span
-                className={`text-[14px] font-medium transition-colors ${navFont} ${
+                className={`text-[13px] xl:text-[14px] font-bold tracking-tight transition-all duration-300 ${
                   isActive(link.href)
-                    ? "text-emerald-deep font-bold"
-                    : "text-gray-500 hover:text-emerald-deep"
+                    ? "text-gold"
+                    : "text-white/80 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -124,204 +108,148 @@ export default function Navbar() {
               {isActive(link.href) && (
                 <motion.div
                   layoutId="nav-underline"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold rounded-full"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-gold shadow-[0_0_10px_#fbbf24]"
                 />
               )}
             </Link>
           ))}
         </nav>
 
-        {/* Controls: Language, Theme, Auth */}
-        <div className="flex items-center gap-3">
-          {/* Language Picker */}
+        {/* Controls Section - shrink-0 እዚህም ያስፈልጋል */}
+        <div className="flex items-center gap-2 shrink-0 ml-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-gray-500 hover:text-gold hover:bg-gray-50 rounded-xl transition-all"
+                className="text-white hover:text-gold hover:bg-white/5 rounded-full shrink-0"
               >
                 <Globe className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-48 rounded-2xl border-gray-100 bg-white p-2 shadow-2xl"
+              className="w-40 glass border-white/10 p-1 mt-2"
             >
               {languageOptions.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
                   onClick={() => setLanguage(lang.code)}
-                  className={`rounded-xl px-4 py-3 cursor-pointer mb-1 flex items-center justify-between ${
-                    language === lang.code
-                      ? "bg-gray-50 text-emerald-deep font-bold"
-                      : "text-gray-600 hover:bg-gray-50"
+                  className={`rounded-lg px-3 py-2 cursor-pointer flex items-center justify-between text-white hover:bg-white/10 ${
+                    language === lang.code ? "bg-white/10 text-gold" : ""
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-base">{lang.flag}</span>
-                    <span
-                      className={`text-sm ${
-                        lang.code === "am" ? "font-arefa" : ""
-                      }`}
-                    >
-                      {lang.label}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <span>{lang.flag}</span>
+                    <span className="text-sm font-bold">{lang.label}</span>
                   </div>
-                  {language === lang.code && (
-                    <div className="h-1.5 w-1.5 rounded-full bg-gold" />
-                  )}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Auth Section */}
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="pl-1 pr-3 py-1 rounded-full border border-gray-100 hover:bg-gray-50 group transition-all"
+                  className="flex items-center gap-2 p-1 pr-3 rounded-full border border-white/10 hover:bg-white/5 text-white shrink-0"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-deep text-white text-xs font-bold shadow-sm">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold text-black font-bold shrink-0">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
-                  <span
-                    className={`ml-2 text-sm font-medium text-emerald-deep hidden sm:inline ${navFont}`}
-                  >
+                  <span className="text-sm font-bold hidden xl:inline max-w-[100px] truncate">
                     {user?.name?.split(" ")[0]}
                   </span>
-                  <ChevronDown className="ml-1 h-3 w-3 text-gray-400 group-hover:translate-y-0.5 transition-transform" />
+                  <ChevronDown className="h-3 w-3 opacity-50 shrink-0" />
                 </Button>
               </DropdownMenuTrigger>
-
               <DropdownMenuContent
                 align="end"
-                className="w-64 rounded-3xl border-gray-100 bg-white p-5 mt-2 shadow-2xl"
+                className="w-56 glass border-white/10 p-2 mt-2 shadow-2xl"
               >
-                <div className="px-2 py-4 mb-2">
-                  <p
-                    className={`text-lg font-bold text-emerald-deep ${navFont}`}
-                  >
+                <div className="px-3 py-3">
+                  <p className="text-sm font-bold text-white truncate">
                     {user?.name}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">{user?.email}</p>
+                  <p className="text-[10px] text-white/50 truncate">
+                    {user?.email}
+                  </p>
                 </div>
-
-                <DropdownMenuSeparator className="bg-gray-100 mb-4" />
-
+                <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem
                   asChild
-                  className="rounded-xl cursor-pointer p-0 overflow-hidden"
+                  className="hover:bg-white/10 rounded-lg"
                 >
                   <Link
                     to="/dashboard"
-                    className="flex items-center gap-4 px-4 py-3 text-gray-600 hover:text-emerald-deep hover:bg-gray-50 transition-all"
+                    className="flex items-center gap-3 p-2 text-white"
                   >
-                    <LayoutDashboard size={18} className="text-gold" />
-                    <span className={`text-sm font-medium ${navFont}`}>
-                      {t("dashboard")}
-                    </span>
+                    <LayoutDashboard size={16} className="text-gold" />
+                    <span className="text-sm font-bold">{t("dashboard")}</span>
                   </Link>
                 </DropdownMenuItem>
-
-                <DropdownMenuSeparator className="bg-gray-100 my-4" />
-
+                <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem
                   onClick={logout}
-                  className="rounded-xl text-rose-500 hover:bg-rose-50 cursor-pointer px-4 py-3 transition-all flex items-center gap-4"
+                  className="flex items-center gap-3 p-2 text-red-400 hover:bg-red-500/10 rounded-lg cursor-pointer"
                 >
-                  <LogOut size={18} />
-                  <span className={`text-sm font-medium ${navFont}`}>
-                    Logout
-                  </span>
+                  <LogOut size={16} />
+                  <span className="text-sm font-bold">Logout</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden sm:flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2 shrink-0">
               <Button
                 variant="ghost"
                 asChild
-                className={`text-sm font-medium text-gray-600 hover:text-emerald-deep rounded-xl px-5 ${navFont}`}
+                className="text-white hover:text-gold font-bold"
               >
                 <Link to="/login">{t("login")}</Link>
               </Button>
-              <Button
-                asChild
-                className={`bg-emerald-deep hover:bg-emerald-medium text-white text-sm font-bold rounded-xl px-6 shadow-md transition-all border-none ${navFont}`}
-              >
+              <Button asChild className="btn-gold px-5 rounded-full shrink-0">
                 <Link to="/register">{t("register")}</Link>
               </Button>
             </div>
           )}
 
-          {/* Mobile Menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden text-emerald-deep hover:bg-gray-50 rounded-xl"
+                className="lg:hidden text-white hover:bg-white/5 shrink-0"
               >
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-
             <SheetContent
               side="right"
-              className="w-full sm:w-80 bg-white border-none rounded-l-[2rem] p-0"
+              className="w-[300px] glass border-l border-white/10 text-white p-0"
             >
-              <SheetHeader className="text-left pt-12 px-8">
-                <SheetTitle className="text-emerald-deep font-display text-3xl">
+              <SheetHeader className="p-8 text-left border-b border-white/10">
+                <SheetTitle className="text-white font-bold text-2xl">
                   Menu<span className="text-gold">.</span>
                 </SheetTitle>
               </SheetHeader>
-
-              <nav className="mt-12 flex flex-col gap-2 px-4">
+              <nav className="mt-6 flex flex-col px-4 gap-1">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     to={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${
+                    className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${
                       isActive(link.href)
-                        ? "bg-emerald-deep text-white shadow-lg shadow-emerald-900/10"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-emerald-deep"
+                        ? "bg-gold text-black font-black"
+                        : "text-white/70 hover:bg-white/5 hover:text-white"
                     }`}
                   >
-                    <div
-                      className={
-                        isActive(link.href) ? "text-gold" : "text-emerald-deep"
-                      }
-                    >
-                      {link.icon && <link.icon size={20} />}
-                    </div>
-                    <span className={`text-base font-medium ${navFont}`}>
-                      {link.label}
-                    </span>
+                    {link.icon && <link.icon size={20} />}
+                    <span className="text-base font-bold">{link.label}</span>
                   </Link>
                 ))}
               </nav>
-
-              {!isAuthenticated && (
-                <div className="absolute bottom-10 left-8 right-8 flex flex-col gap-4">
-                  <Button
-                    asChild
-                    className={`w-full bg-emerald-deep text-white py-6 rounded-2xl font-bold text-lg shadow-xl ${navFont}`}
-                  >
-                    <Link to="/register">{t("register")}</Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    asChild
-                    className={`w-full border-gray-100 text-emerald-deep py-6 rounded-2xl font-bold text-lg ${navFont}`}
-                  >
-                    <Link to="/login">{t("login")}</Link>
-                  </Button>
-                </div>
-              )}
             </SheetContent>
           </Sheet>
         </div>

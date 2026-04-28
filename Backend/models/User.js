@@ -27,16 +27,14 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      // 🚀 ለውጥ፦ ሁሉንም ወደ lowercase አድርጌያቸዋለሁ (ለማመሳሰል እንዲቀል)
       enum: ["student", "teacher", "admin", "superadmin", "masjid_admin"],
       default: "student",
-      lowercase: true, // 👈 ዳታ ሲገባ በራሱ ወደ ትንንሽ ፊደል እንዲቀይረው
+      lowercase: true,
     },
     isActive: {
       type: Boolean,
       default: true,
     },
-    // ለተማሪዎች ወይም ለመምህራን የተለየ ፕሮፋይል ካለ ማገናኛ
     profileId: {
       type: mongoose.Schema.Types.ObjectId,
       refPath: "roleModel",
@@ -45,24 +43,36 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["Student", "Teacher", "Masjid"],
     },
+    profilePicture: {
+      type: String,
+      default: "/uploads/default.png",
+    },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function () {
-  // ፓስወርዱ ካልተቀየረ ዝም ብለህ ተመለስ (Return)
+// 1. ፓስወርድ ከመቀመጡ በፊት Hash ማድረጊያ (Middleware)
+userSchema.pre("save", async function (next) {
+  // ፓስወርዱ ካልተቀየረ ወደሚቀጥለው ስራ ሂድ
   if (!this.isModified("password")) {
-    return;
+    return next();
   }
 
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    // 💡 ማስታወሻ፡ async ፈንክሽን ውስጥ next() መጥራት አያስፈልግም
+    next();
   } catch (error) {
-    throw error; // ኤረር ካለ በቀጥታ throw አድርገው
+    next(error);
   }
 });
+
+// 2. 🚀 የተስተካከለው የ matchPassword Method
+// ይህ Method በ Controller ውስጥ user.matchPassword() ብለን እንድንጠራ ያስችለናል
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  // 'this.password' የሚሰራው በ Controller ውስጥ .select("+password") ከተባለ ብቻ ነው
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;

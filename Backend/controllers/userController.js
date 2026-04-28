@@ -176,11 +176,18 @@ export const updateDetails = async (req, res) => {
 export const updatePassword = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("+password");
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "ተጠቃሚው አልተገኘም" });
+    }
+
+    // አሁን matchPassword ይሰራል
     if (!(await user.matchPassword(req.body.currentPassword))) {
       return res
         .status(401)
         .json({ success: false, message: "የድሮው ፓስወርድ ስህተት ነው" });
     }
+
     user.password = req.body.newPassword;
     await user.save();
     res.status(200).json({ success: true, message: "ፓስወርድ ተቀይሯል" });

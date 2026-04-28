@@ -123,26 +123,20 @@ const teacherSchema = new mongoose.Schema(
 
 // ራስ-ሰር ID Generator
 teacherSchema.pre("save", async function () {
-  if (!this.teacherID) {
-    try {
-      const lastTeacher = await this.constructor.findOne(
-        {},
-        { teacherID: 1 },
-        { sort: { createdAt: -1 } }
-      );
+  // async ስለሆነ next አያስፈልግም
+  if (this.isNew && !this.teacherID) {
+    const lastTeacher = await mongoose
+      .model("Teacher")
+      .findOne({}, {}, { sort: { createdAt: -1 } });
 
-      let nextIdNumber = 1;
-      if (lastTeacher && lastTeacher.teacherID) {
-        const currentIdParts = lastTeacher.teacherID.split("-");
-        if (currentIdParts.length > 1) {
-          nextIdNumber = parseInt(currentIdParts[1]) + 1;
-        }
-      }
-      this.teacherID = `T-${String(nextIdNumber).padStart(3, "0")}`;
-    } catch (err) {
-      throw err;
+    if (lastTeacher && lastTeacher.teacherID) {
+      const lastId = parseInt(lastTeacher.teacherID.replace("T-", ""));
+      this.teacherID = `T-${String(lastId + 1).padStart(3, "0")}`;
+    } else {
+      this.teacherID = "T-001";
     }
   }
+  // next() መጥራት አያስፈልግም፣ async ራሱ ስራውን ሲጨርስ ይቀጥላል
 });
 
 module.exports = mongoose.model("Teacher", teacherSchema);
