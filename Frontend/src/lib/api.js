@@ -1,15 +1,20 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "https://masjid-project.onrender.com/api", // የባክኤንድህ አድራሻ
+const instance = axios.create({
+  // የባክኤንድህ ትክክለኛ ሊንክ
+  baseURL: "https://masjid-project.onrender.com/api",
+  // Render ለመነሳት ጊዜ ስለሚወስድ 1 ደቂቃ እንዲታገስ (60 ሰከንድ)
+  timeout: 60000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-// 🚀 ለእያንዳንዱ ጥያቄ ቶከኑን በራስ-ሰር እንዲልክ የሚያደርግ
-api.interceptors.request.use(
+// ለእያንዳንዱ ጥያቄ ቶከኑን በራስ-ሰር የሚያያይዝ
+instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
-      // 'Bearer ' የሚለው ቃል መኖሩን አረጋግጥ
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -19,4 +24,4 @@ api.interceptors.request.use(
   }
 );
 
-export default api;
+export default instance;

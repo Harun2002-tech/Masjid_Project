@@ -48,6 +48,7 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
+app.use(cors(corsOptions)); // 👈 ይህ መስመር የግድ ያስፈልጋል!
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
