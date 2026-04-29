@@ -79,6 +79,30 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
+ * 5. Register ተግባር 🚀
+ */
+const register = async (name, email, password, role = "student") => {
+  try {
+    const res = await api.post("/users/register", { 
+      name, 
+      email, 
+      password, 
+      role 
+    });
+
+    if (res.data.success) {
+      localStorage.setItem("token", res.data.token);
+      setUser(res.data.user);
+      return true; // ለ RegisterForm ስኬታማ መሆኑን ለመንገር
+    }
+    return false;
+  } catch (error) {
+    console.error("Registration error in Context:", error);
+    throw error;
+  }
+};
+
+  /**
    * 4. የሮል ማረጋገጫ (Role Helper) 🚀
    * በዳታቤዝህ ላይ ያሉት ሮሎች (admin, superadmin, masjid_admin) በትክክል እንዲለዩ ያደርጋል
    */
@@ -103,6 +127,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     login,
+    register,
     logout,
     isLoading,
     hasRole, // 👈 PrivateRoute ላይ የሚጠራው
@@ -122,7 +147,7 @@ export const AuthProvider = ({ children }) => {
           <div className="flex flex-col items-center gap-4">
             <div className="h-12 w-12 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
             <p className="text-gold font-medium animate-pulse">
-              Ruhama Tech...
+              Ruhama islamic center...
             </p>
           </div>
         </div>

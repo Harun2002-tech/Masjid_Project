@@ -42,14 +42,12 @@ subDirs.forEach((dir) => {
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "https://ruhamaislamiccenter.vercel.app",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+const corsOptions = {
+  origin: "https://ruhamaislamiccenter.vercel.app", // ያንተ የቪርሴል ሊንክ
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
