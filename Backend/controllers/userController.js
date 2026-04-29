@@ -43,48 +43,45 @@ export const getMe = async (req, res) => {
   }
 };
 
-// ... (ቀሪዎቹ ፈንክሽኖች እንደነበሩ ይቀጥሉ)
-
-// 1. መመዝገብ (REGISTER)
-// 1. መመዝገብ (REGISTER) - 'next' እዚህ ጋር ተጨምሯል 🚀
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, role, phone } = req.body;
 
-    const exists = await User.findOne({ email });
+    // 1. ኢሜይሉን ወደ lowercase መቀየር (ለጥንቃቄ)
+    const cleanEmail = email ? email.toLowerCase().trim() : "";
+
+    const exists = await User.findOne({ email: cleanEmail });
     if (exists) {
-      return res
-        .status(400)
-        .json({ success: false, message: "ይህ ኢሜይል ቀድሞ ተመዝግቧል" });
+      return res.status(400).json({
+        success: false,
+        message: "ይህ ኢሜይል ቀድሞ ተመዝግቧል",
+      });
     }
 
+    // 2. ተጠቃሚውን መፍጠር (ሮሉን ወደ lowercase ቀይረን እንላካለን)
     const user = await User.create({
       name,
-      email,
+      email: cleanEmail,
       password,
-      role: role || "student",
+      role: role ? role.toLowerCase() : "student", // 👈 እዚህ ጋር lowercase ማድረጉ enum ስህተትን ይከላከላል
     });
 
+    // 3. ስሙን ለፕሮፋይል መከፋፈል
     const nameArray = user.name.trim().split(/\s+/);
-
     const profileData = {
       user: user._id,
       firstName: nameArray[0],
       lastName: nameArray.slice(1).join(" ") || "",
       email: user.email,
       phone: phone || "0900000000",
-      // ማሳሰቢያ፡ ለጥንቃቄ ሲባል በProfile ሞዴሎች ላይ 'password' ባይኖር ይመረጣል
     };
 
-    if (user.role === "student") {
-      await Student.create(profileData);
-    } else if (user.role === "teacher") {
-      await Teacher.create(profileData);
-    }
+    // ማሳሰቢያ፡ እዚህ ጋር እንደ ሮሉ Student ወይም Teacher ሞዴል መፈጠር አለበት
+    // ለምሳሌ፡ await Student.create(profileData);
 
     res.status(201).json({
       success: true,
-      token: generateToken(user),
+      message: "ምዝገባው ተሳክቷል",
       user: {
         id: user._id,
         name: user.name,
@@ -93,9 +90,15 @@ export const register = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error("Registration Error:", error);
-    // እዚህ ጋር 'res.status' ከመጠቀም ይልቅ 'next(error)' ብለን ብንልክ ይሻላል
-    next(error);
+    // 🚀 እዚህ ጋር ነው 'next' የሚጠቅመው
+    console.error("Registration Error Details:", error.message);
+
+    // ለ Postman ግልጽ ስህተት እንዲደርሰው
+    res.status(500).json({
+      success: false,
+      message: "በሰርቨሩ ላይ ስህተት ተከስቷል",
+      error: error.message, // 👈 አሁን "next is not a function" ሳይሆን ትክክለኛውን ስህተት ያሳይሃል
+    });
   }
 };
 
