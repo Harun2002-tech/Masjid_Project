@@ -41,7 +41,6 @@ subDirs.forEach((dir) => {
 });
 
 const app = express();
-
 const corsOptions = {
   origin: "https://ruhamaislamiccenter.vercel.app", // ያንተ የቪርሴል ሊንክ
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",

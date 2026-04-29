@@ -46,7 +46,8 @@ export const getMe = async (req, res) => {
 // ... (ቀሪዎቹ ፈንክሽኖች እንደነበሩ ይቀጥሉ)
 
 // 1. መመዝገብ (REGISTER)
-export const register = async (req, res) => {
+// 1. መመዝገብ (REGISTER) - 'next' እዚህ ጋር ተጨምሯል 🚀
+export const register = async (req, res, next) => {
   try {
     const { name, email, password, role, phone } = req.body;
 
@@ -72,7 +73,7 @@ export const register = async (req, res) => {
       lastName: nameArray.slice(1).join(" ") || "",
       email: user.email,
       phone: phone || "0900000000",
-      password: password,
+      // ማሳሰቢያ፡ ለጥንቃቄ ሲባል በProfile ሞዴሎች ላይ 'password' ባይኖር ይመረጣል
     };
 
     if (user.role === "student") {
@@ -93,7 +94,8 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Registration Error:", error);
-    res.status(500).json({ success: false, message: error.message });
+    // እዚህ ጋር 'res.status' ከመጠቀም ይልቅ 'next(error)' ብለን ብንልክ ይሻላል
+    next(error);
   }
 };
 
