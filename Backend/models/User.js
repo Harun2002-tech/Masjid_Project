@@ -54,20 +54,19 @@ const userSchema = new mongoose.Schema(
 // --- 🛠 ማስተካከያ የተደረገበት ክፍል ---
 
 // 1. ፓስወርድ Hash ማድረጊያ (Mongoose Middleware)
-// Async ስለሆነ 'next'ን ፓራሜትር ውስጥ መጨመር እና በስህተት ጊዜ ብቻ መጥራት ይሻላል
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
+  // <--- 'next'ን ከፓራሜትር አስወግደነዋል
+  // ፓስወርዱ ካልተቀየረ ስራህን አቁም (Skip)
   if (!this.isModified("password")) {
-    return next();
+    return;
   }
 
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    // ስኬታማ ሲሆን ቀጣዩን ስራ እንዲቀጥል
-    next();
+    // እዚህ ጋር next() መጥራት አያስፈልግም፣ ምክንያቱም async ፈንክሽኑ ሲያልቅ Mongoose በራሱ ይቀጥላል
   } catch (error) {
-    // ስህተት ካለ ለ Error Handler እንዲያስተላልፍ
-    next(error);
+    throw error; // ስህተት ካለ Mongoose ራሱ ይይዘዋል
   }
 });
 
