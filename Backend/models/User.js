@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "የይለፍ ቃል ያስፈልጋል"],
       minlength: [6, "የይለፍ ቃል ከ6 ፊደላት ማነስ የለበትም"],
-      select: false, // መረጃ ስንጠራ ፓስወርድ አብሮ እንዳይመጣ ይከላከላል
+      select: false,
     },
     role: {
       type: String,
@@ -51,9 +51,11 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 1. ፓስወርድ ከመቀመጡ በፊት Hash ማድረጊያ (Middleware)
+// --- 🛠 ማስተካከያ የተደረገበት ክፍል ---
+
+// 1. ፓስወርድ Hash ማድረጊያ (Mongoose Middleware)
+// Async ስለሆነ 'next'ን ፓራሜትር ውስጥ መጨመር እና በስህተት ጊዜ ብቻ መጥራት ይሻላል
 userSchema.pre("save", async function (next) {
-  // ፓስወርዱ ካልተቀየረ ወደሚቀጥለው ስራ ሂድ
   if (!this.isModified("password")) {
     return next();
   }
@@ -61,16 +63,18 @@ userSchema.pre("save", async function (next) {
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
+    // ስኬታማ ሲሆን ቀጣዩን ስራ እንዲቀጥል
     next();
   } catch (error) {
+    // ስህተት ካለ ለ Error Handler እንዲያስተላልፍ
     next(error);
   }
 });
 
-// 2. 🚀 የተስተካከለው የ matchPassword Method
-// ይህ Method በ Controller ውስጥ user.matchPassword() ብለን እንድንጠራ ያስችለናል
+// 2. የተስተካከለው የ matchPassword Method
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  // 'this.password' የሚሰራው በ Controller ውስጥ .select("+password") ከተባለ ብቻ ነው
+  // 'this.password' የሚሰራው በ Controller ውስጥ .select("+password") ካለ ብቻ ነው
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

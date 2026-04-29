@@ -100,7 +100,6 @@ export const register = async (req, res) => {
   } catch (error) {
     // 1. መጀመሪያ በ Render Logs ላይ ስህተቱን ለማየት
     console.error("ትክክለኛው የሰርቨር ስህተት ይሄ ነው:", error);
-
     // 2. ለ Postman መልስ ለመስጠት (next(error) አንጠቀምም!)
     return res.status(500).json({
       success: false,
