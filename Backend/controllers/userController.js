@@ -43,11 +43,13 @@ export const getMe = async (req, res) => {
   }
 };
 
-export const register = async (req, res, next) => {
+// 1. መመዝገብ (REGISTER) - 'next' ሙሉ በሙሉ ተወግዷል 🚀
+export const register = async (req, res) => {
+  // 👈 እዚህ ጋር 'next' መኖሩ የግድ አይደለም
   try {
     const { name, email, password, role, phone } = req.body;
 
-    // 1. ኢሜይሉን ወደ lowercase መቀየር (ለጥንቃቄ)
+    // 1. ኢሜይሉን ወደ lowercase መቀየር
     const cleanEmail = email ? email.toLowerCase().trim() : "";
 
     const exists = await User.findOne({ email: cleanEmail });
@@ -58,12 +60,12 @@ export const register = async (req, res, next) => {
       });
     }
 
-    // 2. ተጠቃሚውን መፍጠር (ሮሉን ወደ lowercase ቀይረን እንላካለን)
+    // 2. ተጠቃሚውን መፍጠር
     const user = await User.create({
       name,
       email: cleanEmail,
       password,
-      role: role ? role.toLowerCase() : "student", // 👈 እዚህ ጋር lowercase ማድረጉ enum ስህተትን ይከላከላል
+      role: role ? role.toLowerCase() : "student",
     });
 
     // 3. ስሙን ለፕሮፋይል መከፋፈል
@@ -76,10 +78,16 @@ export const register = async (req, res, next) => {
       phone: phone || "0900000000",
     };
 
-    // ማሳሰቢያ፡ እዚህ ጋር እንደ ሮሉ Student ወይም Teacher ሞዴል መፈጠር አለበት
-    // ለምሳሌ፡ await Student.create(profileData);
+    // 4. እንደ ተጠቃሚው ሮል ፕሮፋይል መፍጠር (Student ወይም Teacher)
+    // እዚህ ጋር Model መኖሩን እና Import መደረጉን አረጋግጥ
+    if (user.role === "student") {
+      if (typeof Student !== "undefined") await Student.create(profileData);
+    } else if (user.role === "teacher") {
+      if (typeof Teacher !== "undefined") await Teacher.create(profileData);
+    }
 
-    res.status(201).json({
+    // ስኬታማ ሲሆን
+    return res.status(201).json({
       success: true,
       message: "ምዝገባው ተሳክቷል",
       user: {
@@ -90,14 +98,13 @@ export const register = async (req, res, next) => {
       },
     });
   } catch (error) {
-    // 🚀 እዚህ ጋር ነው 'next' የሚጠቅመው
-    console.error("Registration Error Details:", error.message);
+    // ማንኛውም ስህተት ሲፈጠር እዚህ ጋር ሪፖርት ያደርጋል
+    console.error("Registration Error Details:", error);
 
-    // ለ Postman ግልጽ ስህተት እንዲደርሰው
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "በሰርቨሩ ላይ ስህተት ተከስቷል",
-      error: error.message, // 👈 አሁን "next is not a function" ሳይሆን ትክክለኛውን ስህተት ያሳይሃል
+      error: error.message, // 👈 አሁን ትክክለኛውን የ MongoDB ወይም የኮድ ስህተት ያሳየሃል
     });
   }
 };
