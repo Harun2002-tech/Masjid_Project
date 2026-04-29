@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://https://masjid-project.onrender.com/api",
+  baseURL: "https://masjid-project.onrender.com/api",
 });
 
 // Attach token automatically
