@@ -6,19 +6,14 @@ import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import { useLanguage } from "../../contexts/language-context";
 import {
-  BookOpen,
   Clock,
   Calendar,
   ArrowLeft,
   ArrowRight,
   ShieldCheck,
   ListChecks,
-  Sparkles,
-  PlayCircle,
   Award,
   Loader2,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 export default function CourseOverviewPage() {
@@ -64,26 +59,12 @@ export default function CourseOverviewPage() {
     fetchCourseAndStatus();
   }, [id, navigate]);
 
-  const titleFont =
-    language === "am"
-      ? "font-amharic"
-      : language === "ar"
-      ? "font-serif"
-      : "font-display";
-  const bodyFont = language === "am" ? "font-amharic" : "font-sans";
-
   if (loading)
     return (
-      <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center">
-        <Loader2 className="animate-spin text-emerald-900 mb-4" size={48} />
-        <p
-          className={`text-emerald-900 font-black uppercase tracking-widest text-[10px] ${bodyFont}`}
-        >
-          {language === "am"
-            ? "ዝርዝሩን በማዘጋጀት ላይ..."
-            : language === "ar"
-            ? "جاري تحميل التفاصيل..."
-            : "LOADING DETAILS..."}
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-gold mb-4" size={48} />
+        <p className="text-gold-glow font-black uppercase tracking-widest text-[10px]">
+          {language === "am" ? "ዝርዝሩን በማዘጋጀት ላይ..." : "LOADING DETAILS..."}
         </p>
       </div>
     );
@@ -92,25 +73,17 @@ export default function CourseOverviewPage() {
     return (
       <div
         dir={dir}
-        className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-6"
+        className="min-h-screen flex flex-col items-center justify-center p-6"
       >
-        <h1 className={`text-2xl font-bold text-emerald-900 ${titleFont}`}>
-          {language === "am"
-            ? "ኮርሱ አልተገኘም"
-            : language === "ar"
-            ? "الكورس غير موجود"
-            : "Course Not Found"}
+        <h1 className="text-2xl font-bold text-white">
+          {language === "am" ? "ኮርሱ አልተገኘም" : "Course Not Found"}
         </h1>
         <Link
           to="/courses"
           className="mt-4 text-gold font-bold uppercase text-xs flex items-center gap-2"
         >
-          {dir === "rtl" ? <ArrowRight size={14} /> : <ArrowLeft size={14} />}
-          {language === "am"
-            ? "ወደ ዝርዝር ተመለስ"
-            : language === "ar"
-            ? "العودة إلى القائمة"
-            : "Back to List"}
+          <ArrowLeft size={14} />{" "}
+          {language === "am" ? "ወደ ዝርዝር ተመለስ" : "Back to List"}
         </Link>
       </div>
     );
@@ -120,18 +93,10 @@ export default function CourseOverviewPage() {
       return (
         <Button
           disabled
-          className="w-full h-16 rounded-2xl bg-white/10 text-gold/50 cursor-wait border-none font-black text-[11px] uppercase tracking-[0.1em]"
+          className="w-full h-16 rounded-2xl glass text-gold/50 cursor-wait border-none font-black text-[11px] uppercase"
         >
-          <Loader2
-            className={`h-4 w-4 animate-spin ${
-              dir === "rtl" ? "ml-2" : "mr-2"
-            }`}
-          />
-          {language === "am"
-            ? "ጥያቄዎ በመታየት ላይ ነው..."
-            : language === "ar"
-            ? "طلبك قيد المراجعة..."
-            : "Request Pending..."}
+          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          {language === "am" ? "ጥያቄዎ በመታየት ላይ ነው..." : "Request Pending..."}
         </Button>
       );
     }
@@ -139,20 +104,12 @@ export default function CourseOverviewPage() {
     if (course.enrollmentOpen) {
       return (
         <Button
-          className="w-full h-16 rounded-2xl font-black text-[11px] tracking-[0.2em] uppercase mb-8 shadow-2xl transition-all duration-500 bg-gold text-emerald-900 hover:bg-white hover:scale-[1.02] border-none"
+          className="w-full h-16 rounded-2xl btn-gold text-[11px] tracking-[0.2em] uppercase mb-8 shadow-2xl"
           asChild
         >
           <Link to={`/courses/${id}/enroll`}>
-            {language === "am"
-              ? "አሁኑኑ ይመዝገቡ"
-              : language === "ar"
-              ? "سجل الآن"
-              : "ENROLL NOW"}
-            {dir === "rtl" ? (
-              <ArrowLeft className="mr-3 h-4 w-4" />
-            ) : (
-              <ArrowRight className="ml-3 h-4 w-4" />
-            )}
+            {language === "am" ? "አሁኑኑ ይመዝገቡ" : "ENROLL NOW"}
+            <ArrowRight className="ml-3 h-4 w-4" />
           </Link>
         </Button>
       );
@@ -161,13 +118,9 @@ export default function CourseOverviewPage() {
     return (
       <Button
         disabled
-        className="w-full h-16 rounded-2xl bg-white/10 text-white/40 border-none font-black text-[11px] uppercase"
+        className="w-full h-16 rounded-2xl glass text-white/40 border-none font-black text-[11px] uppercase"
       >
-        {language === "am"
-          ? "ምዝገባ ተዘግቷል"
-          : language === "ar"
-          ? "التسجيل مغلق"
-          : "REGISTRATION CLOSED"}
+        {language === "am" ? "ምዝገባ ተዘግቷል" : "REGISTRATION CLOSED"}
       </Button>
     );
   };
@@ -175,66 +128,41 @@ export default function CourseOverviewPage() {
   return (
     <div
       dir={dir}
-      className="min-h-screen bg-[#FDFBF7] py-12 text-emerald-900 relative pt-32 selection:bg-gold/30"
+      className="min-h-screen py-12 text-white relative pt-32 selection:bg-gold/30 bg-transparent"
     >
-      <div
-        className={`absolute top-0 ${
-          dir === "rtl" ? "left-0" : "right-0"
-        } w-[500px] h-[500px] bg-gold/5 rounded-full blur-[120px] -z-0`}
-      />
-
       <div className="mx-auto max-w-7xl px-6 relative z-10">
         <motion.div
-          initial={{ opacity: 0, x: dir === "rtl" ? 20 : -20 }}
+          initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
         >
           <Button
             variant="ghost"
-            className="mb-10 text-emerald-900/60 hover:text-emerald-900 hover:bg-white/50 transition-all rounded-full px-6 border border-transparent hover:border-emerald-900/10"
+            className="mb-10 text-white/60 hover:text-gold hover:bg-white/5 transition-all rounded-full px-6"
             asChild
           >
-            <Link to="/courses">
-              {dir === "rtl" ? (
-                <ArrowRight className="ml-3 h-4 w-4" />
-              ) : (
-                <ArrowLeft className="mr-3 h-4 w-4" />
-              )}
-              {language === "am"
-                ? "ወደ ኮርሶች ዝርዝር ተመለስ"
-                : language === "ar"
-                ? "العودة إلى الدورات"
-                : "Back to Courses"}
+            <Link to="/courses" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              {language === "am" ? "ወደ ኮርሶች ዝርዝር ተመለስ" : "Back to Courses"}
             </Link>
           </Button>
         </motion.div>
 
         <div className="grid gap-12 lg:grid-cols-3">
-          <div
-            className={`lg:col-span-2 space-y-12 ${
-              dir === "rtl" ? "text-right" : "text-left"
-            }`}
-          >
+          <div className="lg:col-span-2 space-y-12">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <Badge className="bg-emerald-900 text-gold mb-6 uppercase font-black tracking-[0.3em] px-5 py-2 rounded-full shadow-lg border-none">
-                {course.category ||
-                  (language === "am"
-                    ? "ጠቅላላ"
-                    : language === "ar"
-                    ? "عام"
-                    : "General")}
+              <Badge className="bg-gold text-black mb-6 uppercase font-black tracking-[0.3em] px-5 py-2 rounded-full border-none">
+                {course.category || (language === "am" ? "ጠቅላላ" : "General")}
               </Badge>
-              <h1
-                className={`text-5xl md:text-6xl font-bold text-emerald-900 mb-6 leading-[1.1] ${titleFont}`}
-              >
+              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-[1.1]">
                 {course.title} <span className="text-gold">.</span>
               </h1>
             </motion.div>
 
             {course.thumbnail && (
-              <div className="relative aspect-video rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white">
+              <div className="relative aspect-video rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 glass">
                 <img
                   src={`${API_BASE_URL}${
                     course.thumbnail.startsWith("/") ? "" : "/"
@@ -245,59 +173,36 @@ export default function CourseOverviewPage() {
               </div>
             )}
 
-            <div className="space-y-6 bg-white p-10 md:p-14 rounded-[3.5rem] border border-emerald-900/5 shadow-xl relative overflow-hidden">
-              <h2
-                className={`text-gold font-black uppercase tracking-[0.3em] text-[11px] flex items-center gap-3 ${
-                  dir === "rtl" ? "flex-row-reverse" : ""
-                }`}
-              >
+            <div className="space-y-6 glass p-10 md:p-14 rounded-[2.5rem] relative overflow-hidden">
+              <h2 className="text-gold-glow font-black uppercase tracking-[0.3em] text-[11px] flex items-center gap-3">
                 <div className="h-1 w-8 bg-gold rounded-full" />
-                {language === "am"
-                  ? "ስለ ኮርሱ ዝርዝር ማብራሪያ"
-                  : language === "ar"
-                  ? "تفاصيل الدورة"
-                  : "COURSE DESCRIPTION"}
+                {language === "am" ? "ስለ ኮርሱ ዝርዝር ማብራሪያ" : "COURSE DESCRIPTION"}
               </h2>
-              <p
-                className={`text-emerald-900/80 text-xl leading-relaxed italic relative z-10 ${bodyFont}`}
-              >
+              <p className="text-white/80 text-xl leading-relaxed italic relative z-10 font-light">
                 "{course.description}"
               </p>
             </div>
 
             <div className="space-y-8">
-              <div
-                className={`flex items-center gap-4 ${
-                  dir === "rtl" ? "flex-row-reverse" : ""
-                }`}
-              >
+              <div className="flex items-center gap-4">
                 <ListChecks className="text-gold h-6 w-6" />
-                <h3
-                  className={`text-2xl font-bold text-emerald-900 ${titleFont}`}
-                >
-                  {language === "am"
-                    ? "የትምህርቱ ይዘቶች (Syllabus)"
-                    : language === "ar"
-                    ? "منهج الدورة"
-                    : "Syllabus"}
+                <h3 className="text-2xl font-bold text-white">
+                  {language === "am" ? "የትምህርቱ ይዘቶች (Syllabus)" : "Syllabus"}
                 </h3>
               </div>
               <div className="grid gap-4">
                 {course.syllabus?.map((item, i) => (
                   <motion.div
                     key={i}
-                    className={`group p-6 bg-white rounded-3xl border border-emerald-900/5 flex items-center gap-6 hover:shadow-lg transition-all cursor-default ${
-                      dir === "rtl" ? "flex-row-reverse" : ""
-                    }`}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="group p-6 glass rounded-2xl border border-white/5 flex items-center gap-6 hover:border-gold/30 transition-all cursor-default"
                   >
-                    <span className="flex-none w-12 h-12 rounded-2xl bg-emerald-900/5 text-emerald-900 group-hover:bg-emerald-900 group-hover:text-gold flex items-center justify-center text-sm font-black transition-all">
+                    <span className="flex-none w-10 h-10 rounded-xl bg-white/5 text-gold group-hover:bg-gold group-hover:text-black flex items-center justify-center text-xs font-black transition-all">
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <span
-                      className={`text-emerald-900/80 font-bold ${bodyFont}`}
-                    >
-                      {item}
-                    </span>
+                    <span className="text-white/80 font-medium">{item}</span>
                   </motion.div>
                 ))}
               </div>
@@ -310,39 +215,29 @@ export default function CourseOverviewPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="sticky top-32"
             >
-              <Card className="bg-emerald-900 border-none rounded-[3.5rem] p-10 text-white shadow-[0_40px_80px_-15px_rgba(2,44,34,0.3)] relative overflow-hidden">
+              <Card className="glass border-none rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
                 <div className="relative z-10">
                   <div className="flex justify-center mb-8">
-                    <div className="h-16 w-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center">
+                    <div className="h-16 w-16 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
                       <Award className="text-gold h-8 w-8" />
                     </div>
                   </div>
 
                   <div className="text-center mb-8">
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold/60 mb-3">
-                      {language === "am"
-                        ? "የምዝገባ ሁኔታ"
-                        : language === "ar"
-                        ? "حالة التسجيل"
-                        : "ENROLLMENT STATUS"}
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold-glow mb-3">
+                      {language === "am" ? "የምዝገባ ሁኔታ" : "ENROLLMENT STATUS"}
                     </p>
-                    <h3
-                      className={`text-2xl font-bold text-white ${titleFont}`}
-                    >
+                    <h3 className="text-2xl font-bold text-white">
                       {enrollmentStatus === "Pending"
                         ? language === "am"
                           ? "ጥያቄዎ በመታየት ላይ ነው"
-                          : "قيد المراجعة"
+                          : "Pending"
                         : course.enrollmentOpen
                         ? language === "am"
                           ? "ምዝገባ ክፍት ነው"
-                          : language === "ar"
-                          ? "التسجيل مفتوح"
                           : "Open"
                         : language === "am"
                         ? "ምዝገባ ተዘግቷል"
-                        : language === "ar"
-                        ? "التسجيل مغلق"
                         : "Closed"}
                     </h3>
                   </div>
@@ -352,56 +247,25 @@ export default function CourseOverviewPage() {
                   <div className="space-y-6 pt-8 border-t border-white/10">
                     <InfoRow
                       icon={<Clock size={16} />}
-                      label={
-                        language === "am"
-                          ? "ቆይታ"
-                          : language === "ar"
-                          ? "المدة"
-                          : "Duration"
-                      }
+                      label={language === "am" ? "ቆይታ" : "Duration"}
                       value={course.duration || "N/A"}
-                      dir={dir}
                     />
                     <InfoRow
                       icon={<Calendar size={16} />}
-                      label={
-                        language === "am"
-                          ? "የመጀመሪያ ቀን"
-                          : language === "ar"
-                          ? "تاريخ البدء"
-                          : "Start Date"
-                      }
+                      label={language === "am" ? "የመጀመሪያ ቀን" : "Start Date"}
                       value={
                         course.startDate
                           ? new Date(course.startDate).toLocaleDateString(
-                              language === "ar"
-                                ? "ar-SA"
-                                : language === "am"
-                                ? "am-ET"
-                                : "en-US"
+                              "am-ET"
                             )
                           : "TBA"
                       }
-                      dir={dir}
                     />
                     <InfoRow
                       icon={<ShieldCheck size={16} />}
-                      label={
-                        language === "am"
-                          ? "ሰርተፍኬት"
-                          : language === "ar"
-                          ? "الشهادة"
-                          : "Certificate"
-                      }
-                      value={
-                        language === "am"
-                          ? "ይሰጣል"
-                          : language === "ar"
-                          ? "معتمد"
-                          : "Certified"
-                      }
+                      label={language === "am" ? "ሰርተፍኬት" : "Certificate"}
+                      value={language === "am" ? "ይሰጣል" : "Certified"}
                       valueClass="text-gold"
-                      dir={dir}
                     />
                   </div>
                 </div>
@@ -414,18 +278,10 @@ export default function CourseOverviewPage() {
   );
 }
 
-function InfoRow({ icon, label, value, valueClass, dir }) {
+function InfoRow({ icon, label, value, valueClass }) {
   return (
-    <div
-      className={`flex items-center justify-between ${
-        dir === "rtl" ? "flex-row-reverse" : ""
-      }`}
-    >
-      <div
-        className={`flex items-center gap-3 text-white/40 ${
-          dir === "rtl" ? "flex-row-reverse" : ""
-        }`}
-      >
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3 text-white/40">
         {icon}
         <span className="text-[9px] font-black uppercase tracking-widest">
           {label}

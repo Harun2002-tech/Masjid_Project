@@ -319,63 +319,40 @@ export default function AddCoursePage() {
             </div>
           </div>
 
-          {/* Lessons Section */}
-          <div className="glass p-8 md:p-10 rounded-[2.5rem] space-y-8">
-            <div className="flex justify-between items-center border-b border-glass-border pb-6">
-              <h2 className="text-lg font-bold text-text flex items-center gap-3">
-                <LayoutGrid size={22} className="text-gold" /> {t("lessons")}
-              </h2>
-              {!isViewMode && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData((p) => ({
-                      ...p,
-                      lessons: [...p.lessons, { title: "", duration: "" }],
-                    }))
-                  }
-                  className="btn-gold px-5 py-2.5 rounded-xl font-black text-[10px] tracking-widest flex items-center gap-2"
-                >
-                  <Plus size={16} /> {t("add_new")}
-                </button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {formData.lessons.map((lesson, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-3 bg-black/20 p-4 rounded-2xl border border-glass-border"
-                >
-                  <div className="flex-1 space-y-2">
-                    <input
-                      placeholder="Lesson title"
-                      className="bg-transparent w-full outline-none text-sm text-text font-bold"
-                      value={lesson.title}
-                      onChange={(e) => {
-                        const newLessons = [...formData.lessons];
-                        newLessons[idx].title = e.target.value;
-                        update("lessons", newLessons);
-                      }}
-                    />
-                  </div>
-                  {!isViewMode && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        update(
-                          "lessons",
-                          formData.lessons.filter((_, i) => i !== idx)
-                        )
-                      }
-                      className="text-red-400 hover:text-red-500 transition-colors"
-                    >
-                      <X size={18} />
-                    </button>
-                  )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {formData.lessons.map((lesson, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-3 bg-black/20 p-4 rounded-2xl border border-glass-border"
+              >
+                <div className="flex-1 space-y-2">
+                  <input
+                    placeholder="Lesson title"
+                    className="bg-transparent w-full outline-none text-sm text-text font-bold"
+                    value={lesson.title}
+                    onChange={(e) => {
+                      const newLessons = [...formData.lessons];
+                      newLessons[idx].title = e.target.value;
+                      update("lessons", newLessons);
+                    }}
+                  />
                 </div>
-              ))}
-            </div>
+                {!isViewMode && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      update(
+                        "lessons",
+                        formData.lessons.filter((_, i) => i !== idx)
+                      )
+                    }
+                    className="text-red-400 hover:text-red-500 transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
 
           {/* Submit Button */}
