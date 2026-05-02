@@ -4,45 +4,44 @@ const Enrollment = require("../models/Enrollment");
 // 1. አዲስ ኮርስ መፍጠር (Create)
 exports.createCourse = async (req, res) => {
   try {
-    // 1. የጥያቄውን አካል (body) መቅዳት
     let courseData = { ...req.body };
 
-    // 2. Lessons Parsing - JSON ስህተት ቢኖረው ለተጠቃሚው ማሳወቅ ይሻላል
+    // 1. Lessons Parsing (ደህንነቱ በተጠበቀ ሁኔታ)
     if (courseData.lessons && typeof courseData.lessons === "string") {
       try {
         courseData.lessons = JSON.parse(courseData.lessons);
       } catch (e) {
-        return res.status(400).json({
-          success: false,
-          message: "የሳምንታዊ ትምህርቶች (Lessons) አቀማመጥ ስህተት አለበት።",
-        });
+        return res
+          .status(400)
+          .json({ success: false, message: "Lessons JSON format error" });
       }
     }
 
-    // 3. ምስሉ (Thumbnail) ካለ ማስተካከል።
-    // ካልተላከ Default ምስል እንዲኖረው ማድረግ ትችላለህ።
+    // 2. ምስሉን (Thumbnail) ማስተካከል - እዚህ ጋር ነው ስህተቱ የነበረው
     if (req.file) {
+      // Multer የሰጠውን ሙሉ Path ተጠቀም
       courseData.thumbnail = req.file.path.replace(/\\/g, "/");
+    } else {
+      // ምስል ካልተላከ ባዶ እንዲሆን ወይም Default እንዲይዝ
+      courseData.thumbnail = "";
     }
 
-    // 4. ወደ ዳታቤዝ ማስገባት
     const newCourse = await Course.create(courseData);
 
-    // 5. ምላሽ መላክ
     res.status(201).json({
       success: true,
       message: "ኮርሱ በትክክል ተፈጥሯል",
       data: newCourse,
     });
   } catch (err) {
-    console.error("SERVER ERROR (createCourse):", err);
-
-    // ለተጠቃሚው ግልጽ የሆነ የስህተት መልእክት መላክ
-    res.status(500).json({
-      success: false,
-      message: "ኮርሱን መፍጠር አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
-      error: err.message,
-    });
+    console.error("SERVER ERROR:", err);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Internal Server Error",
+        error: err.message,
+      });
   }
 };
 // 2. ሁሉንም ኮርሶች ለማግኘት (Get All)
