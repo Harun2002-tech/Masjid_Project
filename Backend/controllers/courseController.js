@@ -4,25 +4,44 @@ const Enrollment = require("../models/Enrollment");
 // 1. አዲስ ኮርስ መፍጠር (Create)
 exports.createCourse = async (req, res) => {
   try {
+    // 1. የጥያቄውን አካል (body) መቅዳት
     let courseData = { ...req.body };
 
+    // 2. Lessons በ String መልክ ከመጡ ወደ Array መቀየር (JSON.parse)
     if (courseData.lessons && typeof courseData.lessons === "string") {
       try {
         courseData.lessons = JSON.parse(courseData.lessons);
       } catch (e) {
-        console.error("JSON Parsing error:", e);
+        console.error("JSON Parsing error for lessons:", e);
+        // ስህተት ካለው ባዶ array ማድረግ ትችላለህ ወይም እንዳለ መተው
+        courseData.lessons = [];
       }
     }
 
+    // 3. ፋይሉ (ምስሉ) ከተላከ መንገዱን (path) ማስተካከልclear
     if (req.file) {
-      courseData.thumbnail = req.file.path;
+      // Multer ፋይሉን uploads/lessons/ ውስጥ ያስቀምጠዋል
+      // እኛ ደግሞ በዳታቤዝ ውስጥ ሲቀመጥ እንዲህ እናስተካክለዋለን፡
+      // .replace(/\\/g, "/") የምናደርገው ዊንዶውስ ላይ "\" የሚለውን ወደ "/" ለመቀየር ነው
+      courseData.thumbnail = req.file.path.replace(/\\/g, "/");
     }
 
+    // 4. ወደ ዳታቤዝ ማስገባት
     const newCourse = await Course.create(courseData);
-    res.status(201).json({ success: true, data: newCourse });
+
+    // 5. ምላሽ መላክ
+    res.status(201).json({
+      success: true,
+      message: "ኮርሱ በትክክል ተፈጥሯል",
+      data: newCourse,
+    });
   } catch (err) {
-    console.error("SERVER ERROR:", err);
-    res.status(500).json({ success: false, message: err.message });
+    console.error("SERVER ERROR (createCourse):", err);
+    res.status(500).json({
+      success: false,
+      message: "ኮርሱን መፍጠር አልተቻለም",
+      error: err.message,
+    });
   }
 };
 
