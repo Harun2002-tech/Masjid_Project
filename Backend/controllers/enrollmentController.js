@@ -16,15 +16,17 @@ exports.submitEnrollment = async (req, res) => {
 
     // 2. 🛡️ የደህንነት መቆለፊያ (Backend Lock)
     if (targetCourse.enrollmentOpen === false) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "ይቅርታ፣ የዚህ ኮርስ ምዝገባ በአሁኑ ሰዓት በአድሚኑ ተዘግቷል።" 
+      return res.status(400).json({
+        success: false,
+        message: "ይቅርታ፣ የዚህ ኮርስ ምዝገባ በአሁኑ ሰዓት በአድሚኑ ተዘግቷል።",
       });
     }
 
     // 3. ፋይል መኖሩን ማረጋገጥ
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "እባክዎ የመታወቂያ ፎቶ ይስቀሉ" });
+      return res
+        .status(400)
+        .json({ success: false, message: "እባክዎ የመታወቂያ ፎቶ ይስቀሉ" });
     }
 
     const imagePath = req.file.path.replace(/\\/g, "/");
@@ -65,10 +67,11 @@ exports.submitEnrollment = async (req, res) => {
       message: "ማመልከቻዎ በተሳካ ሁኔታ ተልኳል፤ አድሚኑ እስኪያጸድቅልዎ ይጠብቁ።",
       data: newEnrollment,
     });
-
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ success: false, message: "ለዚህ ኮርስ ቀደም ብለው አመልክተዋል።" });
+      return res
+        .status(400)
+        .json({ success: false, message: "ለዚህ ኮርስ ቀደም ብለው አመልክተዋል።" });
     }
     console.error("SUBMIT ERROR:", error);
     res.status(400).json({ success: false, message: error.message });
@@ -84,7 +87,9 @@ exports.getAllEnrollments = async (req, res) => {
       .populate("course", "title")
       .sort({ createdAt: -1 });
 
-    res.status(200).json({ success: true, count: enrollments.length, data: enrollments });
+    res
+      .status(200)
+      .json({ success: true, count: enrollments.length, data: enrollments });
   } catch (error) {
     res.status(500).json({ success: false, message: "መረጃ ማምጣት አልተቻለም" });
   }
@@ -145,9 +150,12 @@ exports.rejectEnrollment = async (req, res) => {
       { new: true }
     );
 
-    if (!enrollment) return res.status(404).json({ success: false, message: "ምዝገባው አልተገኘም" });
+    if (!enrollment)
+      return res.status(404).json({ success: false, message: "ምዝገባው አልተገኘም" });
 
-    res.status(200).json({ success: true, message: "ማመልከቻው ውድቅ ተደርጓል", data: enrollment });
+    res
+      .status(200)
+      .json({ success: true, message: "ማመልከቻው ውድቅ ተደርጓል", data: enrollment });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -167,13 +175,18 @@ exports.updateProgress = async (req, res) => {
       applicationStatus: "approved",
     });
 
-    if (!enrollment) return res.status(404).json({ success: false, message: "ንቁ የሆነ የምዝገባ መረጃ አልተገኘም" });
+    if (!enrollment)
+      return res
+        .status(404)
+        .json({ success: false, message: "ንቁ የሆነ የምዝገባ መረጃ አልተገኘም" });
 
     if (!enrollment.completedLessons.includes(lessonId)) {
       enrollment.completedLessons.push(lessonId);
       const course = await Course.findById(courseId);
       if (course?.lessons?.length > 0) {
-        enrollment.progress = Math.round((enrollment.completedLessons.length / course.lessons.length) * 100);
+        enrollment.progress = Math.round(
+          (enrollment.completedLessons.length / course.lessons.length) * 100
+        );
       }
       await enrollment.save();
     }
@@ -198,14 +211,40 @@ exports.getMyEnrollments = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+/* =====================================================
+   9. Get Enrollment Status (ለተማሪው በኮርስ ID)
+===================================================== */
+exports.getEnrollmentStatus = async (req, res) => {
+  try {
+    const enrollment = await Enrollment.findOne({
+      user: req.user.id, // የገባው ተማሪ ID
+      course: req.params.courseId, // ከ URL የመጣው Course ID
+    });
 
+    if (!enrollment) {
+      return res.status(200).json({ success: true, status: null });
+    }
+
+    res.status(200).json({
+      success: true,
+      status: enrollment.applicationStatus, // "pending", "approved", "rejected"
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 /* =====================================================
    7. Update & 8. Delete
 ===================================================== */
 exports.updateEnrollment = async (req, res) => {
   try {
-    const enrollment = await Enrollment.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!enrollment) return res.status(404).json({ success: false, message: "ምዝገባው አልተገኘም" });
+    const enrollment = await Enrollment.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!enrollment)
+      return res.status(404).json({ success: false, message: "ምዝገባው አልተገኘም" });
     res.status(200).json({ success: true, data: enrollment });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -215,7 +254,8 @@ exports.updateEnrollment = async (req, res) => {
 exports.deleteEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
-    if (!enrollment) return res.status(404).json({ success: false, message: "ምዝገባው አልተገኘም" });
+    if (!enrollment)
+      return res.status(404).json({ success: false, message: "ምዝገባው አልተገኘም" });
     res.status(200).json({ success: true, message: "ምዝገባው በተሳካ ሁኔታ ተሰርዟል" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

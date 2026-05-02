@@ -64,6 +64,7 @@ import libraryRoutes from "./routes/libraryRoutes.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import masjidRoutes from "./routes/prayerRoutes.js";
 import scheduleRoutes from "./routes/scheduleRoutes.js";
+
 import statsRoutes from "./routes/statsRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import testimonialsRoutes from "./routes/testimonialRoutes.js";

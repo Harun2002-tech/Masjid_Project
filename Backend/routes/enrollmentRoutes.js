@@ -10,6 +10,7 @@ import {
   updateEnrollment,
   deleteEnrollment,
   updateProgress,
+  getEnrollmentStatus,
 } from "../controllers/enrollmentController.js"; // 👈 .js መጨመሩን እርግጠኛ ሁን
 
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
@@ -55,6 +56,9 @@ router.patch(
   rejectEnrollment
 );
 
+// በ Course ID መፈለግ
+
+router.get("/status/:courseId", protect, getEnrollmentStatus);
 // የምዝገባ መረጃን ለማስተካከል
 router.put("/:id", protect, allowRoles(...adminRoles), updateEnrollment);
 
