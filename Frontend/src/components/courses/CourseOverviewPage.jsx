@@ -14,12 +14,13 @@ import {
   ListChecks,
   Award,
   Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 export default function CourseOverviewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t, language, dir } = useLanguage();
+  const { language, dir } = useLanguage();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [enrollmentStatus, setEnrollmentStatus] = useState(null);
@@ -32,11 +33,13 @@ export default function CourseOverviewPage() {
         setLoading(true);
         const token = localStorage.getItem("token");
 
+        // 1. የኮርስ መረጃ ማምጣት
         const response = await fetch(`${API_BASE_URL}/api/courses/${id}`);
         const resData = await response.json();
         const courseData = resData.success ? resData.data : resData;
         setCourse(courseData);
 
+        // 2. የምዝገባ ሁኔታ መፈተሽ
         if (token && id) {
           const statusRes = await fetch(
             `${API_BASE_URL}/api/enrollments/status/${id}`,
@@ -44,7 +47,8 @@ export default function CourseOverviewPage() {
           );
           const statusData = await statusRes.json();
 
-          if (statusData?.status === "Approved") {
+          // ሁኔታው የጸደቀ ከሆነ በቀጥታ ወደ ትምህርት ገጽ ውሰደው
+          if (statusData?.status?.toLowerCase() === "approved") {
             navigate(`/course-learn/${id}`);
             return;
           }
@@ -89,7 +93,9 @@ export default function CourseOverviewPage() {
     );
 
   const renderEnrollmentAction = () => {
-    if (enrollmentStatus === "Pending") {
+    const status = enrollmentStatus?.toLowerCase();
+
+    if (status === "pending") {
       return (
         <Button
           disabled
@@ -98,6 +104,27 @@ export default function CourseOverviewPage() {
           <Loader2 className="h-4 w-4 animate-spin mr-2" />
           {language === "am" ? "ጥያቄዎ በመታየት ላይ ነው..." : "Request Pending..."}
         </Button>
+      );
+    }
+
+    if (status === "rejected") {
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-red-400 justify-center bg-red-500/10 p-3 rounded-xl border border-red-500/20">
+            <AlertCircle size={16} />
+            <span className="text-[10px] font-bold uppercase">
+              {language === "am" ? "ጥያቄዎ ውድቅ ተደርጓል" : "Application Rejected"}
+            </span>
+          </div>
+          <Button
+            className="w-full h-16 rounded-2xl btn-gold text-[11px] uppercase"
+            asChild
+          >
+            <Link to={`/courses/${id}/enroll`}>
+              {language === "am" ? "እንደገና አመልክት" : "RE-APPLY NOW"}
+            </Link>
+          </Button>
+        </div>
       );
     }
 
@@ -164,11 +191,17 @@ export default function CourseOverviewPage() {
             {course.thumbnail && (
               <div className="relative aspect-video rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 glass">
                 <img
-                  src={`${API_BASE_URL}${
-                    course.thumbnail.startsWith("/") ? "" : "/"
-                  }${course.thumbnail}`}
+                  src={
+                    course.thumbnail.startsWith("http")
+                      ? course.thumbnail
+                      : `${API_BASE_URL}/${course.thumbnail.replace(/^\//, "")}`
+                  }
                   alt={course.title}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src =
+                      "https://placehold.co/600x400/064e3b/gold?text=Course+Image";
+                  }}
                 />
               </div>
             )}
@@ -228,16 +261,20 @@ export default function CourseOverviewPage() {
                       {language === "am" ? "የምዝገባ ሁኔታ" : "ENROLLMENT STATUS"}
                     </p>
                     <h3 className="text-2xl font-bold text-white">
-                      {enrollmentStatus === "Pending"
+                      {enrollmentStatus?.toLowerCase() === "pending"
                         ? language === "am"
-                          ? "ጥያቄዎ በመታየት ላይ ነው"
+                          ? "ጥያቄዎ በመታየት ላይ"
                           : "Pending"
+                        : enrollmentStatus?.toLowerCase() === "rejected"
+                        ? language === "am"
+                          ? "ውድቅ ተደርጓል"
+                          : "Rejected"
                         : course.enrollmentOpen
                         ? language === "am"
-                          ? "ምዝገባ ክፍት ነው"
+                          ? "ክፍት ነው"
                           : "Open"
                         : language === "am"
-                        ? "ምዝገባ ተዘግቷል"
+                        ? "ተዘግቷል"
                         : "Closed"}
                     </h3>
                   </div>
@@ -256,7 +293,7 @@ export default function CourseOverviewPage() {
                       value={
                         course.startDate
                           ? new Date(course.startDate).toLocaleDateString(
-                              "am-ET"
+                              language === "am" ? "am-ET" : "en-US"
                             )
                           : "TBA"
                       }
