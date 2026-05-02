@@ -1,18 +1,14 @@
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
-  Plus,
-  Trash2,
   Upload,
   ArrowLeft,
   BookOpen,
-  LayoutGrid,
   Save,
   Clock,
   Loader2,
   ImageIcon,
   Sparkles,
-  X,
 } from "lucide-react";
 import { COURSE_URL } from "@/config/api";
 import { useLanguage } from "../../../contexts/language-context";
@@ -42,7 +38,6 @@ export default function AddCoursePage() {
     days: "",
     time: "",
     capacity: 0,
-    lessons: [],
   });
 
   const BASE_URL = "https://masjid-project.onrender.com";
@@ -58,10 +53,15 @@ export default function AddCoursePage() {
           const result = await res.json();
           if (result.success && result.data) {
             setFormData({
-              ...result.data,
-              lessons: Array.isArray(result.data.lessons)
-                ? result.data.lessons
-                : [],
+              title: result.data.title || "",
+              subject: result.data.subject || "",
+              level: result.data.level || "Beginner",
+              description: result.data.description || "",
+              teacher: result.data.teacher || "",
+              duration: result.data.duration || "",
+              days: result.data.days || "",
+              time: result.data.time || "",
+              capacity: result.data.capacity || 0,
             });
             setExistingThumbnail(result.data.thumbnail || "");
           }
@@ -80,7 +80,6 @@ export default function AddCoursePage() {
     setFormData((p) => ({ ...p, [field]: value }));
   };
 
-  // መረጃን ወደ ሰርቨር የሚልክ ፋንክሽን - የተስተካከለ
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isViewMode) return;
@@ -89,19 +88,12 @@ export default function AddCoursePage() {
     const token = localStorage.getItem("token");
     const data = new FormData();
 
-    // 1. ጽሁፎችን ወደ FormData መለወጥ (thumbnail የሚለውን የጽሁፍ ዳታ መዝለል)
+    // ዳታዎችን ወደ FormData መለወጥ
     Object.keys(formData).forEach((key) => {
-      if (key === "thumbnail") return; // የድሮውን ምስል ስም በጽሁፍ እንዳይልከው
-
-      if (key === "lessons") {
-        data.append(key, JSON.stringify(formData[key]));
-      } else {
-        data.append(key, formData[key]);
-      }
+      data.append(key, formData[key]);
     });
 
-    // 2. አዲስ የፋይል ምስል ካለ "thumbnail" በሚል ስም መጨመር
-    // Backend Multerህ URL ላይ "courses" ካየ ወደ uploads/lessons/ ይልከዋል
+    // አዲስ ምስል ካለ መጨመር
     if (thumbnail) {
       data.append("thumbnail", thumbnail);
     }
@@ -112,10 +104,7 @@ export default function AddCoursePage() {
 
       const res = await fetch(url, {
         method: method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // 'Content-Type' እዚህ አያስፈልግም፣ FormData ራሱ ያስተካክላል
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: data,
       });
 
@@ -146,6 +135,7 @@ export default function AddCoursePage() {
   return (
     <div className="min-h-screen py-16 px-4 pt-32" dir={isRTL ? "rtl" : "ltr"}>
       <div className="container mx-auto max-w-5xl relative">
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6 relative z-10">
           <Link
             to="/admin/courses"
@@ -177,6 +167,7 @@ export default function AddCoursePage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
+          {/* Photo Section */}
           <section className="glass p-8 md:p-10 rounded-[2.5rem] border border-glass-border">
             <h2 className="text-lg font-bold text-text flex items-center gap-3 mb-8">
               <ImageIcon size={22} className="text-gold" /> {t("course_photo")}
@@ -218,6 +209,7 @@ export default function AddCoursePage() {
             </div>
           </section>
 
+          {/* Main Info and Schedule Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2 space-y-10">
               <div className="glass p-8 md:p-10 rounded-[2.5rem] space-y-8">
@@ -288,6 +280,7 @@ export default function AddCoursePage() {
               </div>
             </div>
 
+            {/* Schedule Section */}
             <div className="glass p-8 md:p-10 rounded-[2.5rem] border-t-2 border-t-gold/20 h-fit">
               <h2 className="text-lg font-bold flex items-center gap-3 mb-8 border-b border-glass-border pb-4 text-gold-glow">
                 <Clock size={22} /> {t("schedule")}
@@ -317,42 +310,7 @@ export default function AddCoursePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {formData.lessons.map((lesson, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-3 bg-black/20 p-4 rounded-2xl border border-glass-border"
-              >
-                <div className="flex-1 space-y-2">
-                  <input
-                    placeholder="Lesson title"
-                    className="bg-transparent w-full outline-none text-sm text-text font-bold"
-                    value={lesson.title}
-                    onChange={(e) => {
-                      const newLessons = [...formData.lessons];
-                      newLessons[idx].title = e.target.value;
-                      update("lessons", newLessons);
-                    }}
-                  />
-                </div>
-                {!isViewMode && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      update(
-                        "lessons",
-                        formData.lessons.filter((_, i) => i !== idx)
-                      )
-                    }
-                    className="text-red-400 hover:text-red-500 transition-colors"
-                  >
-                    <X size={18} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-
+          {/* Submit Button */}
           {!isViewMode && (
             <div className="flex justify-center pt-10">
               <button
