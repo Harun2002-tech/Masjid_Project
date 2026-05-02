@@ -35,13 +35,11 @@ exports.createCourse = async (req, res) => {
     });
   } catch (err) {
     console.error("SERVER ERROR:", err);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal Server Error",
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
+    });
   }
 };
 // 2. ሁሉንም ኮርሶች ለማግኘት (Get All)
@@ -78,10 +76,11 @@ exports.addLesson = async (req, res) => {
     const { id } = req.params;
     const { title, description, dayNumber, youtubeUrl } = req.body;
 
+    // ፋይሉ መኖሩን ቼክ ሳታደርግ .path አትጥራ። እንዲህ አስተካክለው፡
+    const audioUrl = req.files?.audio?.[0]?.path?.replace(/\\/g, "/") || null;
+    const pdfUrl = req.files?.pdf?.[0]?.path?.replace(/\\/g, "/") || null;
+    const videoUrl = req.files?.video?.[0]?.path?.replace(/\\/g, "/") || null;
     // ፋይሎቹ መኖራቸውን ቼክ ማድረግ (MulterMiddleware.fields በመጠቀም የመጡ)
-    const audioUrl = req.files?.audio ? req.files.audio[0].path : null;
-    const pdfUrl = req.files?.pdf ? req.files.pdf[0].path : null;
-    const videoUrl = req.files?.video ? req.files.video[0].path : null;
 
     const newLesson = {
       title,
