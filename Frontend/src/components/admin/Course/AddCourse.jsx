@@ -47,7 +47,6 @@ export default function AddCoursePage() {
 
   const BASE_URL = "https://masjid-project.onrender.com";
 
-  // ኮርስ ዳታ ከ Backend ለመሳብ (ለ Edit mode)
   useEffect(() => {
     if (isEditMode) {
       const fetchCourseData = async () => {
@@ -81,7 +80,7 @@ export default function AddCoursePage() {
     setFormData((p) => ({ ...p, [field]: value }));
   };
 
-  // መረጃን ወደ ሰርቨር የሚልክ ፋንክሽን
+  // መረጃን ወደ ሰርቨር የሚልክ ፋንክሽን - የተስተካከለ
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isViewMode) return;
@@ -90,8 +89,10 @@ export default function AddCoursePage() {
     const token = localStorage.getItem("token");
     const data = new FormData();
 
-    // ጽሁፎችን ወደ FormData መለወጥ
+    // 1. ጽሁፎችን ወደ FormData መለወጥ (thumbnail የሚለውን የጽሁፍ ዳታ መዝለል)
     Object.keys(formData).forEach((key) => {
+      if (key === "thumbnail") return; // የድሮውን ምስል ስም በጽሁፍ እንዳይልከው
+
       if (key === "lessons") {
         data.append(key, JSON.stringify(formData[key]));
       } else {
@@ -99,7 +100,8 @@ export default function AddCoursePage() {
       }
     });
 
-    // አዲስ ፎቶ ካለ መጨመር
+    // 2. አዲስ የፋይል ምስል ካለ "thumbnail" በሚል ስም መጨመር
+    // Backend Multerህ URL ላይ "courses" ካየ ወደ uploads/lessons/ ይልከዋል
     if (thumbnail) {
       data.append("thumbnail", thumbnail);
     }
@@ -110,7 +112,10 @@ export default function AddCoursePage() {
 
       const res = await fetch(url, {
         method: method,
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // 'Content-Type' እዚህ አያስፈልግም፣ FormData ራሱ ያስተካክላል
+        },
         body: data,
       });
 
@@ -141,7 +146,6 @@ export default function AddCoursePage() {
   return (
     <div className="min-h-screen py-16 px-4 pt-32" dir={isRTL ? "rtl" : "ltr"}>
       <div className="container mx-auto max-w-5xl relative">
-        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6 relative z-10">
           <Link
             to="/admin/courses"
@@ -151,7 +155,7 @@ export default function AddCoursePage() {
             {t("back")}
           </Link>
 
-          <div className={isRTL ? "text-right" : "text-right"}>
+          <div className="text-right">
             <div
               className={`flex items-center gap-2 text-gold mb-1 ${
                 isRTL ? "justify-start" : "justify-end"
@@ -173,7 +177,6 @@ export default function AddCoursePage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
-          {/* Thumbnail Section */}
           <section className="glass p-8 md:p-10 rounded-[2.5rem] border border-glass-border">
             <h2 className="text-lg font-bold text-text flex items-center gap-3 mb-8">
               <ImageIcon size={22} className="text-gold" /> {t("course_photo")}
@@ -216,13 +219,11 @@ export default function AddCoursePage() {
           </section>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* Main Info */}
             <div className="lg:col-span-2 space-y-10">
               <div className="glass p-8 md:p-10 rounded-[2.5rem] space-y-8">
                 <h2 className="text-lg font-bold text-text flex items-center gap-3 border-b border-glass-border pb-4">
                   <BookOpen size={22} className="text-gold" /> {t("basic_info")}
                 </h2>
-
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-text/40 uppercase tracking-widest ml-2">
@@ -236,7 +237,6 @@ export default function AddCoursePage() {
                       disabled={isViewMode}
                     />
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-text/40 uppercase tracking-widest ml-2">
@@ -272,7 +272,6 @@ export default function AddCoursePage() {
                       </select>
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-text/40 uppercase tracking-widest ml-2">
                       {t("description")}
@@ -289,7 +288,6 @@ export default function AddCoursePage() {
               </div>
             </div>
 
-            {/* Sidebar Schedule */}
             <div className="glass p-8 md:p-10 rounded-[2.5rem] border-t-2 border-t-gold/20 h-fit">
               <h2 className="text-lg font-bold flex items-center gap-3 mb-8 border-b border-glass-border pb-4 text-gold-glow">
                 <Clock size={22} /> {t("schedule")}
@@ -355,7 +353,6 @@ export default function AddCoursePage() {
             ))}
           </div>
 
-          {/* Submit Button */}
           {!isViewMode && (
             <div className="flex justify-center pt-10">
               <button

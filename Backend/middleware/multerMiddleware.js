@@ -41,6 +41,7 @@ const storage = multer.diskStorage({
     else if (url.includes("books") || url.includes("library")) {
       dest = "uploads/books/";
     }
+    
     // ለትምህርቶች (Courses/Lessons)
     else if (url.includes("courses") || url.includes("lessons")) {
       dest = "uploads/lessons/";
