@@ -7,22 +7,21 @@ exports.createCourse = async (req, res) => {
     // 1. የጥያቄውን አካል (body) መቅዳት
     let courseData = { ...req.body };
 
-    // 2. Lessons በ String መልክ ከመጡ ወደ Array መቀየር (JSON.parse)
+    // 2. Lessons Parsing - JSON ስህተት ቢኖረው ለተጠቃሚው ማሳወቅ ይሻላል
     if (courseData.lessons && typeof courseData.lessons === "string") {
       try {
         courseData.lessons = JSON.parse(courseData.lessons);
       } catch (e) {
-        console.error("JSON Parsing error for lessons:", e);
-        // ስህተት ካለው ባዶ array ማድረግ ትችላለህ ወይም እንዳለ መተው
-        courseData.lessons = [];
+        return res.status(400).json({
+          success: false,
+          message: "የሳምንታዊ ትምህርቶች (Lessons) አቀማመጥ ስህተት አለበት።",
+        });
       }
     }
 
-    // 3. ፋይሉ (ምስሉ) ከተላከ መንገዱን (path) ማስተካከልclear
+    // 3. ምስሉ (Thumbnail) ካለ ማስተካከል።
+    // ካልተላከ Default ምስል እንዲኖረው ማድረግ ትችላለህ።
     if (req.file) {
-      // Multer ፋይሉን uploads/lessons/ ውስጥ ያስቀምጠዋል
-      // እኛ ደግሞ በዳታቤዝ ውስጥ ሲቀመጥ እንዲህ እናስተካክለዋለን፡
-      // .replace(/\\/g, "/") የምናደርገው ዊንዶውስ ላይ "\" የሚለውን ወደ "/" ለመቀየር ነው
       courseData.thumbnail = req.file.path.replace(/\\/g, "/");
     }
 
@@ -37,14 +36,15 @@ exports.createCourse = async (req, res) => {
     });
   } catch (err) {
     console.error("SERVER ERROR (createCourse):", err);
+
+    // ለተጠቃሚው ግልጽ የሆነ የስህተት መልእክት መላክ
     res.status(500).json({
       success: false,
-      message: "ኮርሱን መፍጠር አልተቻለም",
+      message: "ኮርሱን መፍጠር አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
       error: err.message,
     });
   }
 };
-
 // 2. ሁሉንም ኮርሶች ለማግኘት (Get All)
 exports.getAllCourses = async (req, res) => {
   try {
