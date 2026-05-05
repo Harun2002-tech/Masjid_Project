@@ -13,19 +13,17 @@ export const sendContactEmail = async (req, res) => {
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      // 🚀 በጣም ወሳኙ መስመር ይህ ነው! 
-      // Render.com ላይ IPv6 እንዳይጠቀም እና ENETUNREACH ስህተት እንዳይመጣ ያደርጋል
-      family: 4, 
+      port: 465, // Try 465 (SSL) if 587 continues to timeout
+      secure: true, // true for 465, false for other ports
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
       tls: {
+        // This helps bypass some network restrictions
         rejectUnauthorized: false,
-        minVersion: "TLSv1.2",
       },
+      family: 4, // <--- Add this line to force IPv4
     });
 
     const mailOptions = {
@@ -50,7 +48,6 @@ export const sendContactEmail = async (req, res) => {
       success: true,
       message: "መልእክትዎ በትክክል ተልኳል!",
     });
-
   } catch (error) {
     console.error("❌ Nodemailer Error Detail:", error);
     return res.status(500).json({
