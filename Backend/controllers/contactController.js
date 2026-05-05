@@ -12,18 +12,16 @@ export const sendContactEmail = async (req, res) => {
     }
 
     const transporter = nodemailer.createTransport({
+      service: "gmail",
       host: "smtp.gmail.com",
-      port: 465, // Try 465 (SSL) if 587 continues to timeout
-      secure: true, // true for 465, false for other ports
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
-      tls: {
-        // This helps bypass some network restrictions
-        rejectUnauthorized: false,
-      },
-      family: 4, // <--- Add this line to force IPv4
+      // ይህች ክፍል መታከል አለባት
+      family: 4,
     });
 
     const mailOptions = {
