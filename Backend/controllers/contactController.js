@@ -17,21 +17,22 @@ export const sendContactEmail = async (req, res) => {
       });
     }
 
-    // 2. የኢሜይል ማጓጓዣ (Transporter) ማዘጋጀት
-    // Render ላይ port 465 ብዙ ጊዜ ስለሚዘጋ 587 መጠቀም ይመከራል
     const transporter = nodemailer.createTransport({
+      // ከ "smtp.gmail.com" ይልቅ የ Gmail IPv4 አድራሻን በቀጥታ መጠቀም ይቻላል
+      // ወይም ደግሞ host እንደነበረ ሆኖ ፖርቱን ማስተካከል
       host: "smtp.gmail.com",
       port: 587,
-      secure: false, // ለ port 587 false መሆን አለበት
+      secure: false,
       auth: {
-        user: process.env.EMAIL_USER, // የእርሶ Gmail (ለምሳሌ፡ ruhamaislamic@gmail.com)
-        pass: process.env.EMAIL_PASS, // Bjkvclclrivwbcrs (App Password)
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
+      // ይህ ክፍል IPv6 ችግርን ይፈታል
       tls: {
-        rejectUnauthorized: false, // ሰርቨር ላይ የግንኙነት ስህተትን ለመከላከል
+        rejectUnauthorized: false,
+        minVersion: "TLSv1.2",
       },
     });
-
     // 3. የኢሜይል ይዘት እና ዲዛይን
     const mailOptions = {
       from: `"Ruhama Website" <${process.env.EMAIL_USER}>`,
