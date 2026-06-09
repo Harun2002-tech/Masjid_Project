@@ -1,5 +1,5 @@
 const api_url =
-  import.meta.env.VITE_API_URL || "https://masjid-project.onrender.com";
+  import.meta.env.VITE_API_URL || "https://api.ruhamaislamiccenter.com";
 
 // ከ LocalStorage ቶከን ለማምጣት የሚረዳ ረዳት (ለ Admin ስራዎች)
 const getAuthHeaders = () => {

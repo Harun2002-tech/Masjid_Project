@@ -117,7 +117,7 @@ const TestimonialProfile = () => {
               <img
                 src={
                   testimonial.photo || testimonial.image
-                    ? `https://masjid-project.onrender.com${
+                    ? `https://api.ruhamaislamiccenter.com${
                         testimonial.photo || testimonial.image
                       }`
                     : `https://ui-avatars.com/api/?name=${encodeURIComponent(

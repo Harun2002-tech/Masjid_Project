@@ -36,6 +36,7 @@ const FormField = ({
   placeholder,
   options = null,
   isRTL,
+  disabled = false, // እዚህ ላይ የነበረው 'disable' ወደ 'disabled' ተስተካክሏል
 }) => (
   <div className="space-y-2 group">
     <label
@@ -56,9 +57,10 @@ const FormField = ({
         name={name}
         value={value}
         onChange={onChange}
+        disabled={disabled}
         className={`w-full payment-input rounded-2xl px-6 py-4 outline-none font-bold appearance-none transition-all cursor-pointer ${
           isRTL ? "text-right" : "text-left"
-        }`}
+        } disabled:opacity-50`}
       >
         {options.map((opt) => (
           <option
@@ -76,10 +78,11 @@ const FormField = ({
         name={name}
         value={value}
         onChange={onChange}
+        disabled={disabled}
         placeholder={placeholder}
         className={`w-full payment-input rounded-2xl px-6 py-4 outline-none font-bold placeholder:text-gray-600 transition-all ${
           isRTL ? "text-right" : "text-left"
-        }`}
+        } disabled:opacity-50`}
       />
     )}
   </div>
@@ -109,7 +112,7 @@ export default function AddStudent() {
       male: "ወንድ",
       female: "ሴት",
       nationality: "ዜግነት",
-      birthDate: "የትውልድ ቀን",
+      birthDate: "የትውልድ ቀን", // እዚህ ላይ 'birtDate' የነበረው ተስተካክሏል
       maritalStatus: "የጋብቻ ሁኔታ",
       disability: "አካላዊ ጉዳት",
       single: "ያላገባ",
@@ -151,7 +154,7 @@ export default function AddStudent() {
       male: "Male",
       female: "Female",
       nationality: "Nationality",
-      birthDate: "BirthDate",
+      birthDate: "Birth Date",
       maritalStatus: "Marital Status",
       disability: "Disability Status",
       single: "Single",
@@ -243,8 +246,6 @@ export default function AddStudent() {
     woreda: "",
     kebele: "",
     address: "",
-    birthDate: "",
-    birthPlace: "",
     gradeLevel: "Beginner",
     shift: "Morning",
     emergencyName: "",
@@ -268,7 +269,7 @@ export default function AddStudent() {
   const [fetching, setFetching] = useState(false);
   const [msg, setMsg] = useState({ type: "", text: "" });
 
-  const API_BASE_URL = "https://masjid-project.onrender.com";
+  const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
 
   useEffect(() => {
     if (isEditMode) {
@@ -486,17 +487,19 @@ export default function AddStudent() {
                     </div>
                   )}
                 </div>
-                <label className="absolute bottom-1 right-1 p-3 btn-gold rounded-xl cursor-pointer hover:scale-110 shadow-lg">
-                  <Camera size={18} />
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={(e) =>
-                      handleFileChange(e, setPhoto, setPhotoPreview)
-                    }
-                    accept="image/*"
-                  />
-                </label>
+                {!isViewOnly && (
+                  <label className="absolute bottom-1 right-1 p-3 btn-gold rounded-xl cursor-pointer hover:scale-110 shadow-lg">
+                    <Camera size={18} />
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) =>
+                        handleFileChange(e, setPhoto, setPhotoPreview)
+                      }
+                      accept="image/*"
+                    />
+                  </label>
+                )}
               </div>
               <div className="space-y-3 mb-8 text-left">
                 <label
@@ -520,17 +523,19 @@ export default function AddStudent() {
                   ) : (
                     <FileText size={40} className="text-white/10 mb-2" />
                   )}
-                  <label className="cursor-pointer text-gold text-[10px] font-black uppercase tracking-tighter flex items-center gap-2">
-                    <Camera size={14} /> {idPreview ? t.change : t.upload}
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) =>
-                        handleFileChange(e, setStudentIDPhoto, setIdPreview)
-                      }
-                      accept="image/*"
-                    />
-                  </label>
+                  {!isViewOnly && (
+                    <label className="cursor-pointer text-gold text-[10px] font-black uppercase tracking-tighter flex items-center gap-2">
+                      <Camera size={14} /> {idPreview ? t.change : t.upload}
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) =>
+                          handleFileChange(e, setStudentIDPhoto, setIdPreview)
+                        }
+                        accept="image/*"
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
               <div className="pt-6 border-t border-white/5">
@@ -567,6 +572,7 @@ export default function AddStudent() {
                     value={formData.firstName}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.lname}
@@ -575,6 +581,7 @@ export default function AddStudent() {
                     value={formData.lastName}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.email}
@@ -584,6 +591,7 @@ export default function AddStudent() {
                     value={formData.email}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   {!isEditMode && (
                     <FormField
@@ -594,6 +602,7 @@ export default function AddStudent() {
                       value={formData.password}
                       onChange={handleChange}
                       isRTL={isRTL}
+                      disabled={isViewOnly}
                     />
                   )}
                   <FormField
@@ -603,6 +612,7 @@ export default function AddStudent() {
                     value={formData.phone}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.nationality}
@@ -611,16 +621,16 @@ export default function AddStudent() {
                     value={formData.nationality}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
-                    label={t.birtDate}
-                    name="birtDate"
+                    label={t.birthDate}
+                    name="birthDate"
                     type="date"
-                    value={formData.birtDate}
+                    value={formData.birthDate}
                     onChange={handleChange}
-                    disable={isViewOnly}
+                    disabled={isViewOnly}
                   />
-
                   <FormField
                     label={t.maritalStatus}
                     name="maritalStatus"
@@ -632,6 +642,7 @@ export default function AddStudent() {
                     value={formData.maritalStatus}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.disability}
@@ -644,6 +655,7 @@ export default function AddStudent() {
                     value={formData.disability}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.gender}
@@ -655,6 +667,7 @@ export default function AddStudent() {
                     value={formData.gender}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                 </div>
               </section>
@@ -679,6 +692,7 @@ export default function AddStudent() {
                     value={formData.region}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.subCity}
@@ -686,6 +700,7 @@ export default function AddStudent() {
                     value={formData.subCity}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.woreda}
@@ -693,6 +708,7 @@ export default function AddStudent() {
                     value={formData.woreda}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.kebele}
@@ -700,6 +716,7 @@ export default function AddStudent() {
                     value={formData.kebele}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                 </div>
               </section>
@@ -725,6 +742,7 @@ export default function AddStudent() {
                     value={formData.gradeLevel}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.shift}
@@ -734,6 +752,7 @@ export default function AddStudent() {
                     value={formData.shift}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                 </div>
                 <div className="space-y-2">
@@ -755,20 +774,24 @@ export default function AddStudent() {
                         className="bg-gold text-[#0b1220] px-4 py-1.5 rounded-xl text-[11px] font-black flex items-center gap-2 shadow-lg"
                       >
                         {sub}{" "}
-                        <X
-                          size={14}
-                          className="cursor-pointer hover:scale-125 transition-transform"
-                          onClick={() => removeSubject(i)}
-                        />
+                        {!isViewOnly && (
+                          <X
+                            size={14}
+                            className="cursor-pointer hover:scale-125 transition-transform"
+                            onClick={() => removeSubject(i)}
+                          />
+                        )}
                       </span>
                     ))}
-                    <input
-                      onKeyDown={handleAddSubject}
-                      className={`bg-transparent outline-none text-sm font-bold flex-1 placeholder:text-gray-600 ${
-                        isRTL ? "text-right" : "text-left"
-                      }`}
-                      placeholder={t.subPlaceholder}
-                    />
+                    {!isViewOnly && (
+                      <input
+                        onKeyDown={handleAddSubject}
+                        className={`bg-transparent outline-none text-sm font-bold flex-1 placeholder:text-gray-600 ${
+                          isRTL ? "text-right" : "text-left"
+                        }`}
+                        placeholder={t.subPlaceholder}
+                      />
+                    )}
                   </div>
                 </div>
               </section>
@@ -794,6 +817,7 @@ export default function AddStudent() {
                     value={formData.emergencyName}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.relation}
@@ -802,6 +826,7 @@ export default function AddStudent() {
                     value={formData.emergencyRelation}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.phone}
@@ -810,6 +835,7 @@ export default function AddStudent() {
                     value={formData.emergencyPhone}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                 </div>
 
@@ -821,6 +847,7 @@ export default function AddStudent() {
                     value={formData.emergencyRegion}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.subCity}
@@ -828,6 +855,7 @@ export default function AddStudent() {
                     value={formData.emergencySubCity}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.woreda}
@@ -835,6 +863,7 @@ export default function AddStudent() {
                     value={formData.emergencyWoreda}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                   <FormField
                     label={t.kebele}
@@ -842,6 +871,7 @@ export default function AddStudent() {
                     value={formData.emergencyKebele}
                     onChange={handleChange}
                     isRTL={isRTL}
+                    disabled={isViewOnly}
                   />
                 </div>
 
@@ -853,36 +883,40 @@ export default function AddStudent() {
                       alt="Emergency ID"
                     />
                   )}
-                  <label className="cursor-pointer bg-red-500/20 text-red-400 px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
-                    {t.emergencyID}{" "}
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) =>
-                        handleFileChange(
-                          e,
-                          setEmergencyIDPhoto,
-                          setEmergencyIdPreview
-                        )
-                      }
-                      accept="image/*"
-                    />
-                  </label>
+                  {!isViewOnly && (
+                    <label className="cursor-pointer bg-red-500/20 text-red-400 px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+                      {t.emergencyID}{" "}
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) =>
+                          handleFileChange(
+                            e,
+                            setEmergencyIDPhoto,
+                            setEmergencyIdPreview
+                          )
+                        }
+                        accept="image/*"
+                      />
+                    </label>
+                  )}
                 </div>
               </section>
 
-              <button
-                type="submit"
-                disabled={loading || fetching}
-                className="w-full btn-gold py-6 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xs flex items-center justify-center gap-4 shadow-2xl disabled:opacity-50 transition-all hover:scale-[1.01]"
-              >
-                {loading ? (
-                  <Loader2 className="animate-spin" size={20} />
-                ) : (
-                  <Save size={20} />
-                )}{" "}
-                {t.save}
-              </button>
+              {!isViewOnly && (
+                <button
+                  type="submit"
+                  disabled={loading || fetching}
+                  className="w-full btn-gold py-6 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xs flex items-center justify-center gap-4 shadow-2xl disabled:opacity-50 transition-all hover:scale-[1.01]"
+                >
+                  {loading ? (
+                    <Loader2 className="animate-spin" size={20} />
+                  ) : (
+                    <Save size={20} />
+                  )}{" "}
+                  {t.save}
+                </button>
+              )}
             </div>
           </div>
         </form>

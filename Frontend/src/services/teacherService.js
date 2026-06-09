@@ -1,5 +1,5 @@
 const api_url =
-  import.meta.env.VITE_API_URL || "https://masjid-project.onrender.com";
+  import.meta.env.VITE_API_URL || "https://api.ruhamaislamiccenter.com";
 
 // Auth Header ለማዘጋጀት (ቶከን ካለ ለመጨመር)
 const getAuthHeaders = () => {

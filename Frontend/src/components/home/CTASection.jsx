@@ -49,7 +49,7 @@ function Stat({ value, label, icon, bodyFont, dir }) {
 export default function CTASection() {
   const { language, dir, t } = useLanguage();
   const API_BASE_URL =
-    import.meta.env.VITE_API_URL || "https://masjid-project.onrender.com";
+    import.meta.env.VITE_API_URL || "https://api.ruhamaislamiccenter.com";
 
   const [stats, setStats] = useState(() => {
     const saved = localStorage.getItem("ruhama_stats");

@@ -40,7 +40,7 @@ export default function AddCoursePage() {
     capacity: 0,
   });
 
-  const BASE_URL = "https://masjid-project.onrender.com";
+  const BASE_URL = "https://api.ruhamaislamiccenter.com";
 
   useEffect(() => {
     if (isEditMode) {

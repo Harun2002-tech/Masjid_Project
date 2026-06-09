@@ -6,16 +6,20 @@ import cors from "cors";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import connectDB from "./config/db.js"; // .js መጨመር እንዳትረሳ
+import connectDB from "./config/db.js";
 
-// 1. የዳታቤዝ ግንኙነት
+// 🛑 1. የUPLOADTHING ጥቅሎችን እዚህ ጋር ኢምፖርት እናደርጋለን (የተስተካከለ)
+import { createRouteHandler } from "uploadthing/express";
+import { uploadRouter } from "./utils/uploadthing.js";
+
+// የዳታቤዝ ግንኙነት
 connectDB();
 
 // ES Modules ላይ __dirname ስለሌለ ይሄን እንጠቀማለን
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 2. የፎልደር ዝግጅት
+// የፎልደር ዝግጅት
 const rootUploads = path.join(__dirname, "uploads");
 const subDirs = [
   "books",
@@ -41,20 +45,20 @@ subDirs.forEach((dir) => {
 });
 
 const app = express();
+
 const corsOptions = {
-  origin: "https://ruhamaislamiccenter.vercel.app", // ያንተ የቪርሴል ሊንክ
+  origin: "https://ruhamaislamiccenter.com", // ያንተ የቪርሴል ሊንክ
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 200,
 };
-app.use(cors(corsOptions)); // 👈 ይህ መስመር የግድ ያስፈልጋል!
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* ---------------- API ROUTES ---------------- */
-// 🚀 ሁሉንም ወደ import ቀይረናቸዋል - የፋይል ስሞቹን .js መጨመርህን አረጋግጥ
 import userRoutes from "./routes/userRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
@@ -64,7 +68,6 @@ import libraryRoutes from "./routes/libraryRoutes.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import masjidRoutes from "./routes/prayerRoutes.js";
 import scheduleRoutes from "./routes/scheduleRoutes.js";
-
 import statsRoutes from "./routes/statsRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import testimonialsRoutes from "./routes/testimonialRoutes.js";
@@ -89,6 +92,14 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/youtube", youtubeRoutes);
 app.use("/api/newsletter", newsletterRouter);
+
+// 🛑 2. የUPLOADTHING ኤፒአይ ሮውትን እዚህ ጋር መፍቀድ
+app.use(
+  "/api/uploadthing",
+  createRouteHandler({
+    router: uploadRouter,
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Ruhama Islamic Center API is Running...");

@@ -2,7 +2,7 @@ import axios from "axios";
 
 const instance = axios.create({
   // የባክኤንድህ ትክክለኛ ሊንክ
-  baseURL: "https://masjid-project.onrender.com/api",
+  baseURL: "https://api.ruhamaislamiccenter.com/api",
   // Render ለመነሳት ጊዜ ስለሚወስድ 1 ደቂቃ እንዲታገስ (60 ሰከንድ)
   timeout: 60000,
   headers: {

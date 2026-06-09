@@ -11,7 +11,7 @@ export default function NewsSection() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE_URL = "https://masjid-project.onrender.com";
+  const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
 
   useEffect(() => {
     const fetchNews = async () => {

@@ -11,7 +11,7 @@ const YouTubeGallery = () => {
 
   // Use environment variable for API URL or fallback to localhost
   const API_BASE_URL =
-    import.meta.env.VITE_API_URL || "https://masjid-project.onrender.com";
+    import.meta.env.VITE_API_URL || "https://api.ruhamaislamiccenter.com";
   const API_URL = `${API_BASE_URL}/api/youtube/videos`;
 
   useEffect(() => {

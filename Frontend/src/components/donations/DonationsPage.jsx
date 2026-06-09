@@ -23,7 +23,7 @@ const VerifySection = ({ tx_ref, language, dir, bodyFont }) => {
     const verify = async () => {
       try {
         const response = await fetch(
-          `https://masjid-project.onrender.com/api/payment/verify/${tx_ref}`
+          `https://api.ruhamaislamiccenter.com/api/payment/verify/${tx_ref}`
         );
         const data = await response.json();
         if (data.status === "success") setStatus("success");
@@ -134,7 +134,7 @@ export default function BankPayment() {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://masjid-project.onrender.com/api/payment/initialize",
+        "https://api.ruhamaislamiccenter.com/api/payment/initialize",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

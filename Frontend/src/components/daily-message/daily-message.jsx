@@ -30,7 +30,7 @@ export default function DailyMessagePage() {
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://masjid-project.onrender.com/api/messages/random"
+        "https://api.ruhamaislamiccenter.com/api/messages/random"
       );
       setMessage(response.data);
     } catch (error) {

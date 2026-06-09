@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "https://masjid-project.onrender.com/api",
+  baseURL: "https://api.ruhamaislamiccenter.com/api",
 });
 
 // Attach token automatically

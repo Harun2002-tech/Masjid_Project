@@ -25,7 +25,7 @@ export default function CourseListPage() {
   const { t, dir } = useLanguage();
   const isRtl = dir === "rtl";
 
-  const API_BASE_URL = "https://masjid-project.onrender.com";
+  const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
 
   const getAuthConfig = () => {
     const token = localStorage.getItem("token");

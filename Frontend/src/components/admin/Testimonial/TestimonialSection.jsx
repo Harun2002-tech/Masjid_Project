@@ -12,7 +12,7 @@ import axios from "@/api/axios";
 import { useToast } from "@/components/ui/use-toast";
 import { useLanguage } from "../../../contexts/language-context";
 
-const BASE_URL = "https://masjid-project.onrender.com";
+const BASE_URL = "https://api.ruhamaislamiccenter.com";
 
 const translations = {
   am: {

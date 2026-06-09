@@ -1,5 +1,5 @@
 const API_URL =
-  import.meta.env.VITE_API_URL || "https://masjid-project.onrender.com";
+  import.meta.env.VITE_API_URL || "https://api.ruhamaislamiccenter.com";
 
 /* ================= REGISTER ================= */
 export const registerService = async (name, email, password) => {

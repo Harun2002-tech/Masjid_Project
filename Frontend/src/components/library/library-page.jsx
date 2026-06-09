@@ -41,7 +41,7 @@ export default function LibraryPage() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://masjid-project.onrender.com/api/library"
+          "https://api.ruhamaislamiccenter.com/api/library"
         );
         setItems(response.data.data || []);
       } catch (err) {

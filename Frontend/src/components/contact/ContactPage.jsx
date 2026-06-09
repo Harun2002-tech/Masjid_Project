@@ -24,7 +24,7 @@ export default function ContactPage() {
 
     try {
       const response = await fetch(
-        "https://masjid-project.onrender.com/api/contact",
+        "https://api.ruhamaislamiccenter.com/api/contact",
         {
           method: "POST",
           headers: {
