@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const MasjidSchema = new mongoose.Schema(
   {
@@ -55,4 +55,4 @@ const MasjidSchema = new mongoose.Schema(
 MasjidSchema.index({ name: 1, city: 1 }, { unique: true });
 
 // module.exports ሁሌም መጨረሻ ላይ!
-module.exports = mongoose.model("Masjid", MasjidSchema);
+export default mongoose.model("Masjid", MasjidSchema);

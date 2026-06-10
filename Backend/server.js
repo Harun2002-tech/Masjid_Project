@@ -46,8 +46,21 @@ subDirs.forEach((dir) => {
 
 const app = express();
 
+const allowedOrigins = [
+  "https://ruhamaislamiccenter.com",
+  "https://www.ruhamaislamiccenter.com",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
 const corsOptions = {
-  origin: "https://ruhamaislamiccenter.com", // ያንተ የቪርሴል ሊንክ
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 200,
@@ -75,6 +88,8 @@ import paymentRoutes from "./routes/payment.Routes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import youtubeRoutes from "./routes/youtubeRoutes.js";
 import newsletterRouter from "./routes/newsletterRouter.js";
+import adminRoutes from "./routes/admin.routes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
@@ -92,6 +107,8 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/youtube", youtubeRoutes);
 app.use("/api/newsletter", newsletterRouter);
+app.use("/api/admin", adminRoutes);
+app.use("/api/events", eventRoutes);
 
 // 🛑 2. የUPLOADTHING ኤፒአይ ሮውትን እዚህ ጋር መፍቀድ
 app.use(

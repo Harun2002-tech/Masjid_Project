@@ -1,30 +1,13 @@
-const News = require("../models/News");
-const fs = require("fs");
-const path = require("path");
-const multer = require("multer");
+import News from "../models/News.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// Multer storage config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, "../uploads/news");
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image/")) cb(null, true);
-  else cb(new Error("Only image files are allowed!"), false);
-};
-
-exports.upload = multer({ storage, fileFilter });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Get all news
-exports.getAllNews = async (req, res) => {
+export const getAllNews = async (req, res) => {
   try {
     const news = await News.find().sort({ date: -1 });
     res.status(200).json({ success: true, count: news.length, data: news });
@@ -34,7 +17,7 @@ exports.getAllNews = async (req, res) => {
 };
 
 // Get single news by ID
-exports.getNewsById = async (req, res) => {
+export const getNewsById = async (req, res) => {
   try {
     const newsItem = await News.findById(req.params.id);
     if (!newsItem) return res.status(404).json({ success: false, message: "News not found" });
@@ -45,7 +28,7 @@ exports.getNewsById = async (req, res) => {
 };
 
 // Create news
-exports.createNews = async (req, res) => {
+export const createNews = async (req, res) => {
   try {
     const data = req.body;
     if (req.file) data.imageUrl = `/uploads/news/${req.file.filename}`;
@@ -57,7 +40,7 @@ exports.createNews = async (req, res) => {
 };
 
 // Update news
-exports.updateNews = async (req, res) => {
+export const updateNews = async (req, res) => {
   try {
     const newsItem = await News.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!newsItem) return res.status(404).json({ success: false, message: "News not found" });
@@ -68,7 +51,7 @@ exports.updateNews = async (req, res) => {
 };
 
 // Delete news
-exports.deleteNews = async (req, res) => {
+export const deleteNews = async (req, res) => {
   try {
     const newsItem = await News.findById(req.params.id);
     if (!newsItem) return res.status(404).json({ success: false, message: "News not found" });

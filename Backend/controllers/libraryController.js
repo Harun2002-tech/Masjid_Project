@@ -1,9 +1,9 @@
-const Book = require("../models/Book");
-const fs = require('fs');
-const path = require('path');
+import Book from "../models/Book.js";
+import fs from "fs";
+import path from "path";
 
 // 1. አዲስ መጽሐፍ ለመመዝገብ (Create)
-exports.addBook = async (req, res) => {
+export const addBook = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "ፋይል አልተመረጠም!" });
 
@@ -33,7 +33,7 @@ exports.addBook = async (req, res) => {
 };
 
 // 2. ሁሉንም መጽሐፍት ለማምጣት (Get All)
-exports.getBooks = async (req, res) => {
+export const getBooks = async (req, res) => {
   try {
     // የሼኩንና ሌሎችንም በአንድ ላይ አዳዲሶቹ ከላይ እንዲሆኑ አድርጎ ያመጣል
     const books = await Book.find().sort("-uploadedAt").lean();
@@ -44,7 +44,7 @@ exports.getBooks = async (req, res) => {
 };
 
 // 3. መጽሐፍ በ ID ለይቶ ማምጣት (Get by ID)
-exports.getBookById = async (req, res) => {
+export const getBookById = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id).lean();
     if (!book) return res.status(404).json({ success: false, message: "መጽሐፉ አልተገኘም" });
@@ -55,7 +55,7 @@ exports.getBookById = async (req, res) => {
 };
 
 // 4. መጽሐፍ ለማሻሻል (Update)
-exports.updateBook = async (req, res) => {
+export const updateBook = async (req, res) => {
   try {
     const { title, author, category, description, isSheikhBook } = req.body;
     const updates = { title, author, category, description };
@@ -77,7 +77,7 @@ exports.updateBook = async (req, res) => {
 };
 
 // 5. መጽሐፍ ለመሰረዝ (Delete)
-exports.deleteBook = async (req, res) => {
+export const deleteBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ message: "መጽሐፉ አልተገኘም" });

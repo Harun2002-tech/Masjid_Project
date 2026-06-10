@@ -1,7 +1,7 @@
-const axios = require("axios");
-const Donation = require("../models/Donation");
+import axios from "axios";
+import Donation from "../models/Donation.js";
 
-exports.initializePayment = async (req, res) => {
+export const initializePayment = async (req, res) => {
   const { amount, email, first_name, last_name, bankName } = req.body;
   const tx_ref = `ruhama-tx-${Date.now()}`;
 
@@ -31,8 +31,8 @@ exports.initializePayment = async (req, res) => {
       first_name: first_name || "Ruhama",
       last_name: last_name || "Donor",
       tx_ref: tx_ref,
-      callback_url: "https://webhook.site/test",
-      return_url: `https://ruhamaislamiccenter.vercel.app/donations`,
+      callback_url: `https://api.ruhamaislamiccenter.com/api/payment/verify/${tx_ref}`,
+      return_url: `https://ruhamaislamiccenter.com/donations`,
       "customization[title]": "ለሩሃማ መስጂድ ልገሳ",
     };
 
@@ -66,7 +66,7 @@ exports.initializePayment = async (req, res) => {
 };
 // controllers/paymentController.js ውስጥ ከታች ጨምረው
 
-exports.verifyPayment = async (req, res) => {
+export const verifyPayment = async (req, res) => {
   const { tx_ref } = req.params;
 
   try {

@@ -1,12 +1,12 @@
-const Student = require("../models/Student");
-const Teacher = require("../models/Teacher");
-const Course = require("../models/Course");
+import Student from "../models/Student.js";
+import Teacher from "../models/Teacher.js";
+import Course from "../models/Course.js";
 
 /**
  * @desc    ከ Student እና Teacher ሞዴሎች ትክክለኛ መረጃዎችን ቆጥሮ ያመጣል
  * @route   GET /api/stats
  */
-exports.getStats = async (req, res) => {
+export const getStats = async (req, res) => {
   try {
     // 1. ከተማሪዎች ሰንጠረዥ (Collection) ላይ ያሉትን ሁሉንም መቁጠር
     const studentCount = await Student.countDocuments();

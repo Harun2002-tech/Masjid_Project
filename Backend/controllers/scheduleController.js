@@ -1,7 +1,7 @@
-const Schedule = require("../models/Schedule");
+import Schedule from "../models/Schedule.js";
 
 // 1. ሁሉንም ፕሮግራሞች ማምጣት
-exports.getSchedules = async (req, res) => {
+export const getSchedules = async (req, res) => {
   try {
     const schedules = await Schedule.find().sort({ createdAt: -1 });
     res.status(200).json(schedules);
@@ -11,7 +11,7 @@ exports.getSchedules = async (req, res) => {
 };
 
 // 2. አንድን ፕሮግራም በ ID ለይቶ ማምጣት (አዲስ የተጨመረ)
-exports.getScheduleById = async (req, res) => {
+export const getScheduleById = async (req, res) => {
   try {
     const schedule = await Schedule.findById(req.params.id);
     if (!schedule) {
@@ -24,7 +24,7 @@ exports.getScheduleById = async (req, res) => {
 };
 
 // 3. አዲስ ፕሮግራም መመዝገብ
-exports.createSchedule = async (req, res) => {
+export const createSchedule = async (req, res) => {
   try {
     const newSchedule = new Schedule(req.body);
     const savedSchedule = await newSchedule.save();
@@ -35,7 +35,7 @@ exports.createSchedule = async (req, res) => {
 };
 
 // 4. ፕሮግራም ማሻሻል (አዲስ የተጨመረ)
-exports.updateSchedule = async (req, res) => {
+export const updateSchedule = async (req, res) => {
   try {
     const updatedSchedule = await Schedule.findByIdAndUpdate(
       req.params.id,
@@ -52,7 +52,7 @@ exports.updateSchedule = async (req, res) => {
 };
 
 // 5. ፕሮግራም መሰረዝ
-exports.deleteSchedule = async (req, res) => {
+export const deleteSchedule = async (req, res) => {
   try {
     const deletedSchedule = await Schedule.findByIdAndDelete(req.params.id);
     if (!deletedSchedule) {

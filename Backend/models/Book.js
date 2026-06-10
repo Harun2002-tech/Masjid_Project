@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const BookSchema = new mongoose.Schema(
   {
@@ -61,4 +61,4 @@ const BookSchema = new mongoose.Schema(
 // በመጽሐፍ ርዕስ እና በደራሲ ለመፈለግ (Search) እንዲመች ኢንዴክስ እንፍጠር
 BookSchema.index({ title: "text", author: "text" });
 
-module.exports = mongoose.model("Book", BookSchema);
+export default mongoose.model("Book", BookSchema);

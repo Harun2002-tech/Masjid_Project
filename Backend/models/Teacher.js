@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const teacherSchema = new mongoose.Schema(
   {
@@ -139,4 +139,4 @@ teacherSchema.pre("save", async function () {
   // next() መጥራት አያስፈልግም፣ async ራሱ ስራውን ሲጨርስ ይቀጥላል
 });
 
-module.exports = mongoose.model("Teacher", teacherSchema);
+export default mongoose.model("Teacher", teacherSchema);

@@ -1,7 +1,7 @@
-const axios = require("axios");
-const Masjid = require("../models/Masjid");
+import axios from "axios";
+import Masjid from "../models/Masjid.js";
 // 5. አዲስ መስጂድ መመዝገብ (Create)
-exports.addMasjid = async (req, res) => {
+export const addMasjid = async (req, res) => {
   try {
     // location (lat/long) እና ስም መኖሩን እናረጋግጥ
     const { name, location } = req.body;
@@ -30,7 +30,7 @@ const adjustTime = (timeStr, offsetMinutes) => {
 };
 
 // 1. ሁሉንም መስጂዶች ማምጣት
-exports.getAllMasjid = async (req, res) => {
+export const getAllMasjid = async (req, res) => {
   try {
     const masjids = await Masjid.find().sort({ createdAt: -1 }).lean();
     res
@@ -44,7 +44,7 @@ exports.getAllMasjid = async (req, res) => {
  * አንድን መስጂድ በ ID ለይቶ የሶላት ሰዓቶቹን ማምጣት
  */
 // በ controller ፋይልህ ውስጥ getPrayerTimesById ን በዚህ ተካው፡
-exports.getPrayerTimesById = async (req, res) => {
+export const getPrayerTimesById = async (req, res) => {
   try {
     const { id } = req.params;
     const masjid = await Masjid.findById(id).lean();
@@ -98,7 +98,7 @@ exports.getPrayerTimesById = async (req, res) => {
   }
 };
 // 2. የጸሎት ሰዓቶችን ከ API አምጥቶ ማቀናጀት
-exports.getPrayerTimes = async (req, res) => {
+export const getPrayerTimes = async (req, res) => {
   try {
     const { masjidId } = req.params;
     const masjid = await Masjid.findById(masjidId).lean();
@@ -140,7 +140,7 @@ exports.getPrayerTimes = async (req, res) => {
 };
 
 // 3. መረጃ ማዘመን
-exports.updateMasjid = async (req, res) => {
+export const updateMasjid = async (req, res) => {
   try {
     const updatedMasjid = await Masjid.findByIdAndUpdate(
       req.params.id,
@@ -156,7 +156,7 @@ exports.updateMasjid = async (req, res) => {
 };
 
 // 4. መሰረዝ
-exports.deleteMasjid = async (req, res) => {
+export const deleteMasjid = async (req, res) => {
   try {
     const deleted = await Masjid.findByIdAndDelete(req.params.id);
     if (!deleted)

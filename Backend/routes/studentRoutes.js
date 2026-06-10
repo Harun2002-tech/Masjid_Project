@@ -55,4 +55,4 @@ router.get(
   getStudentCourses
 );
 
-export default router; // 👈 module.exports ሳይሆን ይሄን ተጠቀም
+export default router;

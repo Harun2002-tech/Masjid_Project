@@ -1,8 +1,9 @@
-const Course = require("../models/Course");
-const Enrollment = require("../models/Enrollment");
+import mongoose from "mongoose";
+import Course from "../models/Course.js";
+import Enrollment from "../models/Enrollment.js";
 
 // 1. አዲስ ኮርስ መፍጠር (Create)
-exports.createCourse = async (req, res) => {
+export const createCourse = async (req, res) => {
   try {
     let courseData = { ...req.body };
 
@@ -43,7 +44,7 @@ exports.createCourse = async (req, res) => {
   }
 };
 // 2. ሁሉንም ኮርሶች ለማግኘት (Get All)
-exports.getAllCourses = async (req, res) => {
+export const getAllCourses = async (req, res) => {
   try {
     // እዚህ ጋር .lean() ስንጠቀም enrollmentOpen መኖሩን ያረጋግጣል
     const courses = await Course.find().sort({ createdAt: -1 }).lean();
@@ -57,7 +58,7 @@ exports.getAllCourses = async (req, res) => {
 
 // 3. አንድን ኮርስ በ ID ማግኘት (Get by ID)
 
-exports.getCourseById = async (req, res) => {
+export const getCourseById = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
     if (!course) {
@@ -71,7 +72,7 @@ exports.getCourseById = async (req, res) => {
 };
 
 // 4. አዲስ ትምህርት (Lesson) ወደ ነባር ኮርስ ለመጨመር
-exports.addLesson = async (req, res) => {
+export const addLesson = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, dayNumber, youtubeUrl } = req.body;
@@ -104,10 +105,8 @@ exports.addLesson = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-const mongoose = require("mongoose");
-
 // --- ትምህርት ለማስተካከል (Update Lesson) ---
-exports.updateLesson = async (req, res) => {
+export const updateLesson = async (req, res) => {
   try {
     const { id, lessonId } = req.params;
     const { title, description, dayNumber, youtubeUrl } = req.body;
@@ -157,7 +156,7 @@ exports.updateLesson = async (req, res) => {
 };
 
 // --- ትምህርት ለማጥፋት (Delete Lesson) ---
-exports.deleteLesson = async (req, res) => {
+export const deleteLesson = async (req, res) => {
   try {
     const { id, lessonId } = req.params;
 
@@ -179,7 +178,7 @@ exports.deleteLesson = async (req, res) => {
   }
 };
 // 5. ኮርስ ማሻሻል (Update)
-exports.updateCourse = async (req, res) => {
+export const updateCourse = async (req, res) => {
   try {
     const updatedData = { ...req.body };
     if (req.file) updatedData.thumbnail = req.file.path;
@@ -198,7 +197,7 @@ exports.updateCourse = async (req, res) => {
 };
 
 // 6. ኮርስ መሰረዝ (Delete)
-exports.deleteCourse = async (req, res) => {
+export const deleteCourse = async (req, res) => {
   try {
     const course = await Course.findByIdAndDelete(req.params.id);
     if (!course)
@@ -210,7 +209,7 @@ exports.deleteCourse = async (req, res) => {
 };
 
 // 7. ተማሪው የተመዘገበባቸውን ኮርሶች ብቻ ማምጣት
-exports.getStudentCourses = async (req, res) => {
+export const getStudentCourses = async (req, res) => {
   try {
     const studentEnrollments = await Enrollment.find({
       user: req.user.id,
@@ -229,7 +228,7 @@ exports.getStudentCourses = async (req, res) => {
 };
 
 // 8. የምዝገባ ሁኔታን ለመቀየር (Toggle Enrollment Status)
-exports.toggleEnrollmentStatus = async (req, res) => {
+export const toggleEnrollmentStatus = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
 

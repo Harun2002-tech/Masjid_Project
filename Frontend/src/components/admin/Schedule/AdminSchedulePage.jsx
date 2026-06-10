@@ -393,7 +393,7 @@ const AdminSchedulePage = () => {
                     ) : (
                       <Save size={20} />
                     )}
-                    {submitting ? t("loading") : t("save")}
+                    {submitting ? t("saving") : t("save")}
                   </button>
                 </form>
               </motion.div>

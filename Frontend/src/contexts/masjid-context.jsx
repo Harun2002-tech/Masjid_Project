@@ -11,9 +11,9 @@ export function MasjidProvider({ children }) {
     const fetchMasjids = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          "https://api.ruhamaislamiccenter.com/api/masjids"
-        );
+        const isDev = import.meta.env.DEV;
+        const baseUrl = isDev ? "http://localhost:5000" : "https://api.ruhamaislamiccenter.com";
+        const response = await fetch(`${baseUrl}/api/masjids`);
 
         // Response-ቱ ትክክል መሆኑን ማረጋገጥ (ለምሳሌ 404 ወይም 500 ካልሆነ)
         if (!response.ok) throw new Error("Network response was not ok");

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
   type: { 
@@ -29,4 +29,4 @@ const messageSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // ✅ ስህተቱ እዚህ ጋር ተስተካክሏል (max ወደ model)
-module.exports = mongoose.model('Message', messageSchema);
+export default mongoose.model('Message', messageSchema);

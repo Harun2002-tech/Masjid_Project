@@ -1,10 +1,10 @@
-const Testimonial = require("../models/Testimonial");
+import Testimonial from "../models/Testimonial.js";
 
 /**
  * @desc    Create a testimonial
  * @route   POST /api/testimonials
  */
-exports.createTestimonial = async (req, res) => {
+export const createTestimonial = async (req, res) => {
   try {
     const { name, role, content, rating, initials } = req.body;
 
@@ -39,7 +39,7 @@ exports.createTestimonial = async (req, res) => {
  * @desc    Get all testimonials
  * @route   GET /api/testimonials
  */
-exports.getTestimonials = async (req, res) => {
+export const getTestimonials = async (req, res) => {
   try {
     const testimonials = await Testimonial.find({ isActive: true })
       .sort({ createdAt: -1 });
@@ -61,7 +61,7 @@ exports.getTestimonials = async (req, res) => {
  * @desc    Get single testimonial
  * @route   GET /api/testimonials/:id
  */
-exports.getTestimonial = async (req, res) => {
+export const getTestimonial = async (req, res) => {
   try {
     const testimonial = await Testimonial.findById(req.params.id);
 
@@ -88,7 +88,7 @@ exports.getTestimonial = async (req, res) => {
  * @desc    Update testimonial
  * @route   PUT /api/testimonials/:id
  */
-exports.updateTestimonial = async (req, res) => {
+export const updateTestimonial = async (req, res) => {
   try {
     let testimonial = await Testimonial.findById(req.params.id);
 
@@ -140,7 +140,7 @@ exports.updateTestimonial = async (req, res) => {
  * @desc    Delete testimonial
  * @route   DELETE /api/testimonials/:id
  */
-exports.deleteTestimonial = async (req, res) => {
+export const deleteTestimonial = async (req, res) => {
   try {
     const testimonial = await Testimonial.findById(req.params.id);
 

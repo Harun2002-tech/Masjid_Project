@@ -1,7 +1,7 @@
-const Achievement = require('../models/Achievement');
+import Achievement from "../models/Achievement.js";
 
 // ሁሉንም የተማሪውን ስኬቶች የሚያመጣ
-exports.getMyAchievements = async (req, res) => {
+export const getMyAchievements = async (req, res) => {
     try {
         // req.user.id የሚመጣው ከ Auth middleware ነው
         const achievements = await Achievement.find({ user: req.user.id })
@@ -22,7 +22,7 @@ exports.getMyAchievements = async (req, res) => {
 };
 
 // አዲስ ስኬት የሚጨምር (ለአስተዳዳሪዎች ወይም ለሲስተሙ)
-exports.createAchievement = async (req, res) => {
+export const createAchievement = async (req, res) => {
     try {
         const newAchievement = await Achievement.create(req.body);
         res.status(201).json({ success: true, data: newAchievement });

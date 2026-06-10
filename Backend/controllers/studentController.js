@@ -1,6 +1,7 @@
-const Student = require("../models/Student");
-const fs = require("fs");
-const path = require("path");
+import Student from "../models/Student.js";
+import Course from "../models/Course.js";
+import fs from "fs";
+import path from "path";
 
 /**
  * ረዳት ተግባር: የፋይል Path ማስተካከያ
@@ -9,7 +10,7 @@ const formatPath = (filePath) =>
   filePath ? filePath.replace(/\\/g, "/") : null;
 
 // 1. ሁሉንም ተማሪዎች ማምጣት
-exports.getAllStudents = async (req, res) => {
+export const getAllStudents = async (req, res) => {
   try {
     const students = await Student.find().sort({ createdAt: -1 });
     res.status(200).json({
@@ -27,7 +28,7 @@ exports.getAllStudents = async (req, res) => {
 };
 
 // 2. አዲስ ተማሪ መመዝገብ
-exports.createStudent = async (req, res) => {
+export const createStudent = async (req, res) => {
   console.log("የመጣው ዳታ:", req.body);
   try {
     // 1. መጀመሪያ ዳታውን ከ body ውስጥ እናውጣ
@@ -108,7 +109,7 @@ exports.createStudent = async (req, res) => {
 };
 
 // 3. አንድ ተማሪ በ ID መፈለግ
-exports.getStudentById = async (req, res) => {
+export const getStudentById = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     if (!student)
@@ -122,7 +123,7 @@ exports.getStudentById = async (req, res) => {
 };
 
 // 4. የተማሪ መረጃ ማዘመን
-exports.updateStudent = async (req, res) => {
+export const updateStudent = async (req, res) => {
   try {
     const currentStudent = await Student.findById(req.params.id);
     if (!currentStudent)
@@ -176,7 +177,7 @@ exports.updateStudent = async (req, res) => {
 };
 
 // 5. ተማሪ መሰረዝ
-exports.deleteStudent = async (req, res) => {
+export const deleteStudent = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     if (!student)
@@ -204,10 +205,8 @@ exports.deleteStudent = async (req, res) => {
   }
 };
 // 6. የተማሪውን ኮርሶች ማምጣት
-exports.getStudentCourses = async (req, res) => {
+export const getStudentCourses = async (req, res) => {
   try {
-    // Course ሞዴል እዚህ ጋር መጠራት አለበት
-    const Course = require("../models/Course");
     const courses = await Course.find({ student: req.params.id });
     res
       .status(200)

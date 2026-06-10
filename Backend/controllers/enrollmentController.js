@@ -1,10 +1,10 @@
-const Enrollment = require("../models/Enrollment");
-const Course = require("../models/Course");
-const sendEmail = require("../utils/sendEmail"); // 👈 ይህ መኖሩን እርግጠኛ ሁን
+import Enrollment from "../models/Enrollment.js";
+import Course from "../models/Course.js";
+import sendEmail from "../utils/sendEmail.js";
 /* =====================================================
    1. Submit Enrollment (ተማሪው ሲያመለክት ከደህንነት ጥበቃ ጋር)
 ===================================================== */
-exports.submitEnrollment = async (req, res) => {
+export const submitEnrollment = async (req, res) => {
   try {
     const { nationalId, course, phone, fullName, gender } = req.body;
 
@@ -80,7 +80,7 @@ exports.submitEnrollment = async (req, res) => {
 /* =====================================================
    2. Get All Enrollments (ለአድሚን ዳሽቦርድ)
 ===================================================== */
-exports.getAllEnrollments = async (req, res) => {
+export const getAllEnrollments = async (req, res) => {
   try {
     const enrollments = await Enrollment.find()
       .populate("user", "name email")
@@ -98,7 +98,7 @@ exports.getAllEnrollments = async (req, res) => {
 /* =====================================================
    3. Approve Enrollment (አድሚኑ ሲያጸድቅ)
 ===================================================== */
-exports.approveEnrollment = async (req, res) => {
+export const approveEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndUpdate(
       req.params.id,
@@ -142,7 +142,7 @@ exports.approveEnrollment = async (req, res) => {
 /* =====================================================
    4. Reject Enrollment (አድሚኑ ውድቅ ሲያደርግ)
 ===================================================== */
-exports.rejectEnrollment = async (req, res) => {
+export const rejectEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndUpdate(
       req.params.id,
@@ -164,7 +164,7 @@ exports.rejectEnrollment = async (req, res) => {
 /* =====================================================
    5. Update Student Progress
 ===================================================== */
-exports.updateProgress = async (req, res) => {
+export const updateProgress = async (req, res) => {
   try {
     const { lessonId } = req.body;
     const { courseId } = req.params;
@@ -200,7 +200,7 @@ exports.updateProgress = async (req, res) => {
 /* =====================================================
    6. Get My Enrollments (ለተማሪው ዳሽቦርድ)
 ===================================================== */
-exports.getMyEnrollments = async (req, res) => {
+export const getMyEnrollments = async (req, res) => {
   try {
     const enrollments = await Enrollment.find({ user: req.user.id })
       .populate("course", "title thumbnail teacher")
@@ -214,7 +214,7 @@ exports.getMyEnrollments = async (req, res) => {
 /* =====================================================
    9. Get Enrollment Status (ለተማሪው በኮርስ ID)
 ===================================================== */
-exports.getEnrollmentStatus = async (req, res) => {
+export const getEnrollmentStatus = async (req, res) => {
   try {
     const enrollment = await Enrollment.findOne({
       user: req.user.id, // የገባው ተማሪ ID
@@ -236,7 +236,7 @@ exports.getEnrollmentStatus = async (req, res) => {
 /* =====================================================
    7. Update & 8. Delete
 ===================================================== */
-exports.updateEnrollment = async (req, res) => {
+export const updateEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndUpdate(
       req.params.id,
@@ -251,7 +251,7 @@ exports.updateEnrollment = async (req, res) => {
   }
 };
 
-exports.deleteEnrollment = async (req, res) => {
+export const deleteEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
     if (!enrollment)

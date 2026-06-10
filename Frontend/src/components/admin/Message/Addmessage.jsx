@@ -189,7 +189,7 @@ export default function MessageAdminForm() {
             ) : (
               <Send size={18} />
             )}
-            {loading ? t("loading") : t("save")}
+            {loading ? t("saving") : t("save")}
           </button>
         </form>
       </motion.div>

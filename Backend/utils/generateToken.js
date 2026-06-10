@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -6,4 +6,4 @@ const generateToken = (id) => {
   });
 };
 
-module.exports = generateToken; // ይህ መኖሩን አረጋግጥ
+export default generateToken;

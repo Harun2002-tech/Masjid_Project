@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const enrollmentSchema = new mongoose.Schema(
   {
@@ -52,4 +52,4 @@ const enrollmentSchema = new mongoose.Schema(
 // አንድ ተማሪ ለአንድ ኮርስ ከአንድ ጊዜ በላይ እንዳያመለክት መከላከያ
 enrollmentSchema.index({ user: 1, course: 1 }, { unique: true });
 
-module.exports = mongoose.model("Enrollment", enrollmentSchema);
+export default mongoose.model("Enrollment", enrollmentSchema);

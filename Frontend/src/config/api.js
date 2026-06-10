@@ -1,4 +1,5 @@
-// src/config/api.js
+const isDev = import.meta.env.DEV;
+const BASE = isDev ? "http://localhost:5000" : "https://api.ruhamaislamiccenter.com";
 
-export const API_URL = "https://api.ruhamaislamiccenter.com/api";
-export const COURSE_URL = "https://api.ruhamaislamiccenter.com/api/courses"; // ይህን መስመር ጨምር
+export const API_URL = `${BASE}/api`;
+export const COURSE_URL = `${BASE}/api/courses`;

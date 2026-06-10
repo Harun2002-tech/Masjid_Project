@@ -1,9 +1,10 @@
 import axios from "axios";
 
+const isDev = import.meta.env.DEV;
+const BASE_URL = isDev ? "http://localhost:5000/api" : "https://api.ruhamaislamiccenter.com/api";
+
 const instance = axios.create({
-  // የባክኤንድህ ትክክለኛ ሊንክ
-  baseURL: "https://api.ruhamaislamiccenter.com/api",
-  // Render ለመነሳት ጊዜ ስለሚወስድ 1 ደቂቃ እንዲታገስ (60 ሰከንድ)
+  baseURL: BASE_URL,
   timeout: 60000,
   headers: {
     "Content-Type": "application/json",

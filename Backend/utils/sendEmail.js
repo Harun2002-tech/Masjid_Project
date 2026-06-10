@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 const sendEmail = async (options) => {
   // 1. Transporter ፍጠር
@@ -35,4 +35,4 @@ const sendEmail = async (options) => {
   }
 };
 
-module.exports = sendEmail;
+export default sendEmail;

@@ -1,8 +1,8 @@
-const Newsletter = require("../models/Newsletter");
-const axios = require("axios");
+import Newsletter from "../models/Newsletter.js";
+import axios from "axios";
 
 // አዲስ ተከታታይ መመዝገብ
-exports.subscribe = async (req, res) => {
+export const subscribe = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -56,7 +56,7 @@ exports.subscribe = async (req, res) => {
 };
 
 // ሁሉንም ተመዝጋቢዎች ለማየት
-exports.getAllSubscribers = async (req, res) => {
+export const getAllSubscribers = async (req, res) => {
   try {
     const subscribers = await Newsletter.find().sort({ createdAt: -1 });
     res.status(200).json(subscribers);

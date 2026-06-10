@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const scheduleSchema = new mongoose.Schema(
   {
@@ -44,4 +44,4 @@ const scheduleSchema = new mongoose.Schema(
 // ፕሮግራሙን በቀናት እና በሰዓት ቅደም ተከተል ለማውጣት ይረዳል
 scheduleSchema.index({ day: 1, startTime: 1 });
 
-module.exports = mongoose.model("Schedule", scheduleSchema);
+export default mongoose.model("Schedule", scheduleSchema);

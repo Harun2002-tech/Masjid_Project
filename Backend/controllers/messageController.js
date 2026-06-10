@@ -1,8 +1,8 @@
-const Message = require('../models/Message');
+import Message from "../models/Message.js";
 
 // 1. የዘፈቀደ መልዕክት ማምጣት (ለተማሪው ዳሽቦርድ)
 // GET /api/messages/random
-exports.getDailyMessage = async (req, res) => {
+export const getDailyMessage = async (req, res) => {
   try {
     // መጀመሪያ በዳታቤዙ ውስጥ ያሉትን መልዕክቶች ብዛት መቁጠር
     const count = await Message.countDocuments({ isActive: true });
@@ -35,7 +35,7 @@ exports.getDailyMessage = async (req, res) => {
 
 // 2. አዲስ መልዕክት መመዝገብ (ለአድሚን)
 // POST /api/messages
-exports.createMessage = async (req, res) => {
+export const createMessage = async (req, res) => {
   try {
     const newMessage = await Message.create(req.body);
     res.status(201).json({ success: true, data: newMessage });
@@ -46,7 +46,7 @@ exports.createMessage = async (req, res) => {
 
 // 3. ሁሉንም መልዕክቶች ማምጣት (ለአድሚን Table)
 // GET /api/messages
-exports.getAllMessages = async (req, res) => {
+export const getAllMessages = async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 }).lean();
     res.status(200).json({ 
@@ -61,7 +61,7 @@ exports.getAllMessages = async (req, res) => {
 
 // 4. አንድን መልዕክት በ ID ማግኘት
 // GET /api/messages/:id
-exports.getMessageById = async (req, res) => {
+export const getMessageById = async (req, res) => {
   try {
     const message = await Message.findById(req.params.id).lean();
     if (!message) {
@@ -75,7 +75,7 @@ exports.getMessageById = async (req, res) => {
 
 // 5. መልዕክትን ማሻሻል (Update)
 // PUT /api/messages/:id
-exports.updateMessage = async (req, res) => {
+export const updateMessage = async (req, res) => {
   try {
     const message = await Message.findByIdAndUpdate(
       req.params.id, 
@@ -93,7 +93,7 @@ exports.updateMessage = async (req, res) => {
 
 // 6. መልዕክትን መሰረዝ (Delete)
 // DELETE /api/messages/:id
-exports.deleteMessage = async (req, res) => {
+export const deleteMessage = async (req, res) => {
   try {
     const message = await Message.findByIdAndDelete(req.params.id);
     if (!message) {
