@@ -160,7 +160,7 @@ export default function CourseListPage() {
               >
                 {/* Thumbnail Area */}
                 <div
-                  className="h-60 w-full bg-white/5 relative flex items-center justify-center overflow-hidden cursor-pointer"
+                  className="h-48 sm:h-60 w-full bg-white/5 relative flex items-center justify-center overflow-hidden cursor-pointer"
                   onClick={() => navigate(`/admin/courses/view/${course._id}`)}
                 >
                   {course.thumbnail ? (
@@ -194,7 +194,7 @@ export default function CourseListPage() {
                 </div>
 
                 {/* Content */}
-                <div className="p-10 flex-1 flex flex-col">
+                <div className="p-6 md:p-10 flex-1 flex flex-col">
                   <h3
                     className="text-2xl font-bold text-white mb-3 line-clamp-1 group-hover:text-gold transition-colors uppercase tracking-tight cursor-pointer"
                     onClick={() =>

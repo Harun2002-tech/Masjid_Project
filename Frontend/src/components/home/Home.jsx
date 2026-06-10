@@ -95,7 +95,7 @@ export default function Home() {
           >
             <Link
               to="/courses"
-              className="group bg-gold hover:bg-white text-black px-12 py-5 rounded-2xl text-base font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(212,175,55,0.2)]"
+              className="group bg-gold hover:bg-white text-black px-6 sm:px-12 py-4 sm:py-5 rounded-2xl text-sm sm:text-base font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(212,175,55,0.2)]"
             >
               {t("exploreCoures")}
               <ArrowRight
@@ -106,7 +106,7 @@ export default function Home() {
 
             <Link
               to="/register"
-              className="px-12 py-5 border border-white/10 text-white rounded-2xl text-base font-black uppercase tracking-widest hover:bg-white/5 transition-all glass flex items-center justify-center"
+              className="px-6 sm:px-12 py-4 sm:py-5 border border-white/10 text-white rounded-2xl text-sm sm:text-base font-black uppercase tracking-widest hover:bg-white/5 transition-all glass flex items-center justify-center"
             >
               {t("register")}
             </Link>

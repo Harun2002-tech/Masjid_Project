@@ -178,7 +178,7 @@ export default function PrayerTimesPage() {
                     <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40 mb-2">
                       {language === "am" ? "የአሁኑ ሰዓት" : "Current Time"}
                     </p>
-                    <p className="text-7xl md:text-9xl font-black tracking-tighter tabular-nums text-white leading-none">
+                    <p className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter tabular-nums text-white leading-none">
                       {currentTime.toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",

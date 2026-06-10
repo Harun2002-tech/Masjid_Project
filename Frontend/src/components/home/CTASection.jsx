@@ -105,7 +105,7 @@ export default function CTASection() {
             initial={{ opacity: 0, x: dir === "rtl" ? 50 : -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className={`glass p-12 md:p-16 rounded-[4rem] border border-white/5 hover:border-gold/20 transition-all duration-700 shadow-2xl relative overflow-hidden group ${
+            className={`glass p-8 md:p-12 lg:p-16 rounded-[4rem] border border-white/5 hover:border-gold/20 transition-all duration-700 shadow-2xl relative overflow-hidden group ${
               dir === "rtl" ? "text-right" : "text-left"
             }`}
           >
@@ -167,7 +167,7 @@ export default function CTASection() {
             initial={{ opacity: 0, x: dir === "rtl" ? -50 : 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className={`glass p-12 md:p-16 rounded-[4rem] border border-white/5 hover:border-red/20 transition-all duration-700 shadow-2xl relative overflow-hidden group ${
+            className={`glass p-8 md:p-12 lg:p-16 rounded-[4rem] border border-white/5 hover:border-red/20 transition-all duration-700 shadow-2xl relative overflow-hidden group ${
               dir === "rtl" ? "text-right" : "text-left"
             }`}
           >

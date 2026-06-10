@@ -89,12 +89,12 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation - ክፍተቶች (gap) ተስተካክለዋል */}
-        <nav className="hidden lg:flex items-center gap-x-1 flex-nowrap overflow-hidden">
+        <nav className="hidden lg:flex items-center gap-x-0 lg:gap-x-1 flex-nowrap overflow-hidden">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
-              className="relative px-3 py-2 group shrink-0"
+              className="relative px-2 xl:px-3 py-2 group shrink-0"
             >
               <span
                 className={`text-[13px] xl:text-[14px] font-bold tracking-tight transition-all duration-300 ${
