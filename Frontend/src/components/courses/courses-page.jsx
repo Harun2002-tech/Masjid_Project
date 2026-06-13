@@ -297,11 +297,17 @@ function CourseCard({
         <div className="relative h-56 -mx-6 -mt-6 mb-8 overflow-hidden">
           {course.thumbnail ? (
             <img
-              src={`${apiBase}${course.thumbnail.startsWith("/") ? "" : "/"}${
-                course.thumbnail
-              }`}
+              src={
+                course.thumbnail.startsWith("http")
+                  ? course.thumbnail
+                  : `${apiBase}/${course.thumbnail.replace(/^\//, "")}`
+              }
               alt={course.title}
               className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+              onError={(e) => {
+                e.target.src =
+                  "https://placehold.co/600x400/064e3b/gold?text=Course+Image";
+              }}
             />
           ) : (
             <div className="flex items-center justify-center h-full bg-[#0b1220]">
