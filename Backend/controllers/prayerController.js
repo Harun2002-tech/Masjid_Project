@@ -3,11 +3,28 @@ import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../util
 
 export const addMasjid = async (req, res) => {
   try {
-    const { name, location } = req.body;
-    if (!name || !location || !location.latitude || !location.longitude) {
-      return res.status(400).json({ success: false, message: "እባክዎ ስም እና ሎኬሽን ያስገቡ" });
+    const { name } = req.body;
+    
+    // Fallback parser for form-data nesting object properties
+    const lat = req.body.latitude || (req.body.location && req.body.location.latitude);
+    const lng = req.body.longitude || (req.body.location && req.body.location.longitude);
+
+    if (!name || !lat || !lng) {
+      return res.status(400).json({ success: false, message: "እባክዎ ስም፣ ላቲቲዩድ እና ሎንጊቲዩድ በትክክል ያስገቡ" });
     }
-    const masjid = await addDoc(collections.masjids, req.body);
+
+    const cleanMasjidData = {
+      name,
+      location: {
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lng),
+        city: req.body.city || "Kombolcha"
+      },
+      imageUrl: req.file ? (req.file.path || req.file.secure_url) : "",
+      createdAt: new Date().toISOString()
+    };
+
+    const masjid = await addDoc(collections.masjids, cleanMasjidData);
     res.status(201).json({ success: true, data: masjid });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
