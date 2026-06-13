@@ -1,26 +1,58 @@
-import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../utils/firestore.js";
+import {
+  getDoc,
+  getDocs,
+  addDoc,
+  setDoc,
+  deleteDoc,
+  collections,
+} from "../utils/firestore.js";
 
 export const addBook = async (req, res) => {
   try {
-    const { title, author, category, description, isSheikhBook, fileUrl } = req.body;
-    const finalUrl = fileUrl || req.body.file || "";
-    if (!finalUrl) return res.status(400).json({ message: "ፋይል አልተመረጠም!" });
+    // ማስተካከያ፡ ከ req.body ላይ 'file' የሚለውን ሊንክ በቀጥታ እንቀበላለን
+    const {
+      title,
+      author,
+      category,
+      description,
+      isSheikhBook,
+      fileUrl,
+      file,
+    } = req.body;
+
+    // በ form-data የመጣው ሊንክ fileUrl ወይም file ወይም ከ uploadedUrls ውስጥ ሊሆን ይችላል
+    const finalUrl =
+      fileUrl ||
+      file ||
+      (req.body.uploadedUrls && req.body.uploadedUrls.file) ||
+      "";
+
+    if (!finalUrl) {
+      return res.status(400).json({ success: false, message: "ፋይል አልተመረጠም!" });
+    }
 
     const book = await addDoc(collections.books, {
-      title, author, category, description,
-      fileUrl: finalUrl,
+      title,
+      author,
+      category,
+      description,
+      fileUrl: finalUrl, // እዚህ ጋር ወደ Firestore የሚገባው ንፁህ ሊንክ ነው
       isSheikhBook: String(isSheikhBook) === "true",
       downloadCount: 0,
+      createdAt: new Date().toISOString(), // የጊዜ ማህተም መጨመር ለ getBooks ማድረደሪያ ይጠቅማል
     });
+
     res.status(201).json({ success: true, data: book });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
 export const getBooks = async (req, res) => {
   try {
-    const books = await getDocs(collections.books, { orderBy: "createdAt", orderDir: "desc" });
+    const books = await getDocs(collections.books, {
+      orderBy: "createdAt",
+      orderDir: "desc",
+    });
     res.json({ success: true, count: books.length, data: books });
   } catch (err) {
     res.status(500).json({ success: false, message: "መረጃ ማግኘት አልተቻለም" });
@@ -30,7 +62,8 @@ export const getBooks = async (req, res) => {
 export const getBookById = async (req, res) => {
   try {
     const book = await getDoc(collections.books, req.params.id);
-    if (!book) return res.status(404).json({ success: false, message: "መጽሐፉ አልተገኘም" });
+    if (!book)
+      return res.status(404).json({ success: false, message: "መጽሐፉ አልተገኘም" });
     res.json({ success: true, data: book });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -45,7 +78,8 @@ export const updateBook = async (req, res) => {
     }
     await setDoc(collections.books, req.params.id, updates);
     const book = await getDoc(collections.books, req.params.id);
-    if (!book) return res.status(404).json({ success: false, message: "መጽሐፉ አልተገኘም" });
+    if (!book)
+      return res.status(404).json({ success: false, message: "መጽሐፉ አልተገኘም" });
     res.json({ success: true, data: book });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
