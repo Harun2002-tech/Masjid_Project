@@ -30,6 +30,7 @@ export default function UstazDetailPage() {
     import.meta.env.VITE_API_URL || "https://api.ruhamaislamiccenter.com";
 
   useEffect(() => {
+    if (!id || id === "undefined") return;
     const fetchUstazDetail = async () => {
       try {
         setLoading(true);

@@ -35,6 +35,10 @@ const getAllTeachers = async () => {
 
 /* ---------------- GET BY ID ---------------- */
 const getTeacherById = async (id) => {
+  if (!id || id === "undefined") {
+    console.error("getTeacherById called with invalid id:", id);
+    return { success: false, data: null, message: "Invalid teacher ID" };
+  }
   try {
     const res = await fetch(`${api_url}/api/teachers/${id}`);
     return await handleResponse(res);
@@ -59,6 +63,10 @@ const createTeacher = async (formData) => {
 
 /* ---------------- UPDATE (Admin Only) ---------------- */
 const updateTeacher = async (id, formData) => {
+  if (!id || id === "undefined") {
+    console.error("updateTeacher called with invalid id:", id);
+    return { success: false, data: null, message: "Invalid teacher ID" };
+  }
   try {
     const res = await fetch(`${api_url}/api/teachers/${id}`, {
       method: "PUT",
@@ -73,6 +81,10 @@ const updateTeacher = async (id, formData) => {
 
 /* ---------------- DELETE (Admin Only) ---------------- */
 const deleteTeacher = async (id) => {
+  if (!id || id === "undefined") {
+    console.error("deleteTeacher called with invalid id:", id);
+    return { success: false, data: null, message: "Invalid teacher ID" };
+  }
   try {
     const res = await fetch(`${api_url}/api/teachers/${id}`, {
       method: "DELETE",
