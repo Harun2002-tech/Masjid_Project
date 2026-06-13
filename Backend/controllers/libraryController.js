@@ -9,23 +9,19 @@ import {
 
 export const addBook = async (req, res) => {
   try {
-    // ማስተካከያ፡ ከ req.body ላይ 'file' የሚለውን ሊንክ በቀጥታ እንቀበላለን
-    const {
-      title,
-      author,
-      category,
-      description,
-      isSheikhBook,
-      fileUrl,
-      file,
-    } = req.body;
+    const { title, author, category, description, isSheikhBook, fileUrl, file } = req.body;
 
-    // በ form-data የመጣው ሊንክ fileUrl ወይም file ወይም ከ uploadedUrls ውስጥ ሊሆን ይችላል
-    const finalUrl =
-      fileUrl ||
-      file ||
-      (req.body.uploadedUrls && req.body.uploadedUrls.file) ||
-      "";
+    let finalUrl = fileUrl || "";
+
+    if (!finalUrl && typeof file === "string") {
+      finalUrl = file;
+    }
+
+    if (!finalUrl && req.body.uploadedUrls && req.body.uploadedUrls.file) {
+      finalUrl = req.body.uploadedUrls.file;
+    }
+
+    console.log("Resolved Book URL:", finalUrl);
 
     if (!finalUrl) {
       return res.status(400).json({ success: false, message: "ፋይል አልተመረጠም!" });
@@ -36,10 +32,10 @@ export const addBook = async (req, res) => {
       author,
       category,
       description,
-      fileUrl: finalUrl, // እዚህ ጋር ወደ Firestore የሚገባው ንፁህ ሊንክ ነው
+      fileUrl: finalUrl,
       isSheikhBook: String(isSheikhBook) === "true",
       downloadCount: 0,
-      createdAt: new Date().toISOString(), // የጊዜ ማህተም መጨመር ለ getBooks ማድረደሪያ ይጠቅማል
+      createdAt: new Date().toISOString(),
     });
 
     res.status(201).json({ success: true, data: book });
