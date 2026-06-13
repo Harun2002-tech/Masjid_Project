@@ -1,105 +1,69 @@
-import Message from "../models/Message.js";
+import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../utils/firestore.js";
 
-// 1. የዘፈቀደ መልዕክት ማምጣት (ለተማሪው ዳሽቦርድ)
-// GET /api/messages/random
 export const getDailyMessage = async (req, res) => {
   try {
-    // መጀመሪያ በዳታቤዙ ውስጥ ያሉትን መልዕክቶች ብዛት መቁጠር
-    const count = await Message.countDocuments({ isActive: true });
-    
-    // ምንም መልዕክት ከሌለ ባዶ ዳታ ከመላክ ይልቅ Default መልዕክት እንልካለን
-    if (count === 0) {
-      return res.status(200).json({ 
-        success: true, 
-        data: {
+    const messages = await getDocs(collections.messages, {
+      where: [{ field: "isActive", op: "==", value: true }],
+    });
+    if (messages.length === 0) {
+      return res.status(200).json({
+        success: true, data: {
           text: "እንኳን ደህና መጡ! እባክዎን መጀመሪያ መልዕክት በአድሚን ገጽ ይመዝግቡ።",
-          arabic: "مرحباً بكم",
-          reference: "System",
-          type: "Quote"
-        } 
+          arabic: "مرحباً بكم", reference: "System", type: "Quote",
+        },
       });
     }
-
-    // ከዜሮ እስከ count ባለው ቁጥር ውስጥ አንዱን በዘፈቀደ መምረጥ
-    const random = Math.floor(Math.random() * count);
-    
-    // .skip() በመጠቀም አንዱን መልዕክት መምረጥ
-    const message = await Message.findOne({ isActive: true }).skip(random).lean();
-
-    res.status(200).json({ success: true, data: message });
+    const random = Math.floor(Math.random() * messages.length);
+    res.status(200).json({ success: true, data: messages[random] });
   } catch (err) {
-    console.error("Error in getDailyMessage:", err);
+    console.error(err);
     res.status(500).json({ success: false, error: "የሰርቨር ስህተት ተፈጥሯል" });
   }
 };
 
-// 2. አዲስ መልዕክት መመዝገብ (ለአድሚን)
-// POST /api/messages
 export const createMessage = async (req, res) => {
   try {
-    const newMessage = await Message.create(req.body);
+    const newMessage = await addDoc(collections.messages, req.body);
     res.status(201).json({ success: true, data: newMessage });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
 };
 
-// 3. ሁሉንም መልዕክቶች ማምጣት (ለአድሚን Table)
-// GET /api/messages
 export const getAllMessages = async (req, res) => {
   try {
-    const messages = await Message.find().sort({ createdAt: -1 }).lean();
-    res.status(200).json({ 
-      success: true, 
-      count: messages.length, 
-      data: messages 
-    });
+    const messages = await getDocs(collections.messages, { orderBy: "createdAt", orderDir: "desc" });
+    res.status(200).json({ success: true, count: messages.length, data: messages });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
 
-// 4. አንድን መልዕክት በ ID ማግኘት
-// GET /api/messages/:id
 export const getMessageById = async (req, res) => {
   try {
-    const message = await Message.findById(req.params.id).lean();
-    if (!message) {
-      return res.status(404).json({ success: false, message: "መልዕክቱ አልተገኘም" });
-    }
+    const message = await getDoc(collections.messages, req.params.id);
+    if (!message) return res.status(404).json({ success: false, message: "መልዕክቱ አልተገኘም" });
     res.status(200).json({ success: true, data: message });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
 
-// 5. መልዕክትን ማሻሻል (Update)
-// PUT /api/messages/:id
 export const updateMessage = async (req, res) => {
   try {
-    const message = await Message.findByIdAndUpdate(
-      req.params.id, 
-      req.body, 
-      { new: true, runValidators: true }
-    );
-    if (!message) {
-      return res.status(404).json({ success: false, message: "ሊታደስ የሚችል መልዕክት አልተገኘም" });
-    }
+    await setDoc(collections.messages, req.params.id, req.body);
+    const message = await getDoc(collections.messages, req.params.id);
+    if (!message) return res.status(404).json({ success: false, message: "ሊታደስ የሚችል መልዕክት አልተገኘም" });
     res.status(200).json({ success: true, data: message });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
 };
 
-// 6. መልዕክትን መሰረዝ (Delete)
-// DELETE /api/messages/:id
 export const deleteMessage = async (req, res) => {
   try {
-    const message = await Message.findByIdAndDelete(req.params.id);
-    if (!message) {
-      return res.status(404).json({ success: false, message: "ሊሰረዝ የሚችል መልዕክት አልተገኘም" });
-    }
-    res.status(200).json({ success: true, message: "መልዕክቱ በተሳካ ሁኔታ ተሰርዟል" });
+    await deleteDoc(collections.messages, req.params.id);
+    res.status(200).json({ success: true, message: "መልዕክቱ ተሰርዟል" });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

@@ -1,64 +1,35 @@
-import Newsletter from "../models/Newsletter.js";
 import axios from "axios";
+import { addDoc, getDocs, findOne, collections } from "../utils/firestore.js";
 
-// አዲስ ተከታታይ መመዝገብ
 export const subscribe = async (req, res) => {
   try {
     const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "እባክዎ ኢሜይል ያስገቡ!" });
 
-    if (!email) {
-      return res.status(400).json({ message: "እባክዎ ኢሜይል ያስገቡ!" });
-    }
+    const existing = await findOne(collections.newsletters, "email", email);
+    if (existing) return res.status(400).json({ message: "ይህ ኢሜይል ቀድሞ ተመዝግቧል!" });
 
-    // 1. በራስህ Database ቀድሞ መኖሩን ቼክ ማድረግ
-    const existingSubscriber = await Newsletter.findOne({ email });
-    if (existingSubscriber) {
-      return res.status(400).json({ message: "ይህ ኢሜይል ቀድሞ ተመዝግቧል!" });
-    }
-
-    // 2. በቀጥታ ወደ Brevo API መላክ (በ Axios)
     try {
       await axios.post(
         "https://api.brevo.com/v3/contacts",
-        {
-          email: email,
-          listIds: [2], // Brevo ላይ ያለው የሊስት ID (ቁጥሩን ዳሽቦርድህ ላይ አረጋግጥ)
-          updateEnabled: true,
-        },
-        {
-          headers: {
-            "api-key": process.env.BREVO_API_KEY,
-            "Content-Type": "application/json",
-          },
-        }
+        { email, listIds: [2], updateEnabled: true },
+        { headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json" } }
       );
-      console.log(`✅ ${email} ወደ Brevo ተልኳል`);
     } catch (brevoError) {
-      // Brevo ላይ ስህተት ቢኖር ሎግ እናድርገው ግን ምዝገባውን አናቋርጥ
-      console.error(
-        "Brevo API Error Details:",
-        brevoError.response?.data || brevoError.message
-      );
+      console.error("Brevo Error:", brevoError.response?.data || brevoError.message);
     }
 
-    // 3. በራስህ Database ላይ ሴቭ ማድረግ
-    const newSubscriber = new Newsletter({ email });
-    await newSubscriber.save();
-
-    res.status(201).json({
-      success: true,
-      message: "በተሳካ ሁኔታ ተመዝግበዋል! እናመሰግናለን።",
-    });
+    await addDoc(collections.newsletters, { email });
+    res.status(201).json({ success: true, message: "በተሳካ ሁኔታ ተመዝግበዋል!" });
   } catch (error) {
-    console.error("Newsletter Controller Error:", error);
+    console.error(error);
     res.status(500).json({ message: "የሰርቨር ስህተት ተከስቷል!" });
   }
 };
 
-// ሁሉንም ተመዝጋቢዎች ለማየት
 export const getAllSubscribers = async (req, res) => {
   try {
-    const subscribers = await Newsletter.find().sort({ createdAt: -1 });
+    const subscribers = await getDocs(collections.newsletters, { orderBy: "createdAt", orderDir: "desc" });
     res.status(200).json(subscribers);
   } catch (error) {
     res.status(500).json({ message: "ዳታውን ማምጣት አልተቻለም!" });

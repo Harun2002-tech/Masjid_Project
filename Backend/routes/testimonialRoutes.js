@@ -13,6 +13,7 @@ import {
 // Middleware
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
 import multerMiddleware from "../middleware/multerMiddleware.js";
+import processUploads from "../middleware/processUploads.js";
 
 // የአድሚን ሮሎች ዝርዝር
 const adminRoles = ["admin", "superadmin", "masjid_admin"];
@@ -28,7 +29,8 @@ router
   // 🔒 Protected: Create testimonial (ሁሉም የገቡ ተጠቃሚዎች ምስክርነት መስጠት እንዲችሉ)
   .post(
     protect,
-    multerMiddleware.single("image"), 
+    multerMiddleware.single("image"),
+    processUploads,
     createTestimonial
   );
 
@@ -46,6 +48,7 @@ router
     protect,
     allowRoles(...adminRoles), // 👈 ሁሉንም አድሚኖች እንዲፈቅድ
     multerMiddleware.single("image"),
+    processUploads,
     updateTestimonial
   )
 

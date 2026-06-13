@@ -17,6 +17,7 @@ import {
 
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
 import multerMiddleware from "../middleware/multerMiddleware.js";
+import processUploads from "../middleware/processUploads.js";
 
 // የአድሚን ሮሎች ዝርዝር (ከ App.js ጋር ተመሳሳይ እንዲሆን)
 const adminRoles = ["admin", "superadmin", "masjid_admin"];
@@ -38,6 +39,7 @@ router.post(
   protect,
   allowRoles(...adminRoles, "teacher"), // 👈 ሁሉንም አድሚኖች እና መምህራንን ይፈቅዳል
   multerMiddleware.single("thumbnail"),
+  processUploads,
   createCourse
 );
 
@@ -53,6 +55,7 @@ router.post(
     { name: "pdf", maxCount: 1 },
     { name: "video", maxCount: 1 },
   ]),
+  processUploads,
   addLesson
 );
 
@@ -67,6 +70,7 @@ router.put(
     { name: "audio", maxCount: 1 },
     { name: "pdf", maxCount: 1 },
   ]),
+  processUploads,
   updateLesson
 );
 
@@ -88,6 +92,7 @@ router.put(
   protect,
   allowRoles(...adminRoles, "teacher"),
   multerMiddleware.single("thumbnail"),
+  processUploads,
   updateCourse
 );
 

@@ -13,13 +13,24 @@
   --glass-border: rgba(255, 255, 255, 0.1);
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 @layer base {
   body {
     @apply min-h-screen;
-    /* Noto Sans Ethiopic ለመደበኛ ጽሁፎች */
     font-family: "Noto Sans Ethiopic", "Inter", system-ui, sans-serif;
     position: relative;
     overflow-x: hidden;
+    max-width: 100vw;
     color: var(--text);
     background: var(--bg);
 
@@ -169,5 +180,93 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--gold);
+}
+
+[dir="rtl"] .flex {
+  flex-direction: row;
+}
+
+[dir="rtl"] .items-center {
+  justify-content: flex-start;
+}
+
+[dir="rtl"] .items-center.justify-between {
+  justify-content: space-between;
+}
+
+[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-6 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-8 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+[dir="rtl"] .right-0 {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .left-0 {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .translate-x-\[-100\%\] {
+  --tw-translate-x: 100%;
+}
+
+[dir="rtl"] .-translate-x-full {
+  --tw-translate-x: 100%;
+}
+
+[dir="rtl"] .translate-x-full {
+  --tw-translate-x: -100%;
+}
+
+@media (max-width: 768px) {
+  [dir="rtl"] .grid {
+    grid-template-columns: 1fr;
+  }
 }
 

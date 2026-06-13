@@ -1,89 +1,62 @@
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
+import uploadToCloudinary from "../utils/cloudinary.js";
+import uploadToGoogleDrive from "../utils/googleDrive.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const imageMimes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const pdfMimes = ["application/pdf"];
+const audioMimes = ["audio/mpeg", "audio/wav", "audio/mp3", "audio/mp4"];
 
-const ensureDirExists = (dir) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-};
+const storage = multer.memoryStorage();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadsRoot = path.join(__dirname, "..", "uploads");
-
-    let subDir = "general/";
-    const url = (req.originalUrl || "").toLowerCase();
-
-    if (url.includes("student")) subDir = "students/";
-    else if (url.includes("teacher")) subDir = "teachers/";
-    else if (url.includes("enrollment")) subDir = "enrollments/";
-    else if (url.includes("testimonial")) subDir = "testimonials/";
-    else if (url.includes("book") || url.includes("library")) subDir = "books/";
-    else if (url.includes("course") || url.includes("lesson"))
-      subDir = "lessons/";
-    else if (url.includes("news")) subDir = "news/";
-
-    const finalDest = path.join(uploadsRoot, subDir);
-
-    ensureDirExists(finalDest);
-    cb(null, finalDest);
-  },
-  filename: (req, file, cb) => {
-    const safeName = file.originalname.replace(/\s+/g, "-");
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const ext = path.extname(safeName).toLowerCase();
-
-    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-  },
-});
-
-/**
- * 3. የፋይል አይነት ማጣሪያ
- */
 const fileFilter = (req, file, cb) => {
-  const allowedExtensions =
-    /jpeg|jpg|png|webp|pdf|docx|zip|mpeg|wav|mp4|mp3|epub/;
-  const extname = allowedExtensions.test(
-    path.extname(file.originalname).toLowerCase()
-  );
-
-  const allowedMimeTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-    "application/pdf",
+  const allowed = [
+    ...imageMimes,
+    ...pdfMimes,
+    ...audioMimes,
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "application/zip",
-    "audio/mpeg",
-    "audio/wav",
     "video/mp4",
-    "audio/mp3",
     "application/epub+zip",
   ];
-
-  if (extname && allowedMimeTypes.includes(file.mimetype)) {
+  if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(new Error("ያልተፈቀደ የፋይል አይነት!"), false);
   }
 };
 
-/**
- * 4. Middleware ውቅር
- */
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: 100 * 1024 * 1024, // 100MB
-  },
+  storage,
+  fileFilter,
+  limits: { fileSize: 100 * 1024 * 1024 },
 });
+
+export const uploadToStorage = async (file) => {
+  if (imageMimes.includes(file.mimetype)) {
+    const folder = file.fieldname || "ruhama";
+    return await uploadToCloudinary(file.buffer, folder);
+  }
+
+  if (pdfMimes.includes(file.mimetype)) {
+    return await uploadToGoogleDrive(
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+      process.env.GOOGLE_PDF_FOLDER_ID
+    );
+  }
+
+  if (audioMimes.includes(file.mimetype)) {
+    return await uploadToGoogleDrive(
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+      process.env.GOOGLE_MUSIC_FOLDER_ID
+    );
+  }
+
+  throw new Error("Unsupported file type for storage routing");
+};
 
 export default upload;

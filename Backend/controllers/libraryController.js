@@ -1,52 +1,35 @@
-import Book from "../models/Book.js";
-import fs from "fs";
-import path from "path";
+import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../utils/firestore.js";
 
-// 1. አዲስ መጽሐፍ ለመመዝገብ (Create)
 export const addBook = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "ፋይል አልተመረጠም!" });
+    const { title, author, category, description, isSheikhBook, fileUrl } = req.body;
+    const finalUrl = fileUrl || req.body.file || "";
+    if (!finalUrl) return res.status(400).json({ message: "ፋይል አልተመረጠም!" });
 
-    const { title, author, category, description, isSheikhBook } = req.body;
-    
-    // በሰርቨሩ ላይ የተቀመጠበትን መንገድ (URL) ማግኘት
-    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/books/${req.file.filename}`;
-
-    const book = await Book.create({
-      title,
-      author,
-      category,
-      description,
-      fileUrl,
-      // String ሆኖ የሚመጣውን ወደ Boolean መቀየር (Multer መረጃውን በ String ስለሚልክ)
-      isSheikhBook: String(isSheikhBook) === "true"
+    const book = await addDoc(collections.books, {
+      title, author, category, description,
+      fileUrl: finalUrl,
+      isSheikhBook: String(isSheikhBook) === "true",
+      downloadCount: 0,
     });
-
     res.status(201).json({ success: true, data: book });
   } catch (err) {
-    // ስህተት ከተፈጠረና ፋይሉ ተሰቅሎ ከሆነ መልሰን እናጥፋው
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
-    }
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// 2. ሁሉንም መጽሐፍት ለማምጣት (Get All)
 export const getBooks = async (req, res) => {
   try {
-    // የሼኩንና ሌሎችንም በአንድ ላይ አዳዲሶቹ ከላይ እንዲሆኑ አድርጎ ያመጣል
-    const books = await Book.find().sort("-uploadedAt").lean();
+    const books = await getDocs(collections.books, { orderBy: "createdAt", orderDir: "desc" });
     res.json({ success: true, count: books.length, data: books });
   } catch (err) {
     res.status(500).json({ success: false, message: "መረጃ ማግኘት አልተቻለም" });
   }
 };
 
-// 3. መጽሐፍ በ ID ለይቶ ማምጣት (Get by ID)
 export const getBookById = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id).lean();
+    const book = await getDoc(collections.books, req.params.id);
     if (!book) return res.status(404).json({ success: false, message: "መጽሐፉ አልተገኘም" });
     res.json({ success: true, data: book });
   } catch (err) {
@@ -54,21 +37,14 @@ export const getBookById = async (req, res) => {
   }
 };
 
-// 4. መጽሐፍ ለማሻሻል (Update)
 export const updateBook = async (req, res) => {
   try {
-    const { title, author, category, description, isSheikhBook } = req.body;
-    const updates = { title, author, category, description };
-
-    if (isSheikhBook !== undefined) {
-      updates.isSheikhBook = String(isSheikhBook) === "true";
+    const updates = { ...req.body };
+    if (req.body.isSheikhBook !== undefined) {
+      updates.isSheikhBook = String(req.body.isSheikhBook) === "true";
     }
-
-    const book = await Book.findByIdAndUpdate(req.params.id, updates, { 
-      new: true, 
-      runValidators: true 
-    });
-
+    await setDoc(collections.books, req.params.id, updates);
+    const book = await getDoc(collections.books, req.params.id);
     if (!book) return res.status(404).json({ success: false, message: "መጽሐፉ አልተገኘም" });
     res.json({ success: true, data: book });
   } catch (err) {
@@ -76,22 +52,12 @@ export const updateBook = async (req, res) => {
   }
 };
 
-// 5. መጽሐፍ ለመሰረዝ (Delete)
 export const deleteBook = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const book = await getDoc(collections.books, req.params.id);
     if (!book) return res.status(404).json({ message: "መጽሐፉ አልተገኘም" });
-
-    // ፋይሉን ከፎልደር ውስጥ መፈለግና መሰረዝ
-    const filename = book.fileUrl.split('/').pop();
-    const filePath = path.join(__dirname, '../uploads/books', filename);
-    
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    await Book.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: "መጽሐፉ እና ፋይሉ በትክክል ተሰርዟል" });
+    await deleteDoc(collections.books, req.params.id);
+    res.json({ success: true, message: "መጽሐፉ ተሰርዟል" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -12,6 +12,7 @@ import {
 
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
 import upload from "../middleware/multerMiddleware.js";
+import processUploads from "../middleware/processUploads.js";
 
 // 🚀 ሁሉንም አድሚኖች እንዲገቡ ፈቅደናል ("superadmin", "masjid_admin")
 const allAdmins = ["admin", "superadmin", "masjid_admin"];
@@ -28,6 +29,7 @@ router
       { name: "studentIDPhoto", maxCount: 1 },
       { name: "emergencyIDPhoto", maxCount: 1 },
     ]),
+    processUploads,
     createStudent
   );
 
@@ -43,6 +45,7 @@ router
       { name: "studentIDPhoto", maxCount: 1 },
       { name: "emergencyIDPhoto", maxCount: 1 },
     ]),
+    processUploads,
     updateStudent
   )
   .delete(protect, allowRoles("superadmin", "admin"), deleteStudent);

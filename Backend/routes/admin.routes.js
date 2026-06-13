@@ -1,50 +1,36 @@
 import express from "express";
-import { protect, allowRoles } from "../middleware/authMiddleware.js"; // 👈 የስሙን አጻጻፍ (authMiddleware.js) አረጋግጥ
-import Student from "../models/Student.js";
-import Teacher from "../models/Teacher.js";
-import User from "../models/User.js";
-// import Course from "../models/Course.js"; // 💡 ኮርስ ሞዴል ከሌለህ ለጊዜው Comment አድርገው
+import { protect, allowRoles } from "../middleware/authMiddleware.js";
+import { countDocs, getDocs, collections } from "../utils/firestore.js";
 
 const router = express.Router();
-
-// የአድሚን ሮሎች ዝርዝር (ከሌሎቹ ጋር ተመሳሳይ እንዲሆን)
 const adminRoles = ["admin", "superadmin", "masjid_admin"];
 
-// ሁሉንም ዳታዎች ጠቅለል አድርጎ ለዳሽቦርድ የሚሰጥ API
-router.get(
-  "/stats",
-  protect,
-  allowRoles(...adminRoles), // 👈 ሁሉንም አይነት አድሚኖች ይፈቅዳል
-  async (req, res) => {
-    try {
-      // ሁሉንም ዳታዎች በአንድ ጊዜ በፓራለል (Parallel) እናምጣ
-      const [studentCount, teacherCount, adminCount, recentStudents] =
-        await Promise.all([
-          Student.countDocuments(),
-          Teacher.countDocuments(),
-          User.countDocuments({ role: { $in: adminRoles } }), // የአድሚኖች ብዛት
-          Student.find().sort({ createdAt: -1 }).limit(5), // በቅርብ የተመዘገቡ 5 ተማሪዎች
-        ]);
+router.get("/stats", protect, allowRoles(...adminRoles), async (req, res) => {
+  try {
+    const [studentCount, teacherCount, adminUsers, recentStudents] = await Promise.all([
+      countDocs(collections.students),
+      countDocs(collections.teachers),
+      getDocs(collections.users, {
+        where: [{ field: "role", op: "in", value: adminRoles }],
+      }),
+      getDocs(collections.students, { orderBy: "createdAt", orderDir: "desc", limit: 5 }),
+    ]);
 
-      res.status(200).json({
-        success: true,
-        data: {
-          summary: {
-            students: studentCount,
-            teachers: teacherCount,
-            admins: adminCount,
-            // courses: 0 // ኮርስ ሞዴል ገና ካልሰራህ 0 አድርገው
-          },
-          recentActivity: {
-            newStudents: recentStudents,
-          },
+    res.status(200).json({
+      success: true,
+      data: {
+        summary: {
+          students: studentCount,
+          teachers: teacherCount,
+          admins: adminUsers.length,
         },
-      });
-    } catch (error) {
-      console.error("Dashboard Stats Error:", error.message);
-      res.status(500).json({ success: false, message: error.message });
-    }
+        recentActivity: { newStudents: recentStudents },
+      },
+    });
+  } catch (error) {
+    console.error("Dashboard Stats Error:", error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
-);
+});
 
 export default router;

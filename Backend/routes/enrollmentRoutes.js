@@ -15,6 +15,7 @@ import {
 
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
 import multerMiddleware from "../middleware/multerMiddleware.js";
+import processUploads from "../middleware/processUploads.js";
 
 // የአድሚን ሮሎች ዝርዝር (ከ App.js ጋር አንድ አይነት እንዲሆን)
 const adminRoles = ["admin", "superadmin", "masjid_admin"];
@@ -29,6 +30,7 @@ router.post(
   "/apply",
   protect,
   multerMiddleware.single("idCardImage"),
+  processUploads,
   submitEnrollment
 );
 

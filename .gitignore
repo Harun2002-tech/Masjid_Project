@@ -22,3 +22,14 @@ Thumbs.db
 # Misc
 .vscode/
 .idea/
+# Secrets (VERY IMPORTANT)
+.env
+.env.*
+Backend/.env
+Frontend/.env
+
+# Firebase Secret Keys
+firebase-service-account.json
+Backend/firebase-service-account.json
+Frontend/firebase-service-account.json
+*.json

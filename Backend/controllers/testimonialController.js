@@ -1,166 +1,70 @@
-import Testimonial from "../models/Testimonial.js";
+import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../utils/firestore.js";
 
-/**
- * @desc    Create a testimonial
- * @route   POST /api/testimonials
- */
 export const createTestimonial = async (req, res) => {
   try {
     const { name, role, content, rating, initials } = req.body;
-
-    let imagePath = "";
-    if (req.file) {
-      // Normalize path (Windows fix + add leading /)
-      imagePath = `/${req.file.path.replace(/\\/g, "/")}`;
-    }
-
-    const testimonial = await Testimonial.create({
-      name,
-      role,
-      content,
+    const data = {
+      name, role: role || "Student", content,
       rating: Number(rating) || 5,
       initials: initials || name?.charAt(0).toUpperCase(),
-      image: imagePath,
-    });
-
-    res.status(201).json({
-      success: true,
-      data: testimonial,
-    });
+      image: req.body.image || "",
+      isActive: true,
+    };
+    const testimonial = await addDoc(collections.testimonials, data);
+    res.status(201).json({ success: true, data: testimonial });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
-/**
- * @desc    Get all testimonials
- * @route   GET /api/testimonials
- */
 export const getTestimonials = async (req, res) => {
   try {
-    const testimonials = await Testimonial.find({ isActive: true })
-      .sort({ createdAt: -1 });
-
-    res.status(200).json({
-      success: true,
-      count: testimonials.length,
-      data: testimonials,
+    const testimonials = await getDocs(collections.testimonials, {
+      where: [{ field: "isActive", op: "==", value: true }],
+      orderBy: "createdAt", orderDir: "desc",
     });
+    res.status(200).json({ success: true, count: testimonials.length, data: testimonials });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-/**
- * @desc    Get single testimonial
- * @route   GET /api/testimonials/:id
- */
 export const getTestimonial = async (req, res) => {
   try {
-    const testimonial = await Testimonial.findById(req.params.id);
-
-    if (!testimonial) {
-      return res.status(404).json({
-        success: false,
-        message: "አስተያየቱ አልተገኘም",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: testimonial,
-    });
+    const testimonial = await getDoc(collections.testimonials, req.params.id);
+    if (!testimonial) return res.status(404).json({ success: false, message: "አስተያየቱ አልተገኘም" });
+    res.status(200).json({ success: true, data: testimonial });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-/**
- * @desc    Update testimonial
- * @route   PUT /api/testimonials/:id
- */
 export const updateTestimonial = async (req, res) => {
   try {
-    let testimonial = await Testimonial.findById(req.params.id);
-
-    if (!testimonial) {
-      return res.status(404).json({
-        success: false,
-        message: "አስተያየቱ አልተገኘም",
-      });
-    }
-
-    // If new image uploaded
-    if (req.file) {
-      req.body.image = `/${req.file.path.replace(/\\/g, "/")}`;
-    }
-
-    // Prevent unwanted fields overwrite
+    const existing = await getDoc(collections.testimonials, req.params.id);
+    if (!existing) return res.status(404).json({ success: false, message: "አስተያየቱ አልተገኘም" });
     const updatedData = {
-      name: req.body.name,
-      role: req.body.role,
-      content: req.body.content,
-      rating: Number(req.body.rating),
-      initials: req.body.initials,
-      image: req.body.image || testimonial.image,
-      isActive: req.body.isActive ?? testimonial.isActive,
+      name: req.body.name || existing.name,
+      role: req.body.role || existing.role,
+      content: req.body.content || existing.content,
+      rating: Number(req.body.rating) || existing.rating,
+      initials: req.body.initials || existing.initials,
+      image: req.body.image || existing.image,
+      isActive: req.body.isActive !== undefined ? req.body.isActive : existing.isActive,
     };
-
-    testimonial = await Testimonial.findByIdAndUpdate(
-      req.params.id,
-      updatedData,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      data: testimonial,
-    });
+    await setDoc(collections.testimonials, req.params.id, updatedData);
+    const updated = await getDoc(collections.testimonials, req.params.id);
+    res.status(200).json({ success: true, data: updated });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
-/**
- * @desc    Delete testimonial
- * @route   DELETE /api/testimonials/:id
- */
 export const deleteTestimonial = async (req, res) => {
   try {
-    const testimonial = await Testimonial.findById(req.params.id);
-
-    if (!testimonial) {
-      return res.status(404).json({
-        success: false,
-        message: "አስተያየቱ አልተገኘም",
-      });
-    }
-
-    await testimonial.deleteOne();
-
-    res.status(200).json({
-      success: true,
-      message: "አስተያየቱ ተሰርዟል",
-    });
+    await deleteDoc(collections.testimonials, req.params.id);
+    res.status(200).json({ success: true, message: "አስተያየቱ ተሰርዟል" });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };

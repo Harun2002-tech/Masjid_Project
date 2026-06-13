@@ -12,6 +12,7 @@ import {
 // የጥበቃ (Security) እና የፎቶ መጫኛ (Multer) Middleware
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
 import multerMiddleware from "../middleware/multerMiddleware.js";
+import processUploads from "../middleware/processUploads.js";
 
 // የአድሚን ዝርዝር (ከ App.js ጋር ተመሳሳይ)
 const adminRoles = ["admin", "superadmin", "masjid_admin"];
@@ -38,6 +39,7 @@ router.post(
     { name: "idCard", maxCount: 1 },
     { name: "emergencyPhoto", maxCount: 1 },
   ]),
+  processUploads,
   createTeacher
 );
 
@@ -53,6 +55,7 @@ router.put(
     { name: "idCard", maxCount: 1 },
     { name: "emergencyPhoto", maxCount: 1 },
   ]),
+  processUploads,
   updateTeacher
 );
 

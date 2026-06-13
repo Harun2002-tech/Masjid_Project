@@ -1,254 +1,161 @@
-import mongoose from "mongoose";
-import Course from "../models/Course.js";
-import Enrollment from "../models/Enrollment.js";
+import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../utils/firestore.js";
 
-// 1. አዲስ ኮርስ መፍጠር (Create)
 export const createCourse = async (req, res) => {
   try {
     let courseData = { ...req.body };
-
-    // 1. Lessons Parsing (ደህንነቱ በተጠበቀ ሁኔታ)
     if (courseData.lessons && typeof courseData.lessons === "string") {
-      try {
-        courseData.lessons = JSON.parse(courseData.lessons);
-      } catch (e) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Lessons JSON format error" });
-      }
+      try { courseData.lessons = JSON.parse(courseData.lessons); }
+      catch { return res.status(400).json({ success: false, message: "Lessons JSON format error" }); }
     }
-
-    // 2. ምስሉን (Thumbnail) ማስተካከል - እዚህ ጋር ነው ስህተቱ የነበረው
-    if (req.file) {
-      // Multer የሰጠውን ሙሉ Path ተጠቀም
-      courseData.thumbnail = req.file.path.replace(/\\/g, "/");
-    } else {
-      // ምስል ካልተላከ ባዶ እንዲሆን ወይም Default እንዲይዝ
-      courseData.thumbnail = "";
+    if (req.body.uploadedFiles) {
+      const files = typeof req.body.uploadedFiles === "string"
+        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
+      if (files.thumbnail) courseData.thumbnail = files.thumbnail;
     }
-
-    const newCourse = await Course.create(courseData);
-
-    res.status(201).json({
-      success: true,
-      message: "ኮርሱ በትክክል ተፈጥሯል",
-      data: newCourse,
-    });
+    const newCourse = await addDoc(collections.courses, courseData);
+    res.status(201).json({ success: true, message: "ኮርሱ በትክክል ተፈጥሯል", data: newCourse });
   } catch (err) {
-    console.error("SERVER ERROR:", err);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: err.message,
-    });
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
   }
 };
-// 2. ሁሉንም ኮርሶች ለማግኘት (Get All)
+
 export const getAllCourses = async (req, res) => {
   try {
-    // እዚህ ጋር .lean() ስንጠቀም enrollmentOpen መኖሩን ያረጋግጣል
-    const courses = await Course.find().sort({ createdAt: -1 }).lean();
-    res
-      .status(200)
-      .json({ success: true, count: courses.length, data: courses });
+    const courses = await getDocs(collections.courses, { orderBy: "createdAt", orderDir: "desc" });
+    res.status(200).json({ success: true, count: courses.length, data: courses });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// 3. አንድን ኮርስ በ ID ማግኘት (Get by ID)
-
 export const getCourseById = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
-    if (!course) {
-      return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
-    }
-    // ✅ ኮርሱ ሲላክ enrollmentOpen አብሮ መሄዱን አረጋግጥ
+    const course = await getDoc(collections.courses, req.params.id);
+    if (!course) return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
     res.status(200).json({ success: true, data: course });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// 4. አዲስ ትምህርት (Lesson) ወደ ነባር ኮርስ ለመጨመር
 export const addLesson = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, dayNumber, youtubeUrl } = req.body;
-
-    // ፋይሉ መኖሩን ቼክ ሳታደርግ .path አትጥራ። እንዲህ አስተካክለው፡
-    const audioUrl = req.files?.audio?.[0]?.path?.replace(/\\/g, "/") || null;
-    const pdfUrl = req.files?.pdf?.[0]?.path?.replace(/\\/g, "/") || null;
-    const videoUrl = req.files?.video?.[0]?.path?.replace(/\\/g, "/") || null;
-    // ፋይሎቹ መኖራቸውን ቼክ ማድረግ (MulterMiddleware.fields በመጠቀም የመጡ)
+    const course = await getDoc(collections.courses, id);
+    if (!course) return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
 
     const newLesson = {
-      title,
-      description,
+      id: Date.now().toString(),
+      title: title || "",
+      description: description || "",
       dayNumber: Number(dayNumber) || 1,
-      youtubeUrl, // ከ YouTube የመጣ ሊንክ
-      videoUrl, // ሰርቨር ላይ የተጫነ ቪዲዮ ካለ
-      audioUrl, // የድምፅ ፋይል
-      pdfUrl, // የንባብ ፋይል
-      createdAt: new Date(),
+      youtubeUrl: youtubeUrl || "",
+      videoUrl: req.body.videoUrl || req.body.video || "",
+      audioUrl: req.body.audioUrl || req.body.audio || "",
+      pdfUrl: req.body.pdfUrl || req.body.pdf || "",
+      createdAt: new Date().toISOString(),
     };
 
-    const course = await Course.findByIdAndUpdate(
-      id,
-      { $push: { lessons: newLesson } },
-      { new: true }
-    );
-
-    res.status(200).json({ success: true, data: course });
+    const lessons = [...(course.lessons || []), newLesson];
+    await setDoc(collections.courses, id, { lessons });
+    const updated = await getDoc(collections.courses, id);
+    res.status(200).json({ success: true, data: updated });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-// --- ትምህርት ለማስተካከል (Update Lesson) ---
+
 export const updateLesson = async (req, res) => {
   try {
     const { id, lessonId } = req.params;
-    const { title, description, dayNumber, youtubeUrl } = req.body;
+    const course = await getDoc(collections.courses, id);
+    if (!course) return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
 
-    // መሰረታዊ የፅሁፍ መረጃዎች
-    const updateData = {
-      "lessons.$.title": title,
-      "lessons.$.description": description,
-      "lessons.$.dayNumber": dayNumber,
-      "lessons.$.youtubeUrl": youtubeUrl,
-    };
-
-    // ፋይሎች ከተጫኑ የፋይሉን path ጨምር
-    if (req.files) {
-      if (req.files["audio"]) {
-        updateData["lessons.$.audioUrl"] = req.files["audio"][0].path.replace(
-          /\\/g,
-          "/"
-        );
+    const lessons = (course.lessons || []).map((l) => {
+      if (l.id === lessonId) {
+        return { ...l, ...req.body };
       }
-      if (req.files["pdf"]) {
-        updateData["lessons.$.pdfUrl"] = req.files["pdf"][0].path.replace(
-          /\\/g,
-          "/"
-        );
-      }
-    }
-
-    const course = await mongoose
-      .model("Course")
-      .findOneAndUpdate(
-        { _id: id, "lessons._id": lessonId },
-        { $set: updateData },
-        { new: true }
-      );
-
-    if (!course) {
-      return res
-        .status(404)
-        .json({ success: false, message: "ኮርሱ ወይም ትምህርቱ አልተገኘም" });
-    }
-
-    res.json({ success: true, data: course });
+      return l;
+    });
+    await setDoc(collections.courses, id, { lessons });
+    const updated = await getDoc(collections.courses, id);
+    res.status(200).json({ success: true, data: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// --- ትምህርት ለማጥፋት (Delete Lesson) ---
 export const deleteLesson = async (req, res) => {
   try {
     const { id, lessonId } = req.params;
+    const course = await getDoc(collections.courses, id);
+    if (!course) return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
 
-    const course = await mongoose
-      .model("Course")
-      .findByIdAndUpdate(
-        id,
-        { $pull: { lessons: { _id: lessonId } } },
-        { new: true }
-      );
-
-    if (!course) {
-      return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
-    }
-
-    res.json({ success: true, data: course });
+    const lessons = (course.lessons || []).filter((l) => l.id !== lessonId);
+    await setDoc(collections.courses, id, { lessons });
+    const updated = await getDoc(collections.courses, id);
+    res.status(200).json({ success: true, data: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-// 5. ኮርስ ማሻሻል (Update)
+
 export const updateCourse = async (req, res) => {
   try {
     const updatedData = { ...req.body };
-    if (req.file) updatedData.thumbnail = req.file.path;
-
-    const course = await Course.findByIdAndUpdate(req.params.id, updatedData, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!course)
-      return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
+    if (req.body.uploadedFiles) {
+      const files = typeof req.body.uploadedFiles === "string"
+        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
+      if (files.thumbnail) updatedData.thumbnail = files.thumbnail;
+    }
+    await setDoc(collections.courses, req.params.id, updatedData);
+    const course = await getDoc(collections.courses, req.params.id);
+    if (!course) return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
     res.status(200).json({ success: true, data: course });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
 };
 
-// 6. ኮርስ መሰረዝ (Delete)
 export const deleteCourse = async (req, res) => {
   try {
-    const course = await Course.findByIdAndDelete(req.params.id);
-    if (!course)
-      return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
+    const course = await getDoc(collections.courses, req.params.id);
+    if (!course) return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
+    await deleteDoc(collections.courses, req.params.id);
     res.status(200).json({ success: true, message: "ኮርሱ በትክክል ተሰርዟል" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// 7. ተማሪው የተመዘገበባቸውን ኮርሶች ብቻ ማምጣት
 export const getStudentCourses = async (req, res) => {
   try {
-    const studentEnrollments = await Enrollment.find({
-      user: req.user.id,
-      status: "approved",
-    }).select("courseId");
-
-    const courseIds = studentEnrollments.map((en) => en.courseId);
-    const myCourses = await Course.find({ _id: { $in: courseIds } }).lean();
-
-    res
-      .status(200)
-      .json({ success: true, count: myCourses.length, data: myCourses });
+    const enrollments = await getDocs(collections.enrollments, {
+      where: [{ field: "userId", op: "==", value: req.user.id }],
+    });
+    const courseIds = enrollments.filter((e) => e.applicationStatus === "approved").map((e) => e.courseId || e.course);
+    const allCourses = await getDocs(collections.courses);
+    const myCourses = allCourses.filter((c) => courseIds.includes(c.id));
+    res.status(200).json({ success: true, count: myCourses.length, data: myCourses });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// 8. የምዝገባ ሁኔታን ለመቀየር (Toggle Enrollment Status)
 export const toggleEnrollmentStatus = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
-
-    if (!course) {
-      return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
-    }
-
-    // ሁኔታውን ይቀይራል (Toggle)
-    course.enrollmentOpen = !course.enrollmentOpen;
-
-    // ✅ ዳታቤዝ ላይ እንዲቀመጥ ያደርጋል
-    await course.save();
-
+    const course = await getDoc(collections.courses, req.params.id);
+    if (!course) return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
+    const newStatus = !course.enrollmentOpen;
+    await setDoc(collections.courses, req.params.id, { enrollmentOpen: newStatus });
     res.status(200).json({
       success: true,
-      message: `ምዝገባው በትክክል ${course.enrollmentOpen ? "ተከፍቷል" : "ተዘግቷል"}`,
-      enrollmentOpen: course.enrollmentOpen,
+      message: `ምዝገባው በትክክል ${newStatus ? "ተከፍቷል" : "ተዘግቷል"}`,
+      enrollmentOpen: newStatus,
     });
   } catch (err) {
-    console.error("TOGGLE ERROR:", err);
-    res.status(500).json({ success: false, message: "የሰርቨር ስህተት አጋጥሟል" });
+    res.status(500).json({ success: false, message: err.message });
   }
 };

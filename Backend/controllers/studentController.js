@@ -1,221 +1,102 @@
-import Student from "../models/Student.js";
-import Course from "../models/Course.js";
-import fs from "fs";
-import path from "path";
+import { getDoc, getDocs, addDoc, setDoc, deleteDoc, findOne, generateId, collections } from "../utils/firestore.js";
 
-/**
- * ረዳት ተግባር: የፋይል Path ማስተካከያ
- */
-const formatPath = (filePath) =>
-  filePath ? filePath.replace(/\\/g, "/") : null;
-
-// 1. ሁሉንም ተማሪዎች ማምጣት
 export const getAllStudents = async (req, res) => {
   try {
-    const students = await Student.find().sort({ createdAt: -1 });
-    res.status(200).json({
-      success: true,
-      count: students.length,
-      data: students,
-    });
+    const students = await getDocs(collections.students, { orderBy: "createdAt", orderDir: "desc" });
+    res.status(200).json({ success: true, count: students.length, data: students });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "ተማሪዎችን ማምጣት አልተቻለም",
-      error: err.message,
-    });
+    res.status(500).json({ success: false, message: "ተማሪዎችን ማምጣት አልተቻለም", error: err.message });
   }
 };
 
-// 2. አዲስ ተማሪ መመዝገብ
 export const createStudent = async (req, res) => {
-  console.log("የመጣው ዳታ:", req.body);
   try {
-    // 1. መጀመሪያ ዳታውን ከ body ውስጥ እናውጣ
     const { subjects, email, ...rest } = req.body;
-
-    // 2. ኢሜይል ቀድሞ መኖሩን ማረጋገጥ
-    const studentExists = await Student.findOne({ email });
+    const studentExists = await findOne(collections.students, "email", email);
     if (studentExists) {
-      // ስህተት ካለ ፋይሎቹን ማጥፋት እንዳትረሳ (Cleanup)
-      if (req.files) {
-        Object.values(req.files)
-          .flat()
-          .forEach((file) => {
-            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-          });
-      }
-      return res
-        .status(400)
-        .json({ success: false, message: "ይህ ኢሜይል ቀድሞ ተመዝግቧል" });
+      return res.status(400).json({ success: false, message: "ይህ ኢሜይል ቀድሞ ተመዝግቧል" });
     }
-
-    // 3. የተማሪውን ዳታ ማዘጋጀት
     const studentData = { ...rest, email };
-
-    // 4. የትምህርት ዝርዝርን (Subjects) ማስተካከል (ወሳኙ ክፍል)
     if (subjects) {
       try {
-        // String ሆኖ ከመጣ ወደ Array መቀየር
-        studentData.subjects =
-          typeof subjects === "string" ? JSON.parse(subjects) : subjects;
-      } catch (e) {
-        console.log("Subject Parse Error:", e);
-        studentData.subjects = []; // ስህተት ካለ ባዶ Array
-      }
+        studentData.subjects = typeof subjects === "string" ? JSON.parse(subjects) : subjects;
+      } catch { studentData.subjects = []; }
     } else {
-      studentData.subjects = []; // ዳታው ካልመጣ ባዶ Array እንዲሆን
+      studentData.subjects = [];
     }
-
-    // 5. ፎቶዎችን ማስተካከል
-    if (req.files) {
-      if (req.files.photo)
-        studentData.photo = formatPath(req.files.photo[0].path);
-      if (req.files.studentIDPhoto)
-        studentData.studentIDPhoto = formatPath(
-          req.files.studentIDPhoto[0].path
-        );
-      if (req.files.emergencyIDPhoto)
-        studentData.emergencyIDPhoto = formatPath(
-          req.files.emergencyIDPhoto[0].path
-        );
+    if (req.body.uploadedFiles) {
+      const files = typeof req.body.uploadedFiles === "string"
+        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
+      if (files.photo) studentData.photo = files.photo;
+      if (files.studentIDPhoto) studentData.studentIDPhoto = files.studentIDPhoto;
+      if (files.emergencyIDPhoto) studentData.emergencyIDPhoto = files.emergencyIDPhoto;
     }
-
-    // 6. ዳታቤዝ ላይ መመዝገብ
-    const student = await Student.create(studentData);
-
-    res.status(201).json({
-      success: true,
-      message: `ተማሪው በቁጥር ${student.studentID} ተመዝግቧል`,
-      data: student,
-    });
+    studentData.studentID = await generateId(collections.students, "S");
+    const student = await addDoc(collections.students, studentData);
+    res.status(201).json({ success: true, message: `ተማሪው በቁጥር ${student.studentID} ተመዝግቧል`, data: student });
   } catch (error) {
-    console.error("የምዝገባ ስህተት ዝርዝር:", error);
-
-    // Cleanup: ፋይሎችን ማጥፋት
-    if (req.files) {
-      Object.values(req.files)
-        .flat()
-        .forEach((file) => {
-          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-        });
-    }
-
-    res.status(400).json({
-      success: false,
-      message: error.message || "ምዝገባ አልተሳካም",
-    });
+    console.error(error);
+    res.status(400).json({ success: false, message: error.message || "ምዝገባ አልተሳካም" });
   }
 };
 
-// 3. አንድ ተማሪ በ ID መፈለግ
 export const getStudentById = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
-    if (!student)
-      return res.status(404).json({ success: false, message: "ተማሪው አልተገኘም" });
+    const student = await getDoc(collections.students, req.params.id);
+    if (!student) return res.status(404).json({ success: false, message: "ተማሪው አልተገኘም" });
     res.status(200).json({ success: true, data: student });
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "የፍለጋ ስህተት", error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// 4. የተማሪ መረጃ ማዘመን
 export const updateStudent = async (req, res) => {
   try {
-    const currentStudent = await Student.findById(req.params.id);
-    if (!currentStudent)
-      return res.status(404).json({ success: false, message: "ተማሪው አልተገኘም" });
-
+    const current = await getDoc(collections.students, req.params.id);
+    if (!current) return res.status(404).json({ success: false, message: "ተማሪው አልተገኘም" });
     let updateData = { ...req.body };
-
-    // ሀ. ፋይሎችን ማስተካከል
-    if (req.files) {
-      const fileFields = ["photo", "studentIDPhoto", "emergencyIDPhoto"];
-      fileFields.forEach((field) => {
-        if (req.files[field]) {
-          // የድሮውን ፋይል ማጥፋት
-          if (currentStudent[field] && fs.existsSync(currentStudent[field])) {
-            try {
-              fs.unlinkSync(currentStudent[field]);
-            } catch (e) {
-              console.log("Old file delete error");
-            }
-          }
-          updateData[field] = formatPath(req.files[field][0].path);
-        }
+    if (req.body.uploadedFiles) {
+      const files = typeof req.body.uploadedFiles === "string"
+        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
+      ["photo", "studentIDPhoto", "emergencyIDPhoto"].forEach((f) => {
+        if (files[f]) updateData[f] = files[f];
       });
     }
-
-    // ለ. Subjects Parsing
     if (updateData.subjects) {
       try {
-        updateData.subjects =
-          typeof updateData.subjects === "string"
-            ? JSON.parse(updateData.subjects)
-            : updateData.subjects;
-      } catch (e) {
-        // Parsing ካልቻለ ባለበት ይተወዋል
-      }
+        updateData.subjects = typeof updateData.subjects === "string"
+          ? JSON.parse(updateData.subjects) : updateData.subjects;
+      } catch {}
     }
-
-    const student = await Student.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true,
-    });
-
-    res
-      .status(200)
-      .json({ success: true, message: "የተማሪው መረጃ ታድሷል", data: student });
+    await setDoc(collections.students, req.params.id, updateData);
+    const student = await getDoc(collections.students, req.params.id);
+    res.status(200).json({ success: true, message: "የተማሪው መረጃ ታድሷል", data: student });
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "ማዘመን አልተሳካም", error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// 5. ተማሪ መሰረዝ
 export const deleteStudent = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
-    if (!student)
-      return res.status(404).json({ success: false, message: "ተማሪው አልተገኘም" });
-
-    const fields = ["photo", "studentIDPhoto", "emergencyIDPhoto"];
-    fields.forEach((field) => {
-      if (student[field] && fs.existsSync(student[field])) {
-        try {
-          fs.unlinkSync(student[field]);
-        } catch (e) {
-          console.log("File delete error");
-        }
-      }
-    });
-
-    await student.deleteOne();
-    res
-      .status(200)
-      .json({ success: true, message: "ተማሪው እና ተያያዥ ፋይሎች ተሰርዘዋል" });
+    const student = await getDoc(collections.students, req.params.id);
+    if (!student) return res.status(404).json({ success: false, message: "ተማሪው አልተገኘም" });
+    await deleteDoc(collections.students, req.params.id);
+    res.status(200).json({ success: true, message: "ተማሪው ተሰርዟል" });
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "ስረዛው አልተሳካም", error: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
-// 6. የተማሪውን ኮርሶች ማምጣት
+
 export const getStudentCourses = async (req, res) => {
   try {
-    const courses = await Course.find({ student: req.params.id });
-    res
-      .status(200)
-      .json({ success: true, count: courses.length, data: courses });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "ኮርሶችን ማምጣት አልተቻለም",
-      error: err.message,
+    const enrollments = await getDocs(collections.enrollments, {
+      where: [{ field: "studentId", op: "==", value: req.params.id }],
     });
+    const courseIds = enrollments.map((e) => e.courseId);
+    const allCourses = await getDocs(collections.courses);
+    const courses = allCourses.filter((c) => courseIds.includes(c.id));
+    res.status(200).json({ success: true, count: courses.length, data: courses });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };

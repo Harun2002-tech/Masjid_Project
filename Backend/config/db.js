@@ -1,16 +1,13 @@
-import mongoose from "mongoose";
+import { db } from "./firebase.js";
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB Connected");
+    await db.collection("_connectionTest").doc("test").set({ timestamp: new Date().toISOString() });
+    console.log("Firebase Firestore Connected");
   } catch (error) {
-    console.error(error);
+    console.error("Firestore connection error:", error);
     process.exit(1);
   }
 };
 
 export default connectDB;
-
-
-

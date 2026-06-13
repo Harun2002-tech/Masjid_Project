@@ -9,17 +9,18 @@
     "@getbrevo/brevo": "^5.0.4",
     "axios": "^1.13.5",
     "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^17.2.4",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.2.0",
-    "multer": "^2.0.2",
-    "nodemailer": "^8.0.1",
-    "tesseract.js": "^7.0.0",
-    "uploadthing": "^7.7.4"
+    "cloudinary": "^2.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.1.0",
+    "googleapis": "^144.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "tesseract.js": "^5.1.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.9"
   }
 }

@@ -4,45 +4,13 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import path from "path";
-import fs from "fs";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 
-// 🛑 1. የUPLOADTHING ጥቅሎችን እዚህ ጋር ኢምፖርት እናደርጋለን (የተስተካከለ)
-import { createRouteHandler } from "uploadthing/express";
-import { uploadRouter } from "./utils/uploadthing.js";
-
-// የዳታቤዝ ግንኙነት
 connectDB();
 
-// ES Modules ላይ __dirname ስለሌለ ይሄን እንጠቀማለን
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// የፎልደር ዝግጅት
-const rootUploads = path.join(__dirname, "uploads");
-const subDirs = [
-  "books",
-  "teachers",
-  "students",
-  "enrollments",
-  "news",
-  "lessons",
-  "testimonials",
-  "general",
-];
-
-if (!fs.existsSync(rootUploads)) {
-  fs.mkdirSync(rootUploads);
-}
-
-subDirs.forEach((dir) => {
-  const fullPath = path.join(rootUploads, dir);
-  if (!fs.existsSync(fullPath)) {
-    fs.mkdirSync(fullPath, { recursive: true });
-    console.log(`📂 ማህደር ተፈጥሯል: ${fullPath}`);
-  }
-});
 
 const app = express();
 
@@ -67,8 +35,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* ---------------- API ROUTES ---------------- */
@@ -110,19 +78,10 @@ app.use("/api/newsletter", newsletterRouter);
 app.use("/api/admin", adminRoutes);
 app.use("/api/events", eventRoutes);
 
-// 🛑 2. የUPLOADTHING ኤፒአይ ሮውትን እዚህ ጋር መፍቀድ
-app.use(
-  "/api/uploadthing",
-  createRouteHandler({
-    router: uploadRouter,
-  })
-);
-
 app.get("/", (req, res) => {
   res.send("Ruhama Islamic Center API is Running...");
 });
 
-// 5. Global Error Handler
 app.use((err, req, res, next) => {
   console.error("Error Detail:", err.message);
   res.status(500).json({
@@ -134,5 +93,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
