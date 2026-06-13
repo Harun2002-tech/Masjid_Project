@@ -6,8 +6,12 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// ማስተካከያ፦ ከ config -> ወደ Backend -> ወደ ዋናው ማውጫ (Root) ለመውጣት ሁለት ጊዜ ".." ተጠቅመናል
 const serviceAccount = JSON.parse(
-  readFileSync(join(__dirname, "..", "firebase-service-account.json"), "utf8")
+  readFileSync(
+    join(__dirname, "..", "..", "firebase-service-account.json"),
+    "utf8"
+  )
 );
 
 admin.initializeApp({
