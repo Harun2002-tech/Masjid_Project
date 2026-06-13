@@ -55,6 +55,7 @@ import TestimonialsListPage from "./components/admin/Testimonial/TestimonialsLis
 import TestimonialProfile from "./components/admin/Testimonial/TestimonialProfile";
 import AdminNewProfile from "./components/admin/admin/NewAdmin";
 import AdminNewsList from "./components/admin/New/AdminNewsList";
+import AddMasjid from "./components/admin/Masjid/AddMasjid";
 
 /* ---------------- COURSE LEARNING ---------------- */
 import CourseOverviewPage from "./components/courses/CourseOverviewPage";
@@ -131,6 +132,7 @@ function App() {
               <Route path="enrollment-control" element={<PrivateRoute roles={adminRoles}><EnrollmentToggle /></PrivateRoute>} />
               <Route path="schedule" element={<PrivateRoute roles={adminRoles}><AdminSchedulePage /></PrivateRoute>} />
               <Route path="prayer-times" element={<PrivateRoute roles={adminRoles}><UpdatePrayertimes /></PrivateRoute>} />
+              <Route path="add-masjid" element={<PrivateRoute roles={adminRoles}><AddMasjid /></PrivateRoute>} />
               <Route path="add-news" element={<PrivateRoute roles={adminRoles}><AdminNewsForm /></PrivateRoute>} />
               <Route path="news" element={<PrivateRoute roles={adminRoles}><AdminNewsList /></PrivateRoute>} />
               <Route path="news/edit/:id" element={<PrivateRoute roles={adminRoles}><AdminNewsForm /></PrivateRoute>} />

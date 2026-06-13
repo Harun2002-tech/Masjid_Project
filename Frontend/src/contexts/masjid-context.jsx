@@ -25,7 +25,7 @@ export function MasjidProvider({ children }) {
 
           const savedMasjidId = localStorage.getItem("selectedMasjidId");
           const initialMasjid =
-            result.data.find((m) => m._id === savedMasjidId) || result.data[0];
+            result.data.find((m) => m.id === savedMasjidId) || result.data[0];
 
           setCurrentMasjid(initialMasjid);
         } else {
@@ -47,7 +47,7 @@ export function MasjidProvider({ children }) {
   const changeMasjid = (masjid) => {
     if (!masjid) return;
     setCurrentMasjid(masjid);
-    localStorage.setItem("selectedMasjidId", masjid._id);
+    localStorage.setItem("selectedMasjidId", masjid.id);
   };
 
   return (

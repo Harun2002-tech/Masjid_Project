@@ -4,12 +4,32 @@ import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../util
 export const addMasjid = async (req, res) => {
   try {
     const { name } = req.body;
-    
-    // Fallback parser for form-data nesting object properties
-    const lat = req.body.latitude || (req.body.location && req.body.location.latitude);
-    const lng = req.body.longitude || (req.body.location && req.body.location.longitude);
 
-    if (!name || !lat || !lng) {
+    let lat, lng;
+
+    if (req.body.latitude != null && req.body.longitude != null) {
+      lat = req.body.latitude;
+      lng = req.body.longitude;
+    } else if (req.body.location) {
+      if (typeof req.body.location === "string") {
+        try {
+          const parsed = JSON.parse(req.body.location);
+          lat = parsed.latitude;
+          lng = parsed.longitude;
+        } catch {
+          lat = undefined;
+          lng = undefined;
+        }
+      } else {
+        lat = req.body.location.latitude;
+        lng = req.body.location.longitude;
+      }
+    } else if (req.body["location.latitude"] != null || req.body["location[latitude]"] != null) {
+      lat = req.body["location.latitude"] || req.body["location[latitude]"];
+      lng = req.body["location.longitude"] || req.body["location[longitude]"];
+    }
+
+    if (!name || lat == null || lng == null) {
       return res.status(400).json({ success: false, message: "እባክዎ ስም፣ ላቲቲዩድ እና ሎንጊቲዩድ በትክክል ያስገቡ" });
     }
 

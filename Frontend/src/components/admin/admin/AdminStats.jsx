@@ -17,6 +17,7 @@ import {
   Loader2,
   Sparkles,
   ChevronRight,
+  MapPin,
 } from "lucide-react";
 
 // ኮንቴክስት እና ሰርቪሶች
@@ -409,6 +410,12 @@ export default function AdminDashboard() {
               icon={Newspaper}
               title={t("newsPost")}
               color="text-white"
+            />
+            <QuickLink
+              to="/admin/add-masjid"
+              icon={MapPin}
+              title="Add Masjid"
+              color="text-emerald-400"
             />
             <QuickLink
               to="/admin/prayer-times"

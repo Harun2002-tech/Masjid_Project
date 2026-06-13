@@ -100,14 +100,14 @@ export default function UpdatePrayertimes() {
   }, [currentMasjid]);
 
   const handleSave = async () => {
-    if (!currentMasjid?._id) return;
+    if (!currentMasjid?.id) return;
     setIsSaving(true);
     setStatus({ type: "", message: "" });
 
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://api.ruhamaislamiccenter.com/api/masjids/${currentMasjid._id}`,
+        `https://api.ruhamaislamiccenter.com/api/masjids/${currentMasjid.id}`,
         {
           method: "PATCH",
           headers: {
