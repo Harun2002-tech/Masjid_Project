@@ -40,7 +40,7 @@ export const addMasjid = async (req, res) => {
         longitude: parseFloat(lng),
         city: req.body.city || "Kombolcha"
       },
-      imageUrl: (req.file && (req.file.path || req.file.secure_url)) || "",
+      imageUrl: req.body.fileUrl || req.body.image || (req.file && (req.file.path || req.file.secure_url)) || "",
       createdAt: new Date().toISOString()
     };
 

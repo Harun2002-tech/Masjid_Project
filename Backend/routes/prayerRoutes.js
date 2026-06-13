@@ -12,6 +12,7 @@ import {
 // ሚድልዌሮችን ማምጣት
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
 import multerMiddleware from "../middleware/multerMiddleware.js";
+import processUploads from "../middleware/processUploads.js";
 
 // የአድሚን ሮሎች ዝርዝር (ለተለዋዋጭነት ሲባል)
 const adminRoles = ["admin", "superadmin", "masjid_admin"];
@@ -33,7 +34,8 @@ router.post(
   "/",
   protect,
   allowRoles(...adminRoles), // 👈 ሁሉንም አይነት አድሚኖች ይፈቅዳል
-  multerMiddleware.single("image"), 
+  multerMiddleware.single("image"),
+  processUploads,
   addMasjid
 );
 
