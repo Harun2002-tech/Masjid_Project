@@ -48,12 +48,14 @@ router
     protect,
     allowRoles(...adminRoles),
     multerMiddleware.single("image"),
+    processUploads,
     updateMasjid
   )
   .put(
     protect,
     allowRoles(...adminRoles),
     multerMiddleware.single("image"),
+    processUploads,
     updateMasjid
   )
   .delete(protect, allowRoles(...adminRoles), deleteMasjid);

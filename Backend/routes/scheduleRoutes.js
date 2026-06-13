@@ -12,6 +12,7 @@ import {
 // የሚድልዌር ፋይሎችን ማምጣት
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
 import multerMiddleware from "../middleware/multerMiddleware.js";
+import processUploads from "../middleware/processUploads.js";
 
 // የአድሚን ሮሎች ዝርዝር
 const adminRoles = ["admin", "superadmin", "masjid_admin"];
@@ -34,6 +35,7 @@ router.post(
   protect,
   allowRoles(...adminRoles, "teacher"), // 👈 ሁሉንም አድሚኖች እና መምህራንን ይፈቅዳል
   multerMiddleware.single("file"),
+  processUploads,
   createSchedule
 );
 
@@ -45,6 +47,7 @@ router.put(
   protect,
   allowRoles(...adminRoles, "teacher"),
   multerMiddleware.single("file"),
+  processUploads,
   updateSchedule
 );
 

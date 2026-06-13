@@ -41,6 +41,9 @@ const processUploads = (req, res, next) => {
 
         req.body.uploadedUrls[fieldname] = url;
         req.body.uploadedUrls.fileUrl = url;
+
+        req.file.secure_url = url;
+        req.file.path = url;
       })
       .catch((err) => {
         console.error(`[processUploads] Upload failed for ${fieldname}:`, err.message);

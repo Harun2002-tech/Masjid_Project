@@ -4,6 +4,7 @@ const router = express.Router();
 // ✅ ማስተካከያ፡ በ import መጠቀም አለብህ
 import { protect, allowRoles } from "../middleware/authMiddleware.js";
 import multerMiddleware from "../middleware/multerMiddleware.js";
+import processUploads from "../middleware/processUploads.js";
 
 // ✅ ማስተካከያ፡ በ import መጠቀም አለብህ
 import {
@@ -31,6 +32,7 @@ router.put(
   "/upload-picture",
   protect,
   multerMiddleware.single("profilePicture"),
+  processUploads,
   updateProfilePicture
 );
 
