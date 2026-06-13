@@ -9,6 +9,7 @@ import {
   Search,
   Hash,
   Users,
+  User,
   AlertCircle,
 } from "lucide-react";
 import studentService from "../../../services/studentService";
@@ -208,7 +209,8 @@ export default function StudentListPage() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 <AnimatePresence mode="popLayout">
-                  {filtered.map((student) => {
+                  {filtered.map((student, index) => {
+                    const studentId = student._id || student.id;
                     const fullName = `${student.firstName} ${student.lastName}`;
                     return (
                       <motion.tr
@@ -216,7 +218,7 @@ export default function StudentListPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        key={student.id}
+                        key={studentId || index}
                         className="hover:bg-white/[0.02] transition-colors group"
                       >
                         <td className="px-10 py-8">
@@ -269,21 +271,21 @@ export default function StudentListPage() {
                               icon={<Eye size={18} />}
                               type="gold"
                               onClick={() =>
-                                navigate(`/admin/student/${student.id}/view`)
+                                studentId && navigate(`/admin/student/${studentId}/view`)
                               }
                             />
                             <ActionButton
                               icon={<Edit size={18} />}
                               type="gold"
                               onClick={() =>
-                                navigate(`/admin/student/${student.id}/edit`)
+                                studentId && navigate(`/admin/student/${studentId}/edit`)
                               }
                             />
                             <ActionButton
                               icon={<Trash2 size={18} />}
                               type="red"
                               onClick={() =>
-                                handleDelete(student.id, fullName)
+                                studentId && handleDelete(studentId, fullName)
                               }
                             />
                           </div>
