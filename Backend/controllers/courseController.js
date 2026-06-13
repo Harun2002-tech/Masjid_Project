@@ -2,15 +2,11 @@ import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../util
 
 export const createCourse = async (req, res) => {
   try {
-    let courseData = { ...req.body };
+    const { uploadedUrls, uploadedFiles, fileUrl, ...rest } = req.body;
+    let courseData = { ...rest };
     if (courseData.lessons && typeof courseData.lessons === "string") {
       try { courseData.lessons = JSON.parse(courseData.lessons); }
       catch { return res.status(400).json({ success: false, message: "Lessons JSON format error" }); }
-    }
-    if (req.body.uploadedFiles) {
-      const files = typeof req.body.uploadedFiles === "string"
-        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
-      if (files.thumbnail) courseData.thumbnail = files.thumbnail;
     }
     const newCourse = await addDoc(collections.courses, courseData);
     res.status(201).json({ success: true, message: "ኮርሱ በትክክል ተፈጥሯል", data: newCourse });
@@ -104,11 +100,17 @@ export const deleteLesson = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
   try {
-    const updatedData = { ...req.body };
-    if (req.body.uploadedFiles) {
-      const files = typeof req.body.uploadedFiles === "string"
-        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
-      if (files.thumbnail) updatedData.thumbnail = files.thumbnail;
+    const existing = await getDoc(collections.courses, req.params.id);
+    if (!existing) return res.status(404).json({ success: false, message: "ኮርሱ አልተገኘም" });
+
+    const { uploadedUrls, uploadedFiles, fileUrl, ...cleanData } = req.body;
+    const updatedData = {
+      ...cleanData,
+      thumbnail: cleanData.thumbnail || existing.thumbnail || "",
+    };
+    if (updatedData.lessons && typeof updatedData.lessons === "string") {
+      try { updatedData.lessons = JSON.parse(updatedData.lessons); }
+      catch { return res.status(400).json({ success: false, message: "Lessons JSON format error" }); }
     }
     await setDoc(collections.courses, req.params.id, updatedData);
     const course = await getDoc(collections.courses, req.params.id);

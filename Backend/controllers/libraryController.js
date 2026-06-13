@@ -9,34 +9,15 @@ import {
 
 export const addBook = async (req, res) => {
   try {
-    const { title, author, category, description, isSheikhBook, fileUrl, file } = req.body;
+    const { uploadedUrls, uploadedFiles, fileUrl, file, ...rest } = req.body;
 
-    let finalUrl = fileUrl || "";
-
-    if (!finalUrl && typeof file === "string") {
-      finalUrl = file;
-    }
-
-    if (!finalUrl && req.body.uploadedUrls && req.body.uploadedUrls.file) {
-      finalUrl = req.body.uploadedUrls.file;
-    }
-
-    console.log("[libraryController] Destructured:", { title, author, category, fileUrl, file: typeof file === "string" ? file.substring(0, 60) : file, isSheikhBook });
-    console.log("[libraryController] Final URL:", finalUrl);
-
-    if (!finalUrl) {
-      console.log("[libraryController] No file URL — saving without file. req.body keys:", Object.keys(req.body));
-    }
+    const finalUrl = fileUrl || rest.fileUrl || "";
 
     const book = await addDoc(collections.books, {
-      title,
-      author,
-      category,
-      description,
-      fileUrl: finalUrl || "",
-      isSheikhBook: String(isSheikhBook) === "true",
+      ...rest,
+      fileUrl: finalUrl,
+      isSheikhBook: String(rest.isSheikhBook) === "true",
       downloadCount: 0,
-      createdAt: new Date().toISOString(),
     });
 
     res.status(201).json({ success: true, data: book });
@@ -69,10 +50,17 @@ export const getBookById = async (req, res) => {
 
 export const updateBook = async (req, res) => {
   try {
-    const updates = { ...req.body };
-    if (req.body.isSheikhBook !== undefined) {
-      updates.isSheikhBook = String(req.body.isSheikhBook) === "true";
-    }
+    const existing = await getDoc(collections.books, req.params.id);
+    if (!existing) return res.status(404).json({ success: false, message: "መጽሐፉ አልተገኘም" });
+
+    const { uploadedUrls, uploadedFiles, fileUrl, file, ...cleanData } = req.body;
+    const updates = {
+      ...cleanData,
+      fileUrl: fileUrl || cleanData.fileUrl || existing.fileUrl || "",
+      isSheikhBook: cleanData.isSheikhBook !== undefined
+        ? String(cleanData.isSheikhBook) === "true"
+        : existing.isSheikhBook,
+    };
     await setDoc(collections.books, req.params.id, updates);
     const book = await getDoc(collections.books, req.params.id);
     if (!book)

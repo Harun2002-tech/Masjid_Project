@@ -21,12 +21,11 @@ export const getNewsById = async (req, res) => {
 
 export const createNews = async (req, res) => {
   try {
-    const data = { ...req.body };
-    if (req.body.uploadedFiles) {
-      const files = typeof req.body.uploadedFiles === "string"
-        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
-      if (files.image) data.imageUrl = files.image;
-    }
+    const { uploadedUrls, uploadedFiles, fileUrl, image, ...rest } = req.body;
+    const data = {
+      ...rest,
+      imageUrl: image || rest.imageUrl || "",
+    };
     const newsItem = await addDoc(collections.news, data);
     res.status(201).json({ success: true, data: newsItem });
   } catch (err) {
@@ -36,12 +35,14 @@ export const createNews = async (req, res) => {
 
 export const updateNews = async (req, res) => {
   try {
-    const data = { ...req.body };
-    if (req.body.uploadedFiles) {
-      const files = typeof req.body.uploadedFiles === "string"
-        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
-      if (files.image) data.imageUrl = files.image;
-    }
+    const existing = await getDoc(collections.news, req.params.id);
+    if (!existing) return res.status(404).json({ success: false, message: "News not found" });
+
+    const { uploadedUrls, uploadedFiles, fileUrl, image, ...rest } = req.body;
+    const data = {
+      ...rest,
+      imageUrl: image || rest.imageUrl || existing.imageUrl || "",
+    };
     await setDoc(collections.news, req.params.id, data);
     const newsItem = await getDoc(collections.news, req.params.id);
     if (!newsItem) return res.status(404).json({ success: false, message: "News not found" });

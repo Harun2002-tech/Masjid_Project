@@ -80,7 +80,10 @@ export const updateProfilePicture = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ success: false, message: "እባክዎ ፎቶ ይምረጡ" });
     }
-    const imageUrl = req.file.path || req.file.secure_url || "";
+    const imageUrl = req.body.profilePicture || req.body.fileUrl || "";
+    if (!imageUrl) {
+      return res.status(500).json({ success: false, message: "የፎቶ ጭነት አልተሳካም።" });
+    }
     await setDoc(collections.users, req.user.id, { profilePicture: imageUrl });
     const user = await getDoc(collections.users, req.user.id);
     const { password, ...rest } = user;

@@ -11,7 +11,7 @@ export const getAllStudents = async (req, res) => {
 
 export const createStudent = async (req, res) => {
   try {
-    const { subjects, email, ...rest } = req.body;
+    const { uploadedUrls, uploadedFiles, fileUrl, subjects, email, ...rest } = req.body;
     const studentExists = await findOne(collections.students, "email", email);
     if (studentExists) {
       return res.status(400).json({ success: false, message: "ይህ ኢሜይል ቀድሞ ተመዝግቧል" });
@@ -24,13 +24,9 @@ export const createStudent = async (req, res) => {
     } else {
       studentData.subjects = [];
     }
-    if (req.body.uploadedFiles) {
-      const files = typeof req.body.uploadedFiles === "string"
-        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
-      if (files.photo) studentData.photo = files.photo;
-      if (files.studentIDPhoto) studentData.studentIDPhoto = files.studentIDPhoto;
-      if (files.emergencyIDPhoto) studentData.emergencyIDPhoto = files.emergencyIDPhoto;
-    }
+    if (studentData.photo === undefined) studentData.photo = "";
+    if (studentData.studentIDPhoto === undefined) studentData.studentIDPhoto = "";
+    if (studentData.emergencyIDPhoto === undefined) studentData.emergencyIDPhoto = "";
     studentData.studentID = await generateId(collections.students, "S");
     const student = await addDoc(collections.students, studentData);
     res.status(201).json({ success: true, message: `ተማሪው በቁጥር ${student.studentID} ተመዝግቧል`, data: student });
@@ -54,20 +50,19 @@ export const updateStudent = async (req, res) => {
   try {
     const current = await getDoc(collections.students, req.params.id);
     if (!current) return res.status(404).json({ success: false, message: "ተማሪው አልተገኘም" });
-    let updateData = { ...req.body };
-    if (req.body.uploadedFiles) {
-      const files = typeof req.body.uploadedFiles === "string"
-        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
-      ["photo", "studentIDPhoto", "emergencyIDPhoto"].forEach((f) => {
-        if (files[f]) updateData[f] = files[f];
-      });
-    }
+    const { uploadedUrls, uploadedFiles, fileUrl, ...cleanData } = req.body;
+    let updateData = { ...cleanData };
     if (updateData.subjects) {
       try {
         updateData.subjects = typeof updateData.subjects === "string"
           ? JSON.parse(updateData.subjects) : updateData.subjects;
       } catch {}
     }
+    ["photo", "studentIDPhoto", "emergencyIDPhoto"].forEach((f) => {
+      if (updateData[f] === undefined) {
+        updateData[f] = current[f] || "";
+      }
+    });
     await setDoc(collections.students, req.params.id, updateData);
     const student = await getDoc(collections.students, req.params.id);
     res.status(200).json({ success: true, message: "የተማሪው መረጃ ታድሷል", data: student });

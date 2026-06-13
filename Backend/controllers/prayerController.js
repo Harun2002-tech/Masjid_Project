@@ -40,7 +40,7 @@ export const addMasjid = async (req, res) => {
         longitude: parseFloat(lng),
         city: req.body.city || "Kombolcha"
       },
-      imageUrl: req.body.fileUrl || req.body.image || (req.file && (req.file.path || req.file.secure_url)) || "",
+      imageUrl: req.body.image || req.body.imageUrl || "",
       createdAt: new Date().toISOString()
     };
 
@@ -113,7 +113,22 @@ export const getPrayerTimesById = async (req, res) => {
 
 export const updateMasjid = async (req, res) => {
   try {
-    await setDoc(collections.masjids, req.params.id, req.body);
+    const existing = await getDoc(collections.masjids, req.params.id);
+    if (!existing) return res.status(404).json({ success: false, message: "መስጂዱ አልተገኘም" });
+
+    const { uploadedUrls, uploadedFiles, fileUrl, image, ...cleanData } = req.body;
+
+    const updateData = {
+      ...cleanData,
+      imageUrl: image || cleanData.imageUrl || existing.imageUrl || "",
+      location: {
+        latitude: parseFloat(cleanData.latitude ?? existing.location?.latitude),
+        longitude: parseFloat(cleanData.longitude ?? existing.location?.longitude),
+        city: cleanData.city || existing.location?.city || "Kombolcha",
+      },
+    };
+
+    await setDoc(collections.masjids, req.params.id, updateData);
     const updated = await getDoc(collections.masjids, req.params.id);
     if (!updated) return res.status(404).json({ success: false, message: "መስጂዱ አልተገኘም" });
     res.status(200).json({ success: true, data: updated });

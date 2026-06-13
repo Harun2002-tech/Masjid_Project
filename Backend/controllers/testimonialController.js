@@ -2,12 +2,13 @@ import { getDoc, getDocs, addDoc, setDoc, deleteDoc, collections } from "../util
 
 export const createTestimonial = async (req, res) => {
   try {
-    const { name, role, content, rating, initials } = req.body;
+    const { uploadedUrls, uploadedFiles, fileUrl, ...rest } = req.body;
+    const { name, role, content, rating, initials } = rest;
     const data = {
       name, role: role || "Student", content,
       rating: Number(rating) || 5,
       initials: initials || name?.charAt(0).toUpperCase(),
-      image: req.body.image || "",
+      image: rest.image || "",
       isActive: true,
     };
     const testimonial = await addDoc(collections.testimonials, data);
@@ -43,14 +44,16 @@ export const updateTestimonial = async (req, res) => {
   try {
     const existing = await getDoc(collections.testimonials, req.params.id);
     if (!existing) return res.status(404).json({ success: false, message: "አስተያየቱ አልተገኘም" });
+
+    const { uploadedUrls, uploadedFiles, fileUrl, ...rest } = req.body;
     const updatedData = {
-      name: req.body.name || existing.name,
-      role: req.body.role || existing.role,
-      content: req.body.content || existing.content,
-      rating: Number(req.body.rating) || existing.rating,
-      initials: req.body.initials || existing.initials,
-      image: req.body.image || existing.image,
-      isActive: req.body.isActive !== undefined ? req.body.isActive : existing.isActive,
+      name: rest.name || existing.name,
+      role: rest.role || existing.role,
+      content: rest.content || existing.content,
+      rating: Number(rest.rating) || existing.rating,
+      initials: rest.initials || existing.initials,
+      image: rest.image || existing.image,
+      isActive: rest.isActive !== undefined ? rest.isActive : existing.isActive,
     };
     await setDoc(collections.testimonials, req.params.id, updatedData);
     const updated = await getDoc(collections.testimonials, req.params.id);

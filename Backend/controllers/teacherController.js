@@ -15,18 +15,14 @@ export const createTeacher = async (req, res) => {
       catch { return data.split(",").map((s) => s.trim()); }
     };
 
+    const { uploadedUrls, uploadedFiles, fileUrl, ...rest } = req.body;
     const teacherData = {
-      ...req.body, subjects: parseArray(subjects), availableDays: parseArray(availableDays),
+      ...rest, subjects: parseArray(subjects), availableDays: parseArray(availableDays),
       teacherID: await generateId(collections.teachers, "T"), isActive: true, rating: 0,
     };
-
-    if (req.body.uploadedFiles) {
-      const files = typeof req.body.uploadedFiles === "string"
-        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
-      if (files.photo) teacherData.photo = files.photo;
-      if (files.idCard) teacherData.idCard = files.idCard;
-      if (files.emergencyPhoto) teacherData.emergencyPhoto = files.emergencyPhoto;
-    }
+    if (teacherData.photo === undefined) teacherData.photo = "";
+    if (teacherData.idCard === undefined) teacherData.idCard = "";
+    if (teacherData.emergencyPhoto === undefined) teacherData.emergencyPhoto = "";
 
     const teacher = await addDoc(collections.teachers, teacherData);
     res.status(201).json({ success: true, data: teacher });
@@ -41,18 +37,17 @@ export const updateTeacher = async (req, res) => {
     const teacher = await getDoc(collections.teachers, req.params.id);
     if (!teacher) return res.status(404).json({ success: false, message: "መምህሩ አልተገኘም" });
 
-    let updateData = { ...req.body };
-    if (req.body.subjects) {
-      try { updateData.subjects = typeof req.body.subjects === "string" ? JSON.parse(req.body.subjects) : req.body.subjects; }
-      catch { updateData.subjects = req.body.subjects.split(",").map((s) => s.trim()); }
+    const { uploadedUrls, uploadedFiles, fileUrl, ...cleanData } = req.body;
+    let updateData = { ...cleanData };
+    if (updateData.subjects) {
+      try { updateData.subjects = typeof updateData.subjects === "string" ? JSON.parse(updateData.subjects) : updateData.subjects; }
+      catch { updateData.subjects = updateData.subjects.split(",").map((s) => s.trim()); }
     }
-    if (req.body.uploadedFiles) {
-      const files = typeof req.body.uploadedFiles === "string"
-        ? JSON.parse(req.body.uploadedFiles) : req.body.uploadedFiles;
-      ["photo", "idCard", "emergencyPhoto"].forEach((f) => {
-        if (files[f]) updateData[f] = files[f];
-      });
-    }
+    ["photo", "idCard", "emergencyPhoto"].forEach((f) => {
+      if (updateData[f] === undefined) {
+        updateData[f] = teacher[f] || "";
+      }
+    });
     await setDoc(collections.teachers, req.params.id, updateData);
     const updated = await getDoc(collections.teachers, req.params.id);
     res.status(200).json({ success: true, data: updated });
