@@ -21,9 +21,11 @@ export const addBook = async (req, res) => {
       finalUrl = req.body.uploadedUrls.file;
     }
 
-    console.log("Resolved Book URL:", finalUrl);
+    console.log("[libraryController] Destructured:", { title, author, category, fileUrl, file: typeof file === "string" ? file.substring(0, 60) : file, isSheikhBook });
+    console.log("[libraryController] Final URL:", finalUrl);
 
     if (!finalUrl) {
+      console.log("[libraryController] NO URL — req.body keys:", Object.keys(req.body));
       return res.status(400).json({ success: false, message: "ፋይል አልተመረጠም!" });
     }
 
