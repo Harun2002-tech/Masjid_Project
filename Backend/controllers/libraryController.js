@@ -25,8 +25,7 @@ export const addBook = async (req, res) => {
     console.log("[libraryController] Final URL:", finalUrl);
 
     if (!finalUrl) {
-      console.log("[libraryController] NO URL — req.body keys:", Object.keys(req.body));
-      return res.status(400).json({ success: false, message: "ፋይል አልተመረጠም!" });
+      console.log("[libraryController] No file URL — saving without file. req.body keys:", Object.keys(req.body));
     }
 
     const book = await addDoc(collections.books, {
@@ -34,7 +33,7 @@ export const addBook = async (req, res) => {
       author,
       category,
       description,
-      fileUrl: finalUrl,
+      fileUrl: finalUrl || "",
       isSheikhBook: String(isSheikhBook) === "true",
       downloadCount: 0,
       createdAt: new Date().toISOString(),
