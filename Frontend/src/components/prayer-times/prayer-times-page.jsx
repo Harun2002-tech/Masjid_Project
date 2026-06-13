@@ -87,17 +87,17 @@ export default function PrayerTimesPage() {
   const [use24Hour, setUse24Hour] = useState(false);
 
   const loadPrayerTimes = useCallback(async () => {
-    if (!currentMasjid?._id) return;
+    if (!currentMasjid?.id) return;
     setLoading(true);
     try {
-      const data = await fetchPrayerTimesFromBackend(currentMasjid._id);
+      const data = await fetchPrayerTimesFromBackend(currentMasjid.id);
       if (data) setPrayerData(data);
     } catch (error) {
       console.error("Failed to load prayers:", error);
     } finally {
       setLoading(false);
     }
-  }, [currentMasjid?._id]);
+  }, [currentMasjid?.id]);
 
   useEffect(() => {
     loadPrayerTimes();
