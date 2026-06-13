@@ -116,7 +116,7 @@ export default function TeacherListPage() {
     }
     try {
       await teacherService.deleteTeacher(id);
-      setTeachers((prev) => prev.filter((t) => t._id !== id));
+      setTeachers((prev) => prev.filter((t) => t.id !== id));
       alert(t.deleteSuccess);
     } catch (error) {
       alert("Error!");
@@ -263,7 +263,7 @@ export default function TeacherListPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        key={teacher._id}
+                        key={teacher.id}
                         className="hover:bg-white/[0.02] transition-colors group"
                       >
                         <td className="px-10 py-7">
@@ -358,21 +358,21 @@ export default function TeacherListPage() {
                               icon={<Eye size={18} />}
                               type="view"
                               onClick={() =>
-                                navigate(`/admin/teacher/${teacher._id}/view`)
+                                navigate(`/admin/teacher/${teacher.id}/view`)
                               }
                             />
                             <ActionButton
                               icon={<Edit size={18} />}
                               type="edit"
                               onClick={() =>
-                                navigate(`/admin/teacher/${teacher._id}/edit`)
+                                navigate(`/admin/teacher/${teacher.id}/edit`)
                               }
                             />
                             <ActionButton
                               icon={<Trash2 size={18} />}
                               type="delete"
                               onClick={() =>
-                                handleDelete(teacher._id, fullName)
+                                handleDelete(teacher.id, fullName)
                               }
                             />
                           </div>

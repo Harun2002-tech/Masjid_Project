@@ -73,7 +73,7 @@ export default function CourseDetailPage() {
   };
 
   const handleEditClick = (lesson) => {
-    setEditingLessonId(lesson._id);
+    setEditingLessonId(lesson.id);
     setNewLesson({
       title: lesson.title,
       description: lesson.description,
@@ -196,14 +196,14 @@ export default function CourseDetailPage() {
           {course?.lessons?.length > 0 ? (
             course.lessons.map((lesson) => (
               <div
-                key={lesson._id}
+                key={lesson.id}
                 className="glass rounded-[2rem] overflow-hidden border border-white/5"
               >
                 <div className="flex items-center justify-between p-6">
                   <button
                     onClick={() =>
                       setExpandedLessonId(
-                        expandedLessonId === lesson._id ? null : lesson._id
+                        expandedLessonId === lesson.id ? null : lesson.id
                       )
                     }
                     className="flex flex-1 items-center gap-5 text-left"
@@ -233,13 +233,13 @@ export default function CourseDetailPage() {
                       <Edit2 size={18} />
                     </button>
                     <button
-                      onClick={() => handleDeleteLesson(lesson._id)}
+                      onClick={() => handleDeleteLesson(lesson.id)}
                       className="p-3 text-white/40 hover:text-red glass rounded-xl transition-all"
                     >
                       <Trash2 size={18} />
                     </button>
                     <div className="ml-2 text-white/20">
-                      {expandedLessonId === lesson._id ? (
+                      {expandedLessonId === lesson.id ? (
                         <ChevronUp size={24} />
                       ) : (
                         <ChevronDown size={24} />
@@ -249,7 +249,7 @@ export default function CourseDetailPage() {
                 </div>
 
                 <AnimatePresence>
-                  {expandedLessonId === lesson._id && (
+                  {expandedLessonId === lesson.id && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}

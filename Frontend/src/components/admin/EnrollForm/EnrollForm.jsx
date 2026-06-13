@@ -115,7 +115,6 @@ export default function EnrollForm() {
 
       await axios.post(`${API_BASE_URL}/api/enrollments/apply`, data, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });

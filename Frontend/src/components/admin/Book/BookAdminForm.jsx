@@ -86,7 +86,6 @@ export default function BookAdminForm() {
         data,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         }

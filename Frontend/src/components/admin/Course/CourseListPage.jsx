@@ -68,7 +68,7 @@ export default function CourseListPage() {
       });
 
       if (res.ok) {
-        setCourses(courses.filter((c) => c._id !== id));
+        setCourses(courses.filter((c) => c.id !== id));
       } else {
         alert("Error!");
       }
@@ -151,7 +151,7 @@ export default function CourseListPage() {
           <AnimatePresence mode="popLayout">
             {filteredCourses.map((course) => (
               <motion.div
-                key={course._id}
+                key={course.id}
                 layout
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -161,7 +161,7 @@ export default function CourseListPage() {
                 {/* Thumbnail Area */}
                 <div
                   className="h-48 sm:h-60 w-full bg-white/5 relative flex items-center justify-center overflow-hidden cursor-pointer"
-                  onClick={() => navigate(`/admin/courses/view/${course._id}`)}
+                  onClick={() => navigate(`/admin/courses/view/${course.id}`)}
                 >
                   {course.thumbnail ? (
                     <img
@@ -198,7 +198,7 @@ export default function CourseListPage() {
                   <h3
                     className="text-2xl font-bold text-white mb-3 line-clamp-1 group-hover:text-gold transition-colors uppercase tracking-tight cursor-pointer"
                     onClick={() =>
-                      navigate(`/admin/courses/view/${course._id}`)
+                      navigate(`/admin/courses/view/${course.id}`)
                     }
                   >
                     {course.title}
@@ -226,7 +226,7 @@ export default function CourseListPage() {
                   <div className="flex gap-3">
                     <button
                       onClick={() =>
-                        navigate(`/admin/courses/view/${course._id}`)
+                        navigate(`/admin/courses/view/${course.id}`)
                       }
                       className="p-4 glass text-white/60 hover:text-gold hover:bg-white/10 rounded-2xl transition-all border border-white/5"
                       title="View Course"
@@ -236,7 +236,7 @@ export default function CourseListPage() {
 
                     <button
                       onClick={() =>
-                        navigate(`/admin/courses/edit/${course._id}`)
+                        navigate(`/admin/courses/edit/${course.id}`)
                       }
                       className="flex-1 bg-white/5 text-white hover:bg-gold hover:text-black py-4 rounded-2xl text-[10px] font-black flex items-center justify-center gap-2 transition-all uppercase tracking-[0.2em] border border-white/10"
                     >
@@ -244,11 +244,11 @@ export default function CourseListPage() {
                     </button>
 
                     <button
-                      disabled={deletingId === course._id}
-                      onClick={() => handleDelete(course._id)}
+                      disabled={deletingId === course.id}
+                      onClick={() => handleDelete(course.id)}
                       className="p-4 glass text-red-400 hover:bg-red-500 hover:text-white rounded-2xl transition-all border border-red-500/20 disabled:opacity-30"
                     >
-                      {deletingId === course._id ? (
+                      {deletingId === course.id ? (
                         <Loader2 className="animate-spin" size={20} />
                       ) : (
                         <Trash2 size={20} />

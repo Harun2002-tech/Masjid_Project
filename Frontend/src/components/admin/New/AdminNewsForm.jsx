@@ -97,7 +97,6 @@ export default function AdminNewsForm() {
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "multipart/form-data",
       },
     };
 
