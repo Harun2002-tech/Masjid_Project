@@ -14,7 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useLanguage } from "../../../contexts/language-context";
-import { COURSE_URL } from "@/config/api";
+import { COURSE_URL, BASE_URL } from "@/config/api";
 
 export default function CourseListPage() {
   const [courses, setCourses] = useState([]);
@@ -25,7 +25,7 @@ export default function CourseListPage() {
   const { t, dir } = useLanguage();
   const isRtl = dir === "rtl";
 
-  const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
+  const API_BASE_URL = BASE_URL;
 
   const getAuthConfig = () => {
     const token = localStorage.getItem("token");

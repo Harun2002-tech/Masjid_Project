@@ -67,6 +67,7 @@ export const register = async (req, res) => {
 
     res.status(201).json({
       success: true, message: "ምዝገባው ተሳክቷል",
+      token: generateToken(user),
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
     });
   } catch (error) {

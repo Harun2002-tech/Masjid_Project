@@ -10,7 +10,7 @@ import {
   ImageIcon,
   Sparkles,
 } from "lucide-react";
-import { COURSE_URL } from "@/config/api";
+import { COURSE_URL, BASE_URL } from "@/config/api";
 import { useLanguage } from "../../../contexts/language-context";
 
 export default function AddCoursePage() {
@@ -39,8 +39,6 @@ export default function AddCoursePage() {
     time: "",
     capacity: 0,
   });
-
-  const BASE_URL = "https://api.ruhamaislamiccenter.com";
 
   useEffect(() => {
     if (isEditMode) {

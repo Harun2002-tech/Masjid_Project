@@ -7,7 +7,7 @@ export const loginService = async (formData) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    const response = await fetch(`${API_URL}/api/auth/login`, {
+    const response = await fetch(`${API_URL}/api/users/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
