@@ -258,13 +258,19 @@ export default function AddTeacherPage({ editMode = false }) {
             const API_BASE = "https://api.ruhamaislamiccenter.com";
             setPreviews({
               photo: data.photo
-                ? `${API_BASE}/${data.photo.replace(/\\/g, "/")}`
+                ? data.photo.startsWith("http")
+                  ? data.photo
+                  : `${API_BASE}/${data.photo.replace(/\\/g, "/")}`
                 : null,
               idCard: data.idCard
-                ? `${API_BASE}/${data.idCard.replace(/\\/g, "/")}`
+                ? data.idCard.startsWith("http")
+                  ? data.idCard
+                  : `${API_BASE}/${data.idCard.replace(/\\/g, "/")}`
                 : null,
               emergencyPhoto: data.emergencyPhoto
-                ? `${API_BASE}/${data.emergencyPhoto.replace(/\\/g, "/")}`
+                ? data.emergencyPhoto.startsWith("http")
+                  ? data.emergencyPhoto
+                  : `${API_BASE}/${data.emergencyPhoto.replace(/\\/g, "/")}`
                 : null,
             });
           }

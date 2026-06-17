@@ -22,6 +22,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { API_URL } from "../../config/api";
 
 const typeIcons = {
   pdf: FileText,
@@ -41,7 +42,7 @@ export default function LibraryPage() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://api.ruhamaislamiccenter.com/api/library"
+          `${API_URL}/library`
         );
         setItems(response.data.data || []);
       } catch (err) {

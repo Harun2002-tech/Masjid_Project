@@ -226,10 +226,14 @@ export default function StudentListPage() {
                             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl shrink-0">
                               {student.photo ? (
                                 <img
-                                  src={`${API_BASE_URL}/${student.photo.replace(
-                                    /\\/g,
-                                    "/"
-                                  )}`}
+                                  src={
+                                    student.photo.startsWith("http")
+                                      ? student.photo
+                                      : `${API_BASE_URL}/${student.photo.replace(
+                                          /\\/g,
+                                          "/"
+                                        )}`
+                                  }
                                   className="w-full h-full object-cover"
                                   alt=""
                                 />

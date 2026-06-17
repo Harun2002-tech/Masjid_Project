@@ -275,10 +275,14 @@ export default function TeacherListPage() {
                             <div className="w-14 h-14 rounded-2xl glass border border-white/10 flex items-center justify-center overflow-hidden shadow-inner group-hover:border-gold/30 transition-all">
                               {teacher.photo ? (
                                 <img
-                                  src={`${API_BASE_URL}/${teacher.photo.replace(
-                                    /\\/g,
-                                    "/"
-                                  )}`}
+                                  src={
+                                    teacher.photo.startsWith("http")
+                                      ? teacher.photo
+                                      : `${API_BASE_URL}/${teacher.photo.replace(
+                                          /\\/g,
+                                          "/"
+                                        )}`
+                                  }
                                   alt={fullName}
                                   className="w-full h-full object-cover"
                                 />

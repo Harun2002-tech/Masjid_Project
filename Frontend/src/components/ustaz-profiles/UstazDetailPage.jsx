@@ -108,7 +108,9 @@ export default function UstazDetailPage() {
   }
 
   const photoUrl = ustaz.photo
-    ? `${API_BASE_URL}/${ustaz.photo.replace(/^\/+/, "")}`
+    ? ustaz.photo.startsWith("http")
+      ? ustaz.photo
+      : `${API_BASE_URL}/${ustaz.photo.replace(/^\/+/, "")}`
     : null;
   const fallbackAvatar = `https://ui-avatars.com/api/?name=${ustaz.firstName}+${ustaz.lastName}&background=0b1220&color=fbbf24&size=512&bold=true`;
 

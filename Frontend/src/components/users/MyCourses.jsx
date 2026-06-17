@@ -161,10 +161,11 @@ export default function MyCourses() {
                   <div className="h-48 bg-[#0b1220] relative overflow-hidden">
                     {course?.thumbnail ? (
                       <img
-                        src={`${API_BASE_URL}/${course.thumbnail.replace(
-                          /\\/g,
-                          "/"
-                        )}`}
+                        src={
+                          course.thumbnail.startsWith("http")
+                            ? course.thumbnail
+                            : `${API_BASE_URL}/${course.thumbnail.replace(/\\/g, "/")}`
+                        }
                         alt={course.title}
                         className="w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700"
                       />

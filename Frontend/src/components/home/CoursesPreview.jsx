@@ -147,19 +147,27 @@ export default function CoursesPreview() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="glass group h-full rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-gold/30 transition-all duration-500 shadow-2xl">
+              <Card className="glass group h-full rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-gold/30 transition-all duration-500 shadow-2xl p-0 gap-0">
                 {/* Image Container */}
                 <div className="relative h-64 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#05080f] to-transparent z-10 opacity-60" />
 
                   {course.thumbnail ? (
                     <img
-                      src={`https://api.ruhamaislamiccenter.com/${course.thumbnail.replace(
-                        /^\/+/,
-                        ""
-                      )}`}
+                      src={
+                        course.thumbnail.startsWith("http")
+                          ? course.thumbnail
+                          : `https://api.ruhamaislamiccenter.com/${course.thumbnail.replace(
+                              /^\/+/,
+                              ""
+                            )}`
+                      }
                       alt={course.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      onError={(e) => {
+                        e.target.src =
+                          "https://placehold.co/600x400/064e3b/gold?text=Course+Image";
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full bg-white/5 flex items-center justify-center">

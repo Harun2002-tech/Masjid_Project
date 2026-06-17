@@ -102,7 +102,7 @@ const TeacherProfile = () => {
   }, [id]);
 
   const getUrl = (path) =>
-    path ? `${API_BASE_URL}/${path.replace(/\\/g, "/")}` : null;
+    path ? (path.startsWith("http") ? path : `${API_BASE_URL}/${path.replace(/\\/g, "/")}`) : null;
 
   const getSubjects = (subs) => {
     if (Array.isArray(subs)) return subs;

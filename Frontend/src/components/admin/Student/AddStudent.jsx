@@ -297,15 +297,21 @@ export default function AddStudent() {
           }));
           if (data.photo)
             setPhotoPreview(
-              `${API_BASE_URL}/${data.photo.replace(/\\/g, "/")}`
+              data.photo.startsWith("http")
+                ? data.photo
+                : `${API_BASE_URL}/${data.photo.replace(/\\/g, "/")}`
             );
           if (data.studentIDPhoto)
             setIdPreview(
-              `${API_BASE_URL}/${data.studentIDPhoto.replace(/\\/g, "/")}`
+              data.studentIDPhoto.startsWith("http")
+                ? data.studentIDPhoto
+                : `${API_BASE_URL}/${data.studentIDPhoto.replace(/\\/g, "/")}`
             );
           if (data.emergencyIDPhoto)
             setEmergencyIdPreview(
-              `${API_BASE_URL}/${data.emergencyIDPhoto.replace(/\\/g, "/")}`
+              data.emergencyIDPhoto.startsWith("http")
+                ? data.emergencyIDPhoto
+                : `${API_BASE_URL}/${data.emergencyIDPhoto.replace(/\\/g, "/")}`
             );
         } catch (err) {
           setMsg({ type: "error", text: "መረጃውን መጫን አልተቻለም" });

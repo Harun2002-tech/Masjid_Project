@@ -180,7 +180,11 @@ export default function AddCoursePage() {
                   />
                 ) : existingThumbnail ? (
                   <img
-                    src={`${BASE_URL}/${existingThumbnail.replace(/^\//, "")}`}
+                    src={
+                      existingThumbnail.startsWith("http")
+                        ? existingThumbnail
+                        : `${BASE_URL}/${existingThumbnail.replace(/^\//, "")}`
+                    }
                     className="w-full h-full object-cover"
                     alt="Existing"
                   />

@@ -14,6 +14,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useLanguage } from "../../../contexts/language-context"; // ቋንቋውን ለመቀየር
+import { API_URL } from "../../../config/api";
 
 export default function BookAdminForm() {
   const { language, t } = useLanguage();
@@ -82,7 +83,7 @@ export default function BookAdminForm() {
       data.append("file", file);
 
       const response = await axios.post(
-        "https://api.ruhamaislamiccenter.com/api/library",
+        `${API_URL}/library`,
         data,
         {
           headers: {

@@ -165,9 +165,13 @@ export default function CourseListPage() {
                 >
                   {course.thumbnail ? (
                     <img
-                      src={`${API_BASE_URL}${
-                        course.thumbnail.startsWith("/") ? "" : "/"
-                      }${course.thumbnail}`}
+                      src={
+                        course.thumbnail.startsWith("http")
+                          ? course.thumbnail
+                          : `${API_BASE_URL}${
+                              course.thumbnail.startsWith("/") ? "" : "/"
+                            }${course.thumbnail}`
+                      }
                       alt={course.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-80 group-hover:opacity-100"
                     />

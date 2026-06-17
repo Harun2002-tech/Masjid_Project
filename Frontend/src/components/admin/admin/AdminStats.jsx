@@ -592,9 +592,11 @@ function DataSection({ title, items, type, tViewAll, isRTL }) {
                 <div className="w-10 h-10 rounded-xl bg-gold/10 overflow-hidden flex items-center justify-center text-gold border border-gold/10">
                   {item.photo ? (
                     <img
-                      src={`${baseUrl}${item.photo.startsWith("/") ? "" : "/"}${
-                        item.photo
-                      }`}
+                      src={
+                        item.photo.startsWith("http")
+                          ? item.photo
+                          : `${baseUrl}${item.photo.startsWith("/") ? "" : "/"}${item.photo}`
+                      }
                       className="w-full h-full object-cover"
                       alt=""
                     />

@@ -27,6 +27,18 @@ const uploadToGoogleDrive = async (buffer, fileName, mimeType, folderId) => {
     fields: "id, webViewLink",
   });
 
+  try {
+    await drive.permissions.create({
+      fileId: response.data.id,
+      requestBody: {
+        role: "reader",
+        type: "anyone",
+      },
+    });
+  } catch (permErr) {
+    console.error("Error setting public permission:", permErr);
+  }
+
   return `https://drive.google.com/file/d/${response.data.id}/view`;
 };
 
