@@ -21,6 +21,7 @@ const processUploads = (req, res, next) => {
             req.body.uploadedUrls[field] = url;
           })
           .catch((err) => {
+            console.error("Upload error (multi-field):", err.message);
             uploadFailed = true;
           });
         uploadPromises.push(promise);
@@ -37,6 +38,7 @@ const processUploads = (req, res, next) => {
         req.body.uploadedUrls.fileUrl = url;
       })
       .catch((err) => {
+        console.error("Upload error (single file):", err.message);
         uploadFailed = true;
       });
     uploadPromises.push(promise);

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../../contexts/language-context";
 import { motion, AnimatePresence } from "framer-motion";
+
 import {
   Loader2,
   Send,
@@ -11,24 +12,42 @@ import {
   Hash,
   Type,
   Sparkles,
-  Globe,
+  Image,
+  X,
 } from "lucide-react";
 
-export const MESSAGE_URL = "https://api.ruhamaislamiccenter.com/api/messages";
+const API = import.meta.env.VITE_API_URL;
+const MESSAGE_URL = `${API}/api/messages`;
 
 export default function MessageAdminForm() {
-  const { language, setLanguage, t, dir } = useLanguage();
+  const { language, t, dir } = useLanguage();
+  const navigate = useNavigate();
 
   const initialFormState = {
     type: "Ayah",
     arabic: "",
-    text: "", // ለትርጉሙ የምንጠቀመው ፊልድ
+    text: "",
     reference: "",
   };
 
   const [formData, setFormData] = useState(initialFormState);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: "", msg: "" });
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,16 +56,26 @@ export default function MessageAdminForm() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post(MESSAGE_URL, formData, {
+      const formPayload = new FormData();
+      formPayload.append("type", formData.type);
+      formPayload.append("arabic", formData.arabic);
+      formPayload.append("text", formData.text);
+      formPayload.append("reference", formData.reference);
+      if (imageFile) {
+        formPayload.append("image", imageFile);
+      }
+
+      await axios.post(MESSAGE_URL, formPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // በ Context ውስጥ ባለው የ "success" ቁልፍ መሰረት መልዕክቱን ያሳያል
-      setStatus({
-        type: "success",
-        msg: t("success"),
-      });
+      setStatus({ type: "success", msg: t("success") });
       setFormData(initialFormState);
+      removeImage();
+
+      setTimeout(() => {
+        navigate("/admin/add-message");
+      }, 1500);
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Error occurred!";
       setStatus({ type: "error", msg: errorMsg });
@@ -56,10 +85,7 @@ export default function MessageAdminForm() {
   };
 
   return (
-    <div
-      className="min-h-screen py-20 px-4 flex items-center justify-center"
-      dir={dir}
-    >
+    <div className="min-h-screen py-20 px-4 flex items-center justify-center" dir={dir}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -77,7 +103,7 @@ export default function MessageAdminForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-8">
-          {/* 2. Message Type Selector */}
+          {/* Message Type Selector */}
           <div className="space-y-3">
             <label className="text-[10px] font-black text-gold/40 uppercase ml-2 tracking-widest flex items-center gap-2">
               <Hash size={12} /> {t("type")}
@@ -100,7 +126,7 @@ export default function MessageAdminForm() {
             </div>
           </div>
 
-          {/* 3. Message Inputs */}
+          {/* Message Inputs */}
           <div className="space-y-6">
             {/* Arabic Input */}
             <div className="space-y-2">
@@ -150,6 +176,37 @@ export default function MessageAdminForm() {
                 className="payment-input w-full rounded-2xl px-6 py-5 font-bold italic"
                 placeholder="e.g. Quran 2:255"
               />
+            </div>
+
+            {/* Image Upload */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gold/40 uppercase ml-2 tracking-widest flex items-center gap-2">
+                <Image size={12} /> {t("course_photo")}
+              </label>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="payment-input w-full rounded-2xl px-6 py-5 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-gold/20 file:text-gold cursor-pointer"
+                />
+                {imagePreview && (
+                  <div className="relative mt-3 inline-block">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-32 h-32 object-cover rounded-xl border border-white/10"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute -top-2 -right-2 bg-red/80 rounded-full p-1"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

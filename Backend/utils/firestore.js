@@ -113,6 +113,7 @@ const generateId = async (col, prefix) => {
   return `${prefix}-${String(next).padStart(3, "0")}`;
 };
 
+
 export {
   db,
   collections,

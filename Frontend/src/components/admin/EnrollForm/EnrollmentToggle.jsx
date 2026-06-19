@@ -10,7 +10,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../../contexts/language-context"; // 🚩 ቋንቋውን ለመቀየር
 
-const API_BASE_URL = "https://api.ruhamaislamiccenter.com/api/courses";
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/courses`;
 
 const EnrollmentToggle = () => {
   const [courses, setCourses] = useState([]);
@@ -50,7 +50,7 @@ const EnrollmentToggle = () => {
         const newState = res.data.enrollmentOpen;
         setCourses((prev) =>
           prev.map((c) =>
-            c._id === courseId ? { ...c, enrollmentOpen: newState } : c
+            c.id === courseId ? { ...c, enrollmentOpen: newState } : c
           )
         );
       }
@@ -86,7 +86,7 @@ const EnrollmentToggle = () => {
           {courses.map((course) => (
             <motion.div
               layout
-              key={course._id}
+              key={course.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="p-5 bg-white/5 border border-white/5 rounded-[2rem] flex justify-between items-center group hover:bg-white/10 hover:border-white/10 transition-all"
@@ -118,15 +118,15 @@ const EnrollmentToggle = () => {
               </div>
 
               <button
-                onClick={() => handleToggle(course._id)}
-                disabled={togglingId === course._id}
+                onClick={() => handleToggle(course.id)}
+                disabled={togglingId === course.id}
                 className={`p-3 rounded-2xl transition-all duration-300 ${
                   course.enrollmentOpen
                     ? "bg-red/10 text-red hover:bg-red hover:text-white"
                     : "bg-gold text-bg font-bold shadow-lg hover:scale-105"
                 }`}
               >
-                {togglingId === course._id ? (
+                {togglingId === course.id ? (
                   <Loader2 size={20} className="animate-spin" />
                 ) : course.enrollmentOpen ? (
                   <XCircle size={20} />
