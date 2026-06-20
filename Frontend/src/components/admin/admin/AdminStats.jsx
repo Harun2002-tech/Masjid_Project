@@ -576,9 +576,9 @@ function DataSection({ title, items, type, tViewAll, isRTL }) {
       </div>
       <div className="space-y-3">
         {items.length > 0 ? (
-          items.map((item) => (
+          items.map((item, idx) => (
             <Link
-              key={item._id}
+              key={item._id || idx}
               to={`/admin/${type}/view/${item._id}`}
               className={`flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] transition-all ${
                 isRTL ? "flex-row-reverse" : ""

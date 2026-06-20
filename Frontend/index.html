@@ -22,6 +22,20 @@
   <title>Ruhama Islamic Center</title>
 
   <script src="https://apis.google.com/js/platform.js"></script>
+  <script>
+    (function() {
+      if ('serviceWorker' in navigator && !sessionStorage.getItem('sw-cleared')) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          if (regs.length > 0) {
+            sessionStorage.setItem('sw-cleared', '1');
+            Promise.all(regs.map(function(reg) { return reg.unregister(); })).then(function() {
+              window.location.reload();
+            });
+          }
+        });
+      }
+    })();
+  </script>
 </head>
 
 <body>

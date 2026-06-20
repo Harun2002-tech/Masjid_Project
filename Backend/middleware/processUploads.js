@@ -5,8 +5,11 @@ const processUploads = (req, res, next) => {
   const hasFile = req.file;
 
   if (!hasFiles && !hasFile) {
+    // No files to process, proceed to next middleware
     return next();
   }
+
+  console.log(`[Upload Processing] Files detected - hasFiles: ${hasFiles}, hasFile: ${!!hasFile}`);
 
   const uploadPromises = [];
   let uploadFailed = false;
@@ -47,23 +50,28 @@ const processUploads = (req, res, next) => {
   Promise.all(uploadPromises)
     .then(() => {
       if (uploadFailed) {
+        console.error("[Upload Processing] Upload failed for one or more files");
         return res.status(500).json({
           success: false,
           message: "የፋይል ጭነት አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
         });
       }
       if (req.body.uploadedUrls) {
+        console.log("[Upload Processing] URLs assigned:", Object.keys(req.body.uploadedUrls));
         Object.assign(req.body, req.body.uploadedUrls);
         if (!req.body.uploadedFiles) {
           req.body.uploadedFiles = req.body.uploadedUrls;
         }
       }
+      console.log("[Upload Processing] Files processed successfully");
       next();
     })
     .catch((err) => {
+      console.error("[Upload Processing] Promise.all error:", err.message);
       res.status(500).json({
         success: false,
         message: "የፋይል ጭነት ሂደት አልተሳካም።",
+        error: err.message
       });
     });
 };

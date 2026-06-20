@@ -4,10 +4,11 @@ import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
+      disable: mode === "development",
       registerType: "autoUpdate",
       includeAssets: [
         "android-chrome-192x192.png",
@@ -117,4 +118,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
