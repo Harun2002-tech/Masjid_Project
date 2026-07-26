@@ -8,6 +8,7 @@ import {
   Loader2,
   ArrowLeft,
   CheckCircle2,
+  XCircle,
   Lock,
   Phone,
   Calendar,
@@ -88,6 +89,23 @@ const FormField = ({
   </div>
 );
 
+// Application status badge
+const StatusBadge = ({ status, t }) => {
+  if (!status) return null;
+  const map = {
+    pending: { label: t.pending, cls: "bg-amber-500/15 text-amber-400 border-amber-500/20" },
+    approved: { label: t.approved, cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
+    rejected: { label: t.rejected, cls: "bg-red-500/15 text-red-400 border-red-500/20" },
+  };
+  const s = map[status];
+  if (!s) return null;
+  return (
+    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border ${s.cls}`}>
+      {s.label}
+    </span>
+  );
+};
+
 export default function AddStudent() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -112,7 +130,7 @@ export default function AddStudent() {
       male: "ወንድ",
       female: "ሴት",
       nationality: "ዜግነት",
-      birthDate: "የትውልድ ቀን", // እዚህ ላይ 'birtDate' የነበረው ተስተካክሏል
+      birthDate: "የትውልድ ቀን",
       maritalStatus: "የጋብቻ ሁኔታ",
       disability: "አካላዊ ጉዳት",
       single: "ያላገባ",
@@ -139,6 +157,17 @@ export default function AddStudent() {
       change: "ቀይር",
       save: isEditMode ? "መረጃውን አዘምን" : "ተማሪውን መዝግብ",
       successMsg: isEditMode ? "የተማሪው መረጃ ታድሷል!" : "ተማሪው በትክክል ተመዝግቧል!",
+      pending: "በመጠባበቅ ላይ",
+      approved: "የጸደቀ",
+      rejected: "ውድቅ የተደረገ",
+      approve: "ማመልከቻውን አጽድቅ",
+      reject: "ማመልከቻውን ውድቅ አድርግ",
+      confirmApprove: "ይህንን ተማሪ ማጽደቅ ትፈልጋለህ?",
+      confirmReject: "ይህንን ማመልከቻ ውድቅ ማድረግ ትፈልጋለህ?",
+      rejectReasonPrompt: "የውድቅ ምክንያት (አማራጭ):",
+      approvedMsg: "ተማሪው ጸድቋል",
+      rejectedMsg: "ማመልከቻው ውድቅ ተደርጓል",
+      actionError: "ስህተት ተከስቷል፣ እባክዎ ደግመው ይሞክሩ",
     },
     en: {
       title: isEditMode ? "Update" : "New",
@@ -181,6 +210,17 @@ export default function AddStudent() {
       change: "Change",
       save: isEditMode ? "Update Profile" : "Register Student",
       successMsg: "Operation successful!",
+      pending: "Pending",
+      approved: "Approved",
+      rejected: "Rejected",
+      approve: "Approve Application",
+      reject: "Reject Application",
+      confirmApprove: "Approve this student?",
+      confirmReject: "Reject this application?",
+      rejectReasonPrompt: "Reason for rejection (optional):",
+      approvedMsg: "Student approved",
+      rejectedMsg: "Application rejected",
+      actionError: "Something went wrong, please try again",
     },
     ar: {
       title: isEditMode ? "تحديث" : "تسجيل",
@@ -223,6 +263,17 @@ export default function AddStudent() {
       change: "تغيير",
       save: isEditMode ? "تحديث البيانات" : "تسجيل الطالب",
       successMsg: "تمت العملية بنجاح!",
+      pending: "قيد الانتظار",
+      approved: "مقبول",
+      rejected: "مرفوض",
+      approve: "قبول الطلب",
+      reject: "رفض الطلب",
+      confirmApprove: "هل تريد قبول هذا الطالب؟",
+      confirmReject: "هل تريد رفض هذا الطلب؟",
+      rejectReasonPrompt: "سبب الرفض (اختياري):",
+      approvedMsg: "تم قبول الطالب",
+      rejectedMsg: "تم رفض الطلب",
+      actionError: "حدث خطأ، يرجى المحاولة مرة أخرى",
     },
   };
 
@@ -257,6 +308,7 @@ export default function AddStudent() {
     emergencyKebele: "",
     subjects: [],
     joinDate: new Date().toISOString().split("T")[0],
+    applicationStatus: "",
   });
 
   const [photo, setPhoto] = useState(null);
@@ -267,20 +319,20 @@ export default function AddStudent() {
   const [emergencyIdPreview, setEmergencyIdPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
+  const [actionLoading, setActionLoading] = useState(""); // "approve" | "reject" | ""
   const [msg, setMsg] = useState({ type: "", text: "" });
 
   const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
+  const authHeader = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  };
 
   useEffect(() => {
     if (isEditMode) {
       const fetchStudent = async () => {
         try {
           setFetching(true);
-          const res = await axios.get(`${API_BASE_URL}/api/students/${id}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          });
+          const res = await axios.get(`${API_BASE_URL}/api/students/${id}`, authHeader);
           const data = res.data.data || res.data;
 
           setFormData((prev) => ({
@@ -294,6 +346,7 @@ export default function AddStudent() {
             joinDate: data.joinDate
               ? data.joinDate.split("T")[0]
               : prev.joinDate,
+            applicationStatus: data.applicationStatus || "",
           }));
           if (data.photo)
             setPhotoPreview(
@@ -352,6 +405,49 @@ export default function AddStudent() {
     });
   };
 
+  // ✅ ማመልከቻ ማጽደቅ
+  const handleApprove = async () => {
+    if (!window.confirm(t.confirmApprove)) return;
+    try {
+      setActionLoading("approve");
+      const res = await axios.put(
+        `${API_BASE_URL}/api/students/${id}/approve`,
+        {},
+        authHeader
+      );
+      setFormData((prev) => ({
+        ...prev,
+        applicationStatus: "approved",
+        studentID: res.data?.data?.studentID || prev.studentID,
+      }));
+      setMsg({ type: "success", text: t.approvedMsg });
+    } catch (err) {
+      setMsg({ type: "error", text: err.response?.data?.message || t.actionError });
+    } finally {
+      setActionLoading("");
+    }
+  };
+
+  // ❌ ማመልከቻ ውድቅ ማድረግ
+  const handleReject = async () => {
+    if (!window.confirm(t.confirmReject)) return;
+    const reason = window.prompt(t.rejectReasonPrompt) || "";
+    try {
+      setActionLoading("reject");
+      await axios.put(
+        `${API_BASE_URL}/api/students/${id}/reject`,
+        { reason },
+        authHeader
+      );
+      setFormData((prev) => ({ ...prev, applicationStatus: "rejected" }));
+      setMsg({ type: "success", text: t.rejectedMsg });
+    } catch (err) {
+      setMsg({ type: "error", text: err.response?.data?.message || t.actionError });
+    } finally {
+      setActionLoading("");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -359,6 +455,7 @@ export default function AddStudent() {
       const formDataToSend = new FormData();
       Object.keys(formData).forEach((key) => {
         if (!isEditMode && key === "studentID") return;
+        if (key === "applicationStatus") return;
         if (key === "subjects") {
           formDataToSend.append("subjects", JSON.stringify(formData[key]));
         } else if (
@@ -381,24 +478,18 @@ export default function AddStudent() {
       if (emergencyIDPhoto)
         formDataToSend.append("emergencyIDPhoto", emergencyIDPhoto);
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      };
-
       if (isEditMode) {
         await axios.put(
           `${API_BASE_URL}/api/students/${id}`,
           formDataToSend,
-          config
+          authHeader
         );
         setMsg({ type: "success", text: t.successMsg });
       } else {
         const response = await axios.post(
           `${API_BASE_URL}/api/students`,
           formDataToSend,
-          config
+          authHeader
         );
         const generatedID = response.data?.data?.studentID || "ተመዝግቧል";
         setMsg({
@@ -416,6 +507,8 @@ export default function AddStudent() {
       setLoading(false);
     }
   };
+
+  const isPending = isEditMode && formData.applicationStatus === "pending";
 
   return (
     <div
@@ -446,26 +539,68 @@ export default function AddStudent() {
             >
               <ArrowLeft size={20} className={isRTL ? "rotate-180" : ""} />
             </Link>
-            <h1 className="text-4xl font-bold tracking-tighter">
-              {t.title}{" "}
-              <span className="text-gold-glow uppercase italic">
-                {t.action}
-              </span>
-            </h1>
+            <div>
+              <h1 className="text-4xl font-bold tracking-tighter">
+                {t.title}{" "}
+                <span className="text-gold-glow uppercase italic">
+                  {t.action}
+                </span>
+              </h1>
+              {isEditMode && formData.applicationStatus && (
+                <div className="mt-3">
+                  <StatusBadge status={formData.applicationStatus} t={t} />
+                </div>
+              )}
+            </div>
           </div>
-          <div className="glass px-8 py-4 rounded-[2rem] flex items-center gap-4 border-gold/20 shadow-[0_0_20px_rgba(251,191,36,0.1)]">
-            <Calendar size={18} className="text-gold" />
-            <div
-              className={`${
-                isRTL ? "border-r pr-4" : "border-l pl-4"
-              } border-white/10`}
-            >
-              <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">
-                {t.regDate}
-              </p>
-              <p className="text-sm font-bold font-mono text-gold">
-                {formData.joinDate}
-              </p>
+
+          <div className="flex items-center gap-4">
+            {/* Approve / Reject actions — only shown for pending applications */}
+            {isPending && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleApprove}
+                  disabled={actionLoading !== ""}
+                  className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-40"
+                >
+                  {actionLoading === "approve" ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <CheckCircle2 size={16} />
+                  )}
+                  {t.approve}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleReject}
+                  disabled={actionLoading !== ""}
+                  className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-white/5 text-white/50 border border-white/10 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/20 transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-40"
+                >
+                  {actionLoading === "reject" ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <XCircle size={16} />
+                  )}
+                  {t.reject}
+                </button>
+              </>
+            )}
+
+            <div className="glass px-8 py-4 rounded-[2rem] flex items-center gap-4 border-gold/20 shadow-[0_0_20px_rgba(251,191,36,0.1)]">
+              <Calendar size={18} className="text-gold" />
+              <div
+                className={`${
+                  isRTL ? "border-r pr-4" : "border-l pl-4"
+                } border-white/10`}
+              >
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">
+                  {t.regDate}
+                </p>
+                <p className="text-sm font-bold font-mono text-gold">
+                  {formData.joinDate}
+                </p>
+              </div>
             </div>
           </div>
         </div>

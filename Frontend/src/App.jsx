@@ -31,6 +31,9 @@ import YouTubeGallery from "./components/home/YouTubeGallery";
 /* ---------------- USER PAGES ---------------- */
 import UserDashboard from "./components/users/DashboardPage";
 import MyCourses from "./components/users/MyCourses";
+// 🆕 ተጠቃሚው ራሱ ተማሪ ሆኖ የሚያመለክትበት ፎርም
+// ⚠️ ካስቀመጥከው ፋይል ትክክለኛ አካባቢ ጋር ይህን path አስተካክል
+import StudentApplication from "./components/admin/Student/Studentapplication";
 
 /* ---------------- ADMIN PAGES ---------------- */
 import AdminDashboard from "./components/admin/admin/AdminStats";
@@ -95,6 +98,8 @@ function App() {
             {/* USER ROUTES (Authentication Required) */}
             <Route path="/dashboard" element={<PrivateRoute><UserDashboard /></PrivateRoute>} />
             <Route path="/my-courses" element={<PrivateRoute><MyCourses /></PrivateRoute>} />
+            {/* 🆕 ተጠቃሚው ራሱ ተማሪ ሆኖ የሚያመለክትበት ገጽ */}
+            <Route path="/apply-student" element={<PrivateRoute><StudentApplication /></PrivateRoute>} />
 
             {/* ADMIN ROUTES (Auth + Role Required) */}
             <Route path="/admin">
