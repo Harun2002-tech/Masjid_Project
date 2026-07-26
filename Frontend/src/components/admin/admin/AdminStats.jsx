@@ -14,6 +14,8 @@ import {
   UserPlus,
   Newspaper,
   MessageSquarePlus,
+  MessageSquareQuote,
+  ShieldPlus,
   Loader2,
   Sparkles,
   ChevronRight,
@@ -57,6 +59,9 @@ const translations = {
     newsList: "ዜና ዝርዝር",
     testimonials: "የተማሪ እይታዎች",
     allCourses: "ሁሉንም ትምህርቶች",
+    submitTestimonial: "እይታ አክል",
+    addAdmin: "አድሚን መዝግብ",
+    scheduleLink: "ፕሮግራም አዘጋጅ",
   },
   en: {
     dashboard: "ADMIN PANEL",
@@ -83,6 +88,9 @@ const translations = {
     newsList: "News List",
     testimonials: "Testimonials",
     allCourses: "All Courses",
+    submitTestimonial: "Submit Testimonial",
+    addAdmin: "Add Admin",
+    scheduleLink: "Manage Schedule",
   },
   ar: {
     enrollmentControl: "التحكم في التسجيل",
@@ -109,6 +117,9 @@ const translations = {
     recentTeachers: "المعلمين الجدد",
     recentStudents: "الطلاب الجدد",
     noSchedule: "لا يوجد جدول اليوم",
+    submitTestimonial: "إضافة رأي",
+    addAdmin: "إضافة مسؤول",
+    scheduleLink: "إدارة الجدول",
   },
 };
 
@@ -381,6 +392,7 @@ export default function AdminDashboard() {
 
           {/* የግሪድ ብዛት ለትናንሽ ስክሪኖች 2፣ ለትላልቅ 6 እንዲሆን ተስተካክሏል */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+            {/* Students */}
             <QuickLink
               to="/admin/add-student"
               icon={UserPlus}
@@ -388,11 +400,27 @@ export default function AdminDashboard() {
               color="text-gold"
             />
             <QuickLink
+              to="/admin/students"
+              icon={Users}
+              title={t("students")}
+              color="text-white/60"
+            />
+
+            {/* Teachers */}
+            <QuickLink
               to="/admin/add-teacher"
               icon={GraduationCap}
               title={t("addTeacher")}
               color="text-white"
             />
+            <QuickLink
+              to="/admin/teachers"
+              icon={GraduationCap}
+              title={t("teachers")}
+              color="text-white/60"
+            />
+
+            {/* Enrollments */}
             <QuickLink
               to="/admin/enrollments"
               icon={ClipboardCheck}
@@ -400,22 +428,60 @@ export default function AdminDashboard() {
               color="text-white/60"
             />
             <QuickLink
+              to="/admin/enrollment-control"
+              icon={ClipboardCheck}
+              title={t("enrollmentControl")}
+              color="text-emerald-400"
+            />
+
+            {/* Courses */}
+            <QuickLink
               to="/admin/add-course"
               icon={BookOpen}
               title={t("addCourse")}
               color="text-gold"
             />
             <QuickLink
-              to="/admin/news"
+              to="/admin/courses"
+              icon={BookOpen}
+              title={t("allCourses")}
+              color="text-purple-400"
+            />
+
+            {/* Testimonials */}
+            <QuickLink
+              to="/admin/submit-testimonial"
+              icon={MessageSquareQuote}
+              title={t("submitTestimonial")}
+              color="text-sky-400"
+            />
+            <QuickLink
+              to="/admin/testimonials"
+              icon={Users}
+              title={t("testimonials")}
+              color="text-sky-400"
+            />
+
+            {/* News */}
+            <QuickLink
+              to="/admin/add-news"
               icon={Newspaper}
               title={t("newsPost")}
               color="text-white"
             />
             <QuickLink
-              to="/admin/add-masjid"
-              icon={MapPin}
-              title="Add Masjid"
-              color="text-emerald-400"
+              to="/admin/news"
+              icon={Newspaper}
+              title={t("newsList")}
+              color="text-red-400"
+            />
+
+            {/* Schedule & Prayer */}
+            <QuickLink
+              to="/admin/schedule"
+              icon={CalendarDays}
+              title={t("scheduleLink")}
+              color="text-gold"
             />
             <QuickLink
               to="/admin/prayer-times"
@@ -424,42 +490,34 @@ export default function AdminDashboard() {
               color="text-gold"
             />
 
-            {/* ያንተ አዳዲስ ሊንኮች እዚህ ጋር ይቀጥላሉ */}
+            {/* Masjid */}
             <QuickLink
-              to="/admin/enrollment-control"
-              icon={ClipboardCheck}
-              title={t("enrollmentControl")}
-              color="text-emerald-400" // ለዳርክ ሞድ እንዲታይ ቀለሙ ፈካ ተደርጓል
+              to="/admin/add-masjid"
+              icon={MapPin}
+              title="Add Masjid"
+              color="text-emerald-400"
             />
+
+            {/* Admin & Messages */}
             <QuickLink
-              to="/admin/news-list"
-              icon={Newspaper}
-              title={t("newsList")}
-              color="text-red-400"
-            />
-            <QuickLink
-              to="/admin/testimonials"
-              icon={Users}
-              title={t("testimonials")}
-              color="text-sky-400"
-            />
-            <QuickLink
-              to="/admin/courses"
-              icon={BookOpen}
-              title={t("allCourses")}
-              color="text-purple-400"
-            />
-            <QuickLink
-              to="/admin/manage-books"
-              icon={BookOpen}
-              title={t("books")}
-              color="text-white"
+              to="/admin/add-admin"
+              icon={ShieldPlus}
+              title={t("addAdmin")}
+              color="text-rose-400"
             />
             <QuickLink
               to="/admin/add-message"
               icon={MessageSquarePlus}
               title={t("dailyMsg")}
               color="text-gold"
+            />
+
+            {/* Books */}
+            <QuickLink
+              to="/admin/manage-books"
+              icon={BookOpen}
+              title={t("books")}
+              color="text-white"
             />
           </div>
         </div>
@@ -595,7 +653,9 @@ function DataSection({ title, items, type, tViewAll, isRTL }) {
                       src={
                         item.photo.startsWith("http")
                           ? item.photo
-                          : `${baseUrl}${item.photo.startsWith("/") ? "" : "/"}${item.photo}`
+                          : `${baseUrl}${
+                              item.photo.startsWith("/") ? "" : "/"
+                            }${item.photo}`
                       }
                       className="w-full h-full object-cover"
                       alt=""
