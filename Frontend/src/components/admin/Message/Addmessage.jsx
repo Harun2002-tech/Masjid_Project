@@ -12,8 +12,6 @@ import {
   Hash,
   Type,
   Sparkles,
-  Image,
-  X,
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL;
@@ -31,23 +29,8 @@ export default function MessageAdminForm() {
   };
 
   const [formData, setFormData] = useState(initialFormState);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: "", msg: "" });
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
-
-  const removeImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,22 +39,13 @@ export default function MessageAdminForm() {
 
     try {
       const token = localStorage.getItem("token");
-      const formPayload = new FormData();
-      formPayload.append("type", formData.type);
-      formPayload.append("arabic", formData.arabic);
-      formPayload.append("text", formData.text);
-      formPayload.append("reference", formData.reference);
-      if (imageFile) {
-        formPayload.append("image", imageFile);
-      }
 
-      await axios.post(MESSAGE_URL, formPayload, {
+      await axios.post(MESSAGE_URL, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       setStatus({ type: "success", msg: t("success") });
       setFormData(initialFormState);
-      removeImage();
 
       setTimeout(() => {
         navigate("/admin/add-message");
@@ -85,7 +59,10 @@ export default function MessageAdminForm() {
   };
 
   return (
-    <div className="min-h-screen py-20 px-4 flex items-center justify-center" dir={dir}>
+    <div
+      className="min-h-screen py-20 px-4 flex items-center justify-center"
+      dir={dir}
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -176,37 +153,6 @@ export default function MessageAdminForm() {
                 className="payment-input w-full rounded-2xl px-6 py-5 font-bold italic"
                 placeholder="e.g. Quran 2:255"
               />
-            </div>
-
-            {/* Image Upload */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gold/40 uppercase ml-2 tracking-widest flex items-center gap-2">
-                <Image size={12} /> {t("course_photo")}
-              </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="payment-input w-full rounded-2xl px-6 py-5 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-gold/20 file:text-gold cursor-pointer"
-                />
-                {imagePreview && (
-                  <div className="relative mt-3 inline-block">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-32 h-32 object-cover rounded-xl border border-white/10"
-                    />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute -top-2 -right-2 bg-red/80 rounded-full p-1"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
