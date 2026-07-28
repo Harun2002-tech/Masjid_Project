@@ -28,6 +28,10 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
+
+// 🔴 ዋናው ማስተካከያ፡ undefined ቫልዩዎች ሲመጡ Firestore እንዳይበላሽ ይከላከላል
+db.settings({ ignoreUndefinedProperties: true });
+
 const auth = admin.auth();
 
 export { db, auth };
