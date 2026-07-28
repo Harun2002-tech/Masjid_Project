@@ -26,12 +26,17 @@ const VerifySection = ({ tx_ref, language, dir, bodyFont }) => {
           `https://api.ruhamaislamiccenter.com/api/payment/verify/${tx_ref}`
         );
         const data = await response.json();
-        if (data.status === "success") setStatus("success");
-        else setStatus("failed");
+        if (data.status === "success") {
+          setStatus("success");
+        } else {
+          setStatus("failed");
+        }
       } catch (error) {
+        console.error("Verification error:", error);
         setStatus("failed");
       }
     };
+
     if (tx_ref) verify();
   }, [tx_ref]);
 
@@ -51,10 +56,11 @@ const VerifySection = ({ tx_ref, language, dir, bodyFont }) => {
           </p>
         </div>
       )}
+
       {status === "success" && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="space-y-6"
         >
           <CheckCircle className="text-gold mx-auto" size={60} />
@@ -79,10 +85,11 @@ const VerifySection = ({ tx_ref, language, dir, bodyFont }) => {
           </button>
         </motion.div>
       )}
+
       {status === "failed" && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="space-y-6"
         >
           <XCircle className="text-red-500 mx-auto" size={60} />
@@ -121,13 +128,23 @@ export default function BankPayment() {
 
   const handlePaymentInit = async () => {
     const minAmount = 5;
-    if (!amount || amount < minAmount) {
+    if (!amount || Number(amount) < minAmount) {
       const errorMsg =
         language === "am"
           ? `ዝቅተኛው የልገሳ መጠን ${minAmount} ብር ነው።`
           : language === "ar"
           ? `الحد الأدنى للتبرع هو ${minAmount} بر.`
           : `Minimum donation is ${minAmount} ETB.`;
+      return alert(errorMsg);
+    }
+
+    if (!email) {
+      const errorMsg =
+        language === "am"
+          ? "እባክዎን ኢሜይል ያስገቡ።"
+          : language === "ar"
+          ? "يرجى إدخال البريد الإلكتروني."
+          : "Please enter an email address.";
       return alert(errorMsg);
     }
 
@@ -142,9 +159,14 @@ export default function BankPayment() {
         }
       );
       const result = await response.json();
-      if (result.status === "success")
+
+      if (result.status === "success" && result.data?.checkout_url) {
         window.location.href = result.data.checkout_url;
+      } else {
+        alert(result.message || "ክፍያውን ማስጀመር አልተቻለም።");
+      }
     } catch (error) {
+      console.error("Payment init error:", error);
       alert(
         language === "am"
           ? "ስህተት ተፈጥሯል። እባክዎ ደግመው ይሞክሩ።"
@@ -286,7 +308,7 @@ export default function BankPayment() {
 
               <button
                 onClick={handlePaymentInit}
-                disabled={!amount || loading}
+                disabled={!amount || !email || loading}
                 className={`w-full h-16 btn-gold rounded-2xl font-bold uppercase tracking-widest flex items-center justify-center gap-3 shadow-2xl active:scale-[0.98] disabled:opacity-20 ${bodyFont}`}
               >
                 {loading ? (
