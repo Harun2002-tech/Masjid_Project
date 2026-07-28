@@ -4,20 +4,18 @@ const router = express.Router();
 import {
   initializePayment,
   verifyPayment,
-} from "../controllers/payment.Controller.js"; // 👈 .js መጨመሩን አረጋግጥ
-
-import { protect } from "../middleware/authMiddleware.js";
+} from "../controllers/payment.Controller.js";
 
 /**
  * 1. ክፍያ ለማስጀመር (Initialize Payment)
- * 🛡️ ተጠቃሚው መግባቱን ለማረጋገጥ protect ጨምረናል
+ * 🔓 ማንኛውም ሰው (ሳይመዘገብ/ሳይገባ) መክፈል እንዲችል protect ተነስቷል
  */
-router.post("/initialize", protect, initializePayment);
+router.post("/initialize", initializePayment);
 
 /**
  * 2. የክፍያ ሁኔታን ለማረጋገጥ (Verify Payment)
- * ይህ በ Chapa ወይም በሌላ የክፍያ መንገድ በኩል የሚመጣውን tx_ref ያረጋግጣል
+ * 🔓 Chapa ክፍያው ከተጠናቀቀ በኋላ redirect ስለሚያደርግ protect አያስፈልገውም
  */
-router.get("/verify/:tx_ref", protect, verifyPayment);
+router.get("/verify/:tx_ref", verifyPayment);
 
 export default router;

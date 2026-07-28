@@ -45,7 +45,10 @@ const FormField = ({
       }`}
     >
       {Icon && (
-        <Icon size={14} className="group-focus-within:text-gold transition-colors" />
+        <Icon
+          size={14}
+          className="group-focus-within:text-gold transition-colors"
+        />
       )}
       {label}
     </label>
@@ -60,7 +63,11 @@ const FormField = ({
         } disabled:opacity-50`}
       >
         {options.map((opt) => (
-          <option key={opt.val || opt} value={opt.val || opt} className="bg-[#0b1220]">
+          <option
+            key={opt.val || opt}
+            value={opt.val || opt}
+            className="bg-[#0b1220]"
+          >
             {opt.label || opt}
           </option>
         ))}
@@ -94,7 +101,8 @@ export default function StudentApplication() {
       action: "ምዝገባ ጥያቄ",
       subtitle: "ይህን ፎርም ይሙሉ፣ አድሚኑ ገምግሞ ካጸደቀው በኋላ ኦፊሴላዊ ተማሪ ይሆናሉ።",
       noticeTitle: "ማመልከቻዎ ወዲያውኑ አይጸድቅም",
-      noticeBody: "ካስገቡ በኋላ ማመልከቻዎ 'በመጠባበቅ ላይ' ሆኖ ይቀመጣል፤ አድሚኑ ሲያጸድቀው በኢሜል ይነገርዎታል።",
+      noticeBody:
+        "ካስገቡ በኋላ ማመልከቻዎ 'በመጠባበቅ ላይ' ሆኖ ይቀመጣል፤ አድሚኑ ሲያጸድቀው በኢሜል ይነገርዎታል።",
       personal: "የግል መረጃ",
       fname: "የመጀመሪያ ስም",
       lname: "የአባት ስም",
@@ -136,9 +144,11 @@ export default function StudentApplication() {
       back: "Back",
       title: "Student",
       action: "Application",
-      subtitle: "Fill this form, and once an admin reviews and approves it you'll become an official student.",
+      subtitle:
+        "Fill this form, and once an admin reviews and approves it you'll become an official student.",
       noticeTitle: "Your application won't be approved instantly",
-      noticeBody: "After submitting, your application stays 'Pending' until an admin reviews it — you'll be notified by email once approved.",
+      noticeBody:
+        "After submitting, your application stays 'Pending' until an admin reviews it — you'll be notified by email once approved.",
       personal: "Personal Information",
       fname: "First Name",
       lname: "Last Name",
@@ -180,9 +190,11 @@ export default function StudentApplication() {
       back: "رجوع",
       title: "طلب",
       action: "تسجيل طالب",
-      subtitle: "املأ هذه الاستمارة، وبعد مراجعة المسؤول والموافقة عليها ستصبح طالبًا رسميًا.",
+      subtitle:
+        "املأ هذه الاستمارة، وبعد مراجعة المسؤول والموافقة عليها ستصبح طالبًا رسميًا.",
       noticeTitle: "لن تتم الموافقة على طلبك فورًا",
-      noticeBody: "بعد الإرسال، يبقى طلبك 'قيد الانتظار' حتى يراجعه المسؤول — سيتم إعلامك عبر البريد الإلكتروني عند الموافقة.",
+      noticeBody:
+        "بعد الإرسال، يبقى طلبك 'قيد الانتظار' حتى يراجعه المسؤول — سيتم إعلامك عبر البريد الإلكتروني عند الموافقة.",
       personal: "معلومات شخصية",
       fname: "الاسم الأول",
       lname: "اسم العائلة",
@@ -294,13 +306,19 @@ export default function StudentApplication() {
       Object.keys(formData).forEach((key) => {
         if (key === "subjects") {
           formDataToSend.append("subjects", JSON.stringify(formData[key]));
-        } else if (formData[key] !== undefined && formData[key] !== null && formData[key] !== "") {
+        } else if (
+          formData[key] !== undefined &&
+          formData[key] !== null &&
+          formData[key] !== ""
+        ) {
           formDataToSend.append(key, formData[key]);
         }
       });
       if (photo) formDataToSend.append("photo", photo);
-      if (studentIDPhoto) formDataToSend.append("studentIDPhoto", studentIDPhoto);
-      if (emergencyIDPhoto) formDataToSend.append("emergencyIDPhoto", emergencyIDPhoto);
+      if (studentIDPhoto)
+        formDataToSend.append("studentIDPhoto", studentIDPhoto);
+      if (emergencyIDPhoto)
+        formDataToSend.append("emergencyIDPhoto", emergencyIDPhoto);
 
       await axios.post(`${API_BASE_URL}/api/students/apply`, formDataToSend, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -382,7 +400,9 @@ export default function StudentApplication() {
             <h3 className="text-xs font-black uppercase tracking-widest text-amber-400 mb-1">
               {t.noticeTitle}
             </h3>
-            <p className="text-[11px] text-white/40 font-bold">{t.noticeBody}</p>
+            <p className="text-[11px] text-white/40 font-bold">
+              {t.noticeBody}
+            </p>
           </div>
         </div>
 
@@ -397,7 +417,11 @@ export default function StudentApplication() {
               <div className="relative w-40 h-40 mx-auto mb-8">
                 <div className="w-full h-full rounded-full border-2 border-gold/30 p-1.5 shadow-[0_0_40px_rgba(251,191,36,0.15)]">
                   {photoPreview ? (
-                    <img src={photoPreview} className="w-full h-full object-cover rounded-full" alt="Profile" />
+                    <img
+                      src={photoPreview}
+                      className="w-full h-full object-cover rounded-full"
+                      alt="Profile"
+                    />
                   ) : (
                     <div className="w-full h-full bg-white/5 rounded-full flex items-center justify-center">
                       <User size={60} className="text-white/10" />
@@ -409,7 +433,9 @@ export default function StudentApplication() {
                   <input
                     type="file"
                     className="hidden"
-                    onChange={(e) => handleFileChange(e, setPhoto, setPhotoPreview)}
+                    onChange={(e) =>
+                      handleFileChange(e, setPhoto, setPhotoPreview)
+                    }
                     accept="image/*"
                   />
                 </label>
@@ -428,7 +454,11 @@ export default function StudentApplication() {
                   }`}
                 >
                   {idPreview ? (
-                    <img src={idPreview} className="w-full h-32 object-contain rounded-xl mb-2" alt="ID" />
+                    <img
+                      src={idPreview}
+                      className="w-full h-32 object-contain rounded-xl mb-2"
+                      alt="ID"
+                    />
                   ) : (
                     <FileText size={40} className="text-white/10 mb-2" />
                   )}
@@ -437,7 +467,9 @@ export default function StudentApplication() {
                     <input
                       type="file"
                       className="hidden"
-                      onChange={(e) => handleFileChange(e, setStudentIDPhoto, setIdPreview)}
+                      onChange={(e) =>
+                        handleFileChange(e, setStudentIDPhoto, setIdPreview)
+                      }
                       accept="image/*"
                     />
                   </label>
@@ -451,17 +483,66 @@ export default function StudentApplication() {
             <div className="glass p-10 md:p-14 rounded-[3.5rem] border-white/5 space-y-12 shadow-2xl">
               {/* Personal */}
               <section className="space-y-8">
-                <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center gap-4 ${
+                    isRTL ? "flex-row-reverse" : ""
+                  }`}
+                >
                   <div className="h-8 w-1.5 bg-gold rounded-full shadow-[0_0_15px_#fbbf24]"></div>
-                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">{t.personal}</h3>
+                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">
+                    {t.personal}
+                  </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField label={t.fname} name="firstName" icon={User} value={formData.firstName} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.lname} name="lastName" icon={User} value={formData.lastName} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.email} name="email" icon={Globe} type="email" value={formData.email} onChange={handleChange} isRTL={isRTL} disabled={!!user?.email} />
-                  <FormField label={t.phone} name="phone" icon={Phone} value={formData.phone} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.nationality} name="nationality" icon={Globe} value={formData.nationality} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.birthDate} name="birthDate" type="date" value={formData.birthDate} onChange={handleChange} />
+                  <FormField
+                    label={t.fname}
+                    name="firstName"
+                    icon={User}
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.lname}
+                    name="lastName"
+                    icon={User}
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.email}
+                    name="email"
+                    icon={Globe}
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                    disabled={!!user?.email}
+                  />
+                  <FormField
+                    label={t.phone}
+                    name="phone"
+                    icon={Phone}
+                    value={formData.phone}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.nationality}
+                    name="nationality"
+                    icon={Globe}
+                    value={formData.nationality}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.birthDate}
+                    name="birthDate"
+                    type="date"
+                    value={formData.birthDate}
+                    onChange={handleChange}
+                  />
                   <FormField
                     label={t.maritalStatus}
                     name="maritalStatus"
@@ -502,23 +583,60 @@ export default function StudentApplication() {
 
               {/* Address */}
               <section className="space-y-8 pt-10 border-t border-white/5">
-                <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center gap-4 ${
+                    isRTL ? "flex-row-reverse" : ""
+                  }`}
+                >
                   <div className="h-8 w-1.5 bg-blue-500 rounded-full shadow-[0_0_15px_#3b82f6]"></div>
-                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">{t.addressTitle}</h3>
+                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">
+                    {t.addressTitle}
+                  </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <FormField label={t.region} name="region" icon={MapPin} value={formData.region} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.subCity} name="subCity" value={formData.subCity} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.woreda} name="woreda" value={formData.woreda} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.kebele} name="kebele" value={formData.kebele} onChange={handleChange} isRTL={isRTL} />
+                  <FormField
+                    label={t.region}
+                    name="region"
+                    icon={MapPin}
+                    value={formData.region}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.subCity}
+                    name="subCity"
+                    value={formData.subCity}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.woreda}
+                    name="woreda"
+                    value={formData.woreda}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.kebele}
+                    name="kebele"
+                    value={formData.kebele}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
                 </div>
               </section>
 
               {/* Education */}
               <section className="space-y-8 pt-10 border-t border-white/5">
-                <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center gap-4 ${
+                    isRTL ? "flex-row-reverse" : ""
+                  }`}
+                >
                   <div className="h-8 w-1.5 bg-emerald-500 rounded-full shadow-[0_0_15px_#10b981]"></div>
-                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">{t.edu}</h3>
+                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">
+                    {t.edu}
+                  </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
@@ -541,19 +659,36 @@ export default function StudentApplication() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className={`text-[10px] font-black text-gray-400 uppercase tracking-widest block ${isRTL ? "mr-4" : "ml-4"}`}>
+                  <label
+                    className={`text-[10px] font-black text-gray-400 uppercase tracking-widest block ${
+                      isRTL ? "mr-4" : "ml-4"
+                    }`}
+                  >
                     {t.subjects}
                   </label>
-                  <div className={`flex flex-wrap gap-2 p-5 glass rounded-2xl min-h-[70px] ${isRTL ? "flex-row-reverse" : ""}`}>
+                  <div
+                    className={`flex flex-wrap gap-2 p-5 glass rounded-2xl min-h-[70px] ${
+                      isRTL ? "flex-row-reverse" : ""
+                    }`}
+                  >
                     {formData.subjects.map((sub, i) => (
-                      <span key={i} className="bg-gold text-[#0b1220] px-4 py-1.5 rounded-xl text-[11px] font-black flex items-center gap-2 shadow-lg">
+                      <span
+                        key={i}
+                        className="bg-gold text-[#0b1220] px-4 py-1.5 rounded-xl text-[11px] font-black flex items-center gap-2 shadow-lg"
+                      >
                         {sub}{" "}
-                        <X size={14} className="cursor-pointer hover:scale-125 transition-transform" onClick={() => removeSubject(i)} />
+                        <X
+                          size={14}
+                          className="cursor-pointer hover:scale-125 transition-transform"
+                          onClick={() => removeSubject(i)}
+                        />
                       </span>
                     ))}
                     <input
                       onKeyDown={handleAddSubject}
-                      className={`bg-transparent outline-none text-sm font-bold flex-1 placeholder:text-gray-600 ${isRTL ? "text-right" : "text-left"}`}
+                      className={`bg-transparent outline-none text-sm font-bold flex-1 placeholder:text-gray-600 ${
+                        isRTL ? "text-right" : "text-left"
+                      }`}
                       placeholder={t.subPlaceholder}
                     />
                   </div>
@@ -562,25 +697,62 @@ export default function StudentApplication() {
 
               {/* Emergency Contact */}
               <section className="p-8 glass bg-red-500/5 border border-red-500/10 rounded-[3rem] space-y-8 shadow-inner">
-                <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center gap-4 ${
+                    isRTL ? "flex-row-reverse" : ""
+                  }`}
+                >
                   <div className="h-8 w-1.5 bg-red-500 rounded-full shadow-[0_0_15px_#ef4444]"></div>
-                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-red-400">{t.emergency}</h3>
+                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-red-400">
+                    {t.emergency}
+                  </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField label={t.emergencyName} name="emergencyName" icon={Heart} value={formData.emergencyName} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.relation} name="emergencyRelation" icon={Info} value={formData.emergencyRelation} onChange={handleChange} isRTL={isRTL} />
-                  <FormField label={t.phone} name="emergencyPhone" icon={Phone} value={formData.emergencyPhone} onChange={handleChange} isRTL={isRTL} />
+                  <FormField
+                    label={t.emergencyName}
+                    name="emergencyName"
+                    icon={Heart}
+                    value={formData.emergencyName}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.relation}
+                    name="emergencyRelation"
+                    icon={Info}
+                    value={formData.emergencyRelation}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
+                  <FormField
+                    label={t.phone}
+                    name="emergencyPhone"
+                    icon={Phone}
+                    value={formData.emergencyPhone}
+                    onChange={handleChange}
+                    isRTL={isRTL}
+                  />
                 </div>
                 <div className="glass bg-white/5 border border-red-500/20 rounded-[2rem] p-6 flex flex-col items-center">
                   {emergencyIdPreview && (
-                    <img src={emergencyIdPreview} className="h-32 object-contain rounded-xl mb-4" alt="Emergency ID" />
+                    <img
+                      src={emergencyIdPreview}
+                      className="h-32 object-contain rounded-xl mb-4"
+                      alt="Emergency ID"
+                    />
                   )}
                   <label className="cursor-pointer bg-red-500/20 text-red-400 px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
                     {t.emergencyID}{" "}
                     <input
                       type="file"
                       className="hidden"
-                      onChange={(e) => handleFileChange(e, setEmergencyIDPhoto, setEmergencyIdPreview)}
+                      onChange={(e) =>
+                        handleFileChange(
+                          e,
+                          setEmergencyIDPhoto,
+                          setEmergencyIdPreview
+                        )
+                      }
                       accept="image/*"
                     />
                   </label>
@@ -592,7 +764,11 @@ export default function StudentApplication() {
                 disabled={loading}
                 className="w-full btn-gold py-6 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xs flex items-center justify-center gap-4 shadow-2xl disabled:opacity-50 transition-all hover:scale-[1.01]"
               >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                {loading ? (
+                  <Loader2 className="animate-spin" size={20} />
+                ) : (
+                  <Save size={20} />
+                )}
                 {t.submit}
               </button>
             </div>
