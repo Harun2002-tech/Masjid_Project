@@ -23,8 +23,10 @@ import {
   MapPin,
   GraduationCap,
   HelpCircle,
+  Printer,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ImageUpload from "../../../components/ui/ImageUpload";
 
 // FormField Component
 const FormField = ({
@@ -168,6 +170,8 @@ export default function AddStudent() {
       approvedMsg: "ተማሪው ጸድቋል",
       rejectedMsg: "ማመልከቻው ውድቅ ተደርጓል",
       actionError: "ስህተት ተከስቷል፣ እባክዎ ደግመው ይሞክሩ",
+      print: "አትም / ፒዲኤፍ",
+      printProfile: "የተማሪ መረጃ አትም",
     },
     en: {
       title: isEditMode ? "Update" : "New",
@@ -221,6 +225,8 @@ export default function AddStudent() {
       approvedMsg: "Student approved",
       rejectedMsg: "Application rejected",
       actionError: "Something went wrong, please try again",
+      print: "Print / Download PDF",
+      printProfile: "Student Profile Record",
     },
     ar: {
       title: isEditMode ? "تحديث" : "تسجيل",
@@ -274,6 +280,8 @@ export default function AddStudent() {
       approvedMsg: "تم قبول الطالب",
       rejectedMsg: "تم رفض الطلب",
       actionError: "حدث خطأ، يرجى المحاولة مرة أخرى",
+      print: "طباعة / تنزيل PDF",
+      printProfile: "سجل بيانات الطالب",
     },
   };
 
@@ -510,13 +518,18 @@ export default function AddStudent() {
 
   const isPending = isEditMode && formData.applicationStatus === "pending";
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <div
-      dir={dir}
-      className={`min-h-screen py-20 px-4 md:px-10 selection:bg-gold/30 ${
-        isRTL ? "text-right" : "text-left"
-      }`}
-    >
+    <>
+      <div
+        dir={dir}
+        className={`min-h-screen py-20 px-4 md:px-10 selection:bg-gold/30 print:hidden ${
+          isRTL ? "text-right" : "text-left"
+        }`}
+      >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -555,6 +568,17 @@ export default function AddStudent() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Print / Download PDF — shown on the profile view page */}
+            {isViewOnly && (
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-gold text-black font-black uppercase text-[10px] tracking-widest shadow-xl hover:brightness-110 transition-all"
+              >
+                <Printer size={16} /> {t.print}
+              </button>
+            )}
+
             {/* Approve / Reject actions — only shown for pending applications */}
             {isPending && (
               <>
@@ -607,10 +631,10 @@ export default function AddStudent() {
 
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 lg:grid-cols-12 gap-10"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
         >
           {/* Left Column */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:self-start">
             <div className="glass p-8 rounded-[3.5rem] relative overflow-hidden text-center">
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-gold to-transparent opacity-50"></div>
               <div className="relative w-40 h-40 mx-auto mb-8">
@@ -628,17 +652,22 @@ export default function AddStudent() {
                   )}
                 </div>
                 {!isViewOnly && (
-                  <label className="absolute bottom-1 right-1 p-3 btn-gold rounded-xl cursor-pointer hover:scale-110 shadow-lg">
-                    <Camera size={18} />
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) =>
-                        handleFileChange(e, setPhoto, setPhotoPreview)
-                      }
-                      accept="image/*"
-                    />
-                  </label>
+                  <ImageUpload
+                    preview={photoPreview}
+                    onFileSelect={(file) => {
+                      setPhoto(file);
+                      setPhotoPreview(URL.createObjectURL(file));
+                    }}
+                    label=""
+                    uploadText={t.upload}
+                    changeText={t.change}
+                    icon={Camera}
+                    rounded="rounded-full"
+                    triggerClassName="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity"
+                    previewClassName="rounded-full"
+                    cameraFacing="user"
+                    showHelperText={false}
+                  />
                 )}
               </div>
               <div className="space-y-3 mb-8 text-left">
@@ -649,34 +678,23 @@ export default function AddStudent() {
                 >
                   {t.idCard}
                 </label>
-                <div
-                  className={`glass rounded-3xl p-4 flex flex-col items-center min-h-[180px] justify-center border-dashed ${
-                    idPreview ? "border-gold/50" : "border-white/10"
-                  }`}
-                >
-                  {idPreview ? (
-                    <img
-                      src={idPreview}
-                      className="w-full h-32 object-contain rounded-xl mb-2"
-                      alt="ID"
-                    />
-                  ) : (
-                    <FileText size={40} className="text-white/10 mb-2" />
-                  )}
-                  {!isViewOnly && (
-                    <label className="cursor-pointer text-gold text-[10px] font-black uppercase tracking-tighter flex items-center gap-2">
-                      <Camera size={14} /> {idPreview ? t.change : t.upload}
-                      <input
-                        type="file"
-                        className="hidden"
-                        onChange={(e) =>
-                          handleFileChange(e, setStudentIDPhoto, setIdPreview)
-                        }
-                        accept="image/*"
-                      />
-                    </label>
-                  )}
-                </div>
+                <ImageUpload
+                  preview={idPreview}
+                  disabled={isViewOnly}
+                  label=""
+                  uploadText={t.upload}
+                  changeText={t.change}
+                  helperText={t.idCard}
+                  icon={FileText}
+                  rounded="rounded-3xl"
+                  triggerClassName="min-h-[180px] flex items-center justify-center bg-white/5"
+                  previewClassName="w-full h-32 object-contain rounded-xl mb-2"
+                  onFileSelect={(file) => {
+                    setStudentIDPhoto(file);
+                    setIdPreview(URL.createObjectURL(file));
+                  }}
+                  showHelperText={false}
+                />
               </div>
               <div className="pt-6 border-t border-white/5">
                 <h2 className="text-xl font-bold text-white tracking-tight">
@@ -1015,32 +1033,23 @@ export default function AddStudent() {
                   />
                 </div>
 
-                <div className="glass bg-white/5 border border-red-500/20 rounded-[2rem] p-6 flex flex-col items-center">
-                  {emergencyIdPreview && (
-                    <img
-                      src={emergencyIdPreview}
-                      className="h-32 object-contain rounded-xl mb-4"
-                      alt="Emergency ID"
-                    />
-                  )}
-                  {!isViewOnly && (
-                    <label className="cursor-pointer bg-red-500/20 text-red-400 px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
-                      {t.emergencyID}{" "}
-                      <input
-                        type="file"
-                        className="hidden"
-                        onChange={(e) =>
-                          handleFileChange(
-                            e,
-                            setEmergencyIDPhoto,
-                            setEmergencyIdPreview
-                          )
-                        }
-                        accept="image/*"
-                      />
-                    </label>
-                  )}
-                </div>
+                <ImageUpload
+                  preview={emergencyIdPreview}
+                  disabled={isViewOnly}
+                  label=""
+                  uploadText={t.emergencyID}
+                  changeText={t.change}
+                  helperText={t.emergencyID}
+                  icon={FileText}
+                  rounded="rounded-[2rem]"
+                  triggerClassName="min-h-[180px] flex items-center justify-center bg-white/5 border border-red-500/20"
+                  previewClassName="h-32 object-contain rounded-xl mb-4"
+                  onFileSelect={(file) => {
+                    setEmergencyIDPhoto(file);
+                    setEmergencyIdPreview(URL.createObjectURL(file));
+                  }}
+                  showHelperText={false}
+                />
               </section>
 
               {!isViewOnly && (
@@ -1085,6 +1094,225 @@ export default function AddStudent() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
+
+      {/* Print / PDF export template — visible only when printing */}
+      <div className="hidden print:block">
+        <StudentPrintTemplate
+          formData={formData}
+          photoPreview={photoPreview}
+          idPreview={idPreview}
+          emergencyIdPreview={emergencyIdPreview}
+          t={t}
+          isRTL={isRTL}
+        />
+      </div>
+    </>
+  );
+}
+
+function PrintField({ label, value }) {
+  return (
+    <div className="mb-3">
+      <p className="text-[9px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">
+        {label}
+      </p>
+      <p className="text-sm font-semibold text-black">
+        {value || "—"}
+      </p>
+    </div>
+  );
+}
+
+function PrintSection({ title, children }) {
+  return (
+    <div className="mb-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="h-5 w-1 bg-black rounded-full"></div>
+        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-black">
+          {title}
+        </h2>
+      </div>
+      <div className="border border-gray-300 rounded-lg p-5">{children}</div>
+    </div>
+  );
+}
+
+function StudentPrintTemplate({
+  formData,
+  photoPreview,
+  idPreview,
+  emergencyIdPreview,
+  t,
+  isRTL,
+}) {
+  return (
+    <div
+      dir={isRTL ? "rtl" : "ltr"}
+      className="bg-white text-black p-8"
+      style={{ fontFamily: "'Noto Sans Ethiopic', 'Inter', sans-serif" }}
+    >
+      {/* Document Header */}
+      <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-8">
+        <div>
+          <h1 className="text-2xl font-black uppercase tracking-tight text-black">
+            Ruhama Islamic Center
+          </h1>
+          <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold mt-1">
+            {t.printProfile}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">
+            Student ID
+          </p>
+          <p className="text-lg font-black text-black">
+            {formData.studentID || "—"}
+          </p>
+          <p className="text-[9px] text-gray-500 mt-1">
+            {t.regDate}: {formData.joinDate || "—"}
+          </p>
+          <p className="text-[9px] text-gray-500">
+            Printed: {new Date().toLocaleDateString()}
+          </p>
+        </div>
+      </div>
+
+      {/* Photo + Documents */}
+      <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="text-center">
+          <div className="border-2 border-gray-300 h-36 w-32 mx-auto flex items-center justify-center overflow-hidden bg-white">
+            {photoPreview ? (
+              <img
+                src={photoPreview}
+                alt="Student"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-gray-400 text-[10px] font-bold uppercase">
+                No photo
+              </span>
+            )}
+          </div>
+          <p className="text-[9px] uppercase tracking-widest text-gray-500 mt-2 font-black">
+            Student Photo
+          </p>
+        </div>
+        <div className="text-center">
+          <div className="border-2 border-gray-300 h-36 w-32 mx-auto flex items-center justify-center overflow-hidden bg-white">
+            {idPreview ? (
+              <img
+                src={idPreview}
+                alt="ID"
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <span className="text-gray-400 text-[10px] font-bold uppercase">
+                No ID
+              </span>
+            )}
+          </div>
+          <p className="text-[9px] uppercase tracking-widest text-gray-500 mt-2 font-black">
+            ID Document
+          </p>
+        </div>
+        <div className="text-center">
+          <div className="border-2 border-gray-300 h-36 w-32 mx-auto flex items-center justify-center overflow-hidden bg-white">
+            {emergencyIdPreview ? (
+              <img
+                src={emergencyIdPreview}
+                alt="Emergency ID"
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <span className="text-gray-400 text-[10px] font-bold uppercase">
+                No ID
+              </span>
+            )}
+          </div>
+          <p className="text-[9px] uppercase tracking-widest text-gray-500 mt-2 font-black">
+            Emergency Contact ID
+          </p>
+        </div>
+      </div>
+
+      {/* Sections */}
+      <PrintSection title="1. Personal Information">
+        <div className="grid grid-cols-3 gap-x-6">
+          <PrintField label={t.fname} value={formData.firstName} />
+          <PrintField label={t.lname} value={formData.lastName} />
+          <PrintField label={t.gender} value={formData.gender} />
+          <PrintField label={t.email} value={formData.email} />
+          <PrintField label={t.phone} value={formData.phone} />
+          <PrintField label={t.nationality} value={formData.nationality} />
+          <PrintField label={t.birthDate} value={formData.birthDate} />
+          <PrintField
+            label={t.maritalStatus}
+            value={formData.maritalStatus}
+          />
+          <PrintField label={t.disability} value={formData.disability} />
+        </div>
+      </PrintSection>
+
+      <PrintSection title="2. Residential Address">
+        <div className="grid grid-cols-4 gap-x-6">
+          <PrintField label={t.region} value={formData.region} />
+          <PrintField label={t.subCity} value={formData.subCity} />
+          <PrintField label={t.woreda} value={formData.woreda} />
+          <PrintField label={t.kebele} value={formData.kebele} />
+          <PrintField label={t.address} value={formData.address} />
+        </div>
+      </PrintSection>
+
+      <PrintSection title="3. Education Info">
+        <div className="grid grid-cols-2 gap-x-6">
+          <PrintField label={t.level} value={formData.gradeLevel} />
+          <PrintField label={t.shift} value={formData.shift} />
+          <div className="col-span-2">
+            <PrintField
+              label={t.subjects}
+              value={formData.subjects?.join(", ")}
+            />
+          </div>
+        </div>
+      </PrintSection>
+
+      <PrintSection title="4. Emergency Contact">
+        <div className="grid grid-cols-3 gap-x-6">
+          <PrintField
+            label={t.emergencyName}
+            value={formData.emergencyName}
+          />
+          <PrintField
+            label={t.relation}
+            value={formData.emergencyRelation}
+          />
+          <PrintField label={t.phone} value={formData.emergencyPhone} />
+          <PrintField label={t.region} value={formData.emergencyRegion} />
+          <PrintField
+            label={t.subCity}
+            value={formData.emergencySubCity}
+          />
+          <PrintField label={t.woreda} value={formData.emergencyWoreda} />
+          <PrintField label={t.kebele} value={formData.emergencyKebele} />
+        </div>
+      </PrintSection>
+
+      {/* Signature Block */}
+      <div className="flex justify-between gap-10 mt-12 pt-6 border-t border-gray-300">
+        <div className="w-1/2">
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">
+            Student Signature
+          </p>
+          <div className="h-12 border-b border-gray-400 mt-8"></div>
+        </div>
+        <div className="w-1/2 text-right">
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">
+            Administrator Signature
+          </p>
+          <div className="h-12 border-b border-gray-400 mt-8"></div>
+        </div>
+      </div>
     </div>
   );
 }

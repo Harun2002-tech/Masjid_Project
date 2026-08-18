@@ -30,9 +30,6 @@ import studentService from "../../../services/studentService";
 import courseService from "../../../services/courseService";
 import scheduleService from "../../../services/scheduleService";
 
-// ያንተ ሎጎ
-import LogoImg from "../../../assets/logo.jpg";
-
 const translations = {
   am: {
     dashboard: "አስተዳዳሪ",
@@ -124,14 +121,12 @@ const translations = {
 };
 
 export default function AdminDashboard() {
-  // እዚህ ጋር setLanguage መጨመሩን እርግጠኛ ሁን
-  const { language: lang, setLanguage } = useLanguage();
+  const { language: lang } = useLanguage();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [recentTeachers, setRecentTeachers] = useState([]);
   const [recentStudents, setRecentStudents] = useState([]);
   const [todaySchedules, setTodaySchedules] = useState([]);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [counts, setCounts] = useState({
     students: 0,
     teachers: 0,
@@ -141,12 +136,9 @@ export default function AdminDashboard() {
 
   const t = (key) => translations[lang][key] || key;
   const isRTL = lang === "ar";
-  const navFont = lang === "am" ? "font-arefa" : "font-sans";
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     loadDashboardData();
-    return () => clearInterval(timer);
   }, []);
 
   const loadDashboardData = async () => {
@@ -231,91 +223,38 @@ export default function AdminDashboard() {
         isRTL ? "text-right" : "text-left"
       }`}
     >
-      {/* --- SITE HEADER (STAY DARK) --- */}
-      <header className="fixed top-0 inset-x-0 z-[100] bg-[#1a141d]/90 backdrop-blur-xl border-b border-white/5 h-24 shadow-2xl">
-        <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between px-6 lg:px-8">
-          {/* Logo Section */}
-          <Link to="/" className="flex items-center gap-4 group shrink-0">
-            <div className="relative h-14 w-14 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full border-2 border-gold/30 group-hover:border-gold transition-colors duration-500" />
-              <div className="h-[90%] w-[90%] rounded-full overflow-hidden bg-white">
-                <img
-                  src={LogoImg}
-                  alt="Logo"
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-              </div>
-            </div>
-            <div
-              className={`flex flex-col border-l border-white/10 pl-4 py-1 ${
-                isRTL ? "border-r border-l-0 pr-4 pl-0 text-right" : ""
-              }`}
-            >
-              <p className="text-2xl font-black leading-none tracking-tight text-white font-display uppercase">
-                Ruhama
-              </p>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold mt-1.5">
-                {t("dashboard")}
-              </p>
-            </div>
-          </Link>
-
-          {/* Right Controls */}
+      {/* --- PAGE HEADER --- */}
+      <div
+        className={`flex flex-col md:flex-row justify-between items-start md:items-end gap-6 ${
+          isRTL ? "md:flex-row-reverse" : ""
+        }`}
+      >
+        <div className="space-y-4">
           <div
-            className={`flex items-center gap-6 ${
+            className={`flex items-center gap-3 text-gold-glow ${
               isRTL ? "flex-row-reverse" : ""
             }`}
           >
-            {/* Clock */}
-            <div className="hidden lg:flex items-center gap-2 text-white/20 font-mono text-[10px]">
-              <Clock size={12} className="text-gold/50" />
-              {currentTime.toLocaleTimeString()}
-            </div>
-
-            {/* Language Switcher */}
-            <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
-              {[
-                { code: "am", label: "AM" },
-                { code: "en", label: "EN" },
-                { code: "ar", label: "AR" },
-              ].map((l) => (
-                <button
-                  key={l.code}
-                  onClick={() => setLanguage(l.code)}
-                  className={`w-9 h-7 flex items-center justify-center rounded-lg text-[10px] font-black transition-all ${
-                    lang === l.code
-                      ? "bg-gold text-bg shadow-lg shadow-gold/20"
-                      : "text-white/40 hover:text-white"
-                  }`}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Profile */}
-            <div
-              className={`flex items-center gap-3 pl-6 border-l border-white/10 ${
-                isRTL ? "border-r border-l-0 pr-6 pl-0" : ""
-              }`}
-            >
-              <div className="flex flex-col items-end hidden sm:block">
-                <span
-                  className={`text-[12px] font-bold text-white tracking-widest uppercase ${navFont}`}
-                >
-                  {user?.name || "Admin"}
-                </span>
-                <span className="text-[8px] text-gold font-bold uppercase tracking-tighter italic">
-                  Online
-                </span>
-              </div>
-              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-gold text-bg text-xs font-black border border-white/10 shadow-lg shadow-gold/10">
-                {user?.name?.charAt(0).toUpperCase() || "A"}
-              </div>
-            </div>
+            <LayoutDashboard size={20} />
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">
+              {t("dashboard")}
+            </span>
+          </div>
+          <h1 className="text-4xl font-serif font-black italic tracking-tight uppercase text-gold-glow">
+            {t("dashboard")}
+          </h1>
+          <div
+            className={`flex items-center gap-3 glass px-4 py-2 rounded-full w-fit ${
+              isRTL ? "flex-row-reverse" : ""
+            }`}
+          >
+            <span className="w-2 h-2 bg-gold rounded-full animate-pulse shadow-[0_0_10px_#fbbf24]"></span>
+            <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest">
+              {user?.name || "Admin"}
+            </p>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* --- MAIN CONTENT --- */}
       <main className="max-w-7xl mx-auto mt-10 space-y-10">

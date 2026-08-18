@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useLanguage } from "../../../contexts/language-context";
 import { motion, AnimatePresence } from "framer-motion";
+import ImageUpload from "../../../components/ui/ImageUpload";
 import {
   Loader2,
   Send,
@@ -255,45 +256,25 @@ export default function AdminNewsForm() {
 
             {/* Image Upload Area */}
             <div className="space-y-2 md:col-span-2">
-              <label className="text-[10px] font-black text-gold/40 uppercase ml-2 tracking-widest flex items-center gap-2">
-                <ImageIcon size={12} />{" "}
-                {language === "am" ? "ምስል" : "Featured Image"}
-              </label>
-              <div
-                className={`relative group ${
-                  isViewMode ? "cursor-default" : "cursor-pointer"
-                }`}
-              >
-                <input
-                  disabled={isViewMode}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label
-                  htmlFor={!isViewMode ? "image-upload" : ""}
-                  className="flex flex-col items-center justify-center w-full min-h-[120px] rounded-3xl border-2 border-dashed border-white/10 bg-white/5 hover:bg-white/10 transition-all overflow-hidden"
-                >
-                  {preview ? (
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="w-full h-64 object-cover"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-white/30">
-                      <ImageIcon size={32} strokeWidth={1} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">
-                        {language === "am"
-                          ? "ምስል አልተመረጠም"
-                          : "No image selected"}
-                      </span>
-                    </div>
-                  )}
-                </label>
-              </div>
+              <ImageUpload
+                label={language === "am" ? "ምስል" : "Featured Image"}
+                preview={preview}
+                disabled={isViewMode}
+                onFileSelect={(file) =>
+                  handleImageChange({ target: { files: [file] } })
+                }
+                icon={ImageIcon}
+                rounded="rounded-3xl"
+                triggerClassName="min-h-[120px]"
+                previewClassName="w-full h-64 object-cover"
+                uploadText={
+                  language === "am" ? "ምስል ይምረጡ" : "Choose Image"
+                }
+                changeText={
+                  language === "am" ? "ምስል ይቀይሩ" : "Change Image"
+                }
+                showHelperText={false}
+              />
             </div>
           </div>
 

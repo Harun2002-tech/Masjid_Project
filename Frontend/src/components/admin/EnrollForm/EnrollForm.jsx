@@ -6,12 +6,12 @@ import {
   ArrowLeft,
   Award,
   Camera,
-  UploadCloud,
   Send,
   Loader2,
   XCircle,
 } from "lucide-react";
 import { useLanguage } from "../../../contexts/language-context";
+import ImageUpload from "../../../components/ui/ImageUpload";
 
 export default function EnrollForm() {
   const { id } = useParams();
@@ -254,40 +254,18 @@ export default function EnrollForm() {
           </div>
 
           {/* ID Photo */}
-          <div className="space-y-2">
-            <label
-              className={`text-[10px] text-text/60 font-black uppercase tracking-widest flex items-center gap-2 ${
-                isRTL ? "mr-4" : "ml-4"
-              }`}
-            >
-              <Camera size={14} className="text-gold" /> {t("id_photo")}
-            </label>
-            <div className="relative group h-32">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setPhoto(e.target.files[0])}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              />
-              <div
-                className={`w-full h-full rounded-[1.25rem] border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all ${
-                  photo
-                    ? "border-gold bg-gold/5"
-                    : "border-white/10 bg-white/5 group-hover:bg-white/10"
-                }`}
-              >
-                {preview ? (
-                  <img
-                    src={preview}
-                    alt="Preview"
-                    className="h-20 w-32 object-cover rounded-lg shadow-md border border-gold/30"
-                  />
-                ) : (
-                  <UploadCloud size={24} className="text-text/20" />
-                )}
-              </div>
-            </div>
-          </div>
+          <ImageUpload
+            label={t("id_photo")}
+            preview={preview}
+            onFileSelect={(file) => setPhoto(file)}
+            icon={Camera}
+            rounded="rounded-[1.25rem]"
+            triggerClassName="min-h-[128px]"
+            previewClassName="w-full h-full object-cover rounded-xl"
+            uploadText={t("id_photo")}
+            changeText={t("id_photo")}
+            showHelperText={false}
+          />
 
           <button
             disabled={loading}

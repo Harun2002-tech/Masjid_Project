@@ -11,6 +11,7 @@ import {
 import axios from "@/api/axios";
 import { useToast } from "@/components/ui/use-toast";
 import { useLanguage } from "../../../contexts/language-context";
+import ImageUpload from "../../../components/ui/ImageUpload";
 
 const BASE_URL = "https://api.ruhamaislamiccenter.com";
 
@@ -217,46 +218,20 @@ const TestimonialSection = ({ editMode = false }) => {
 
           {/* Form Right Side: Image Upload */}
           <div className="flex flex-col">
-            <label className="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] mb-4">
-              {t.photo}
-            </label>
-            <div className="relative group flex-1 min-h-[200px] glass rounded-[2.5rem] border-dashed border-2 border-white/5 flex flex-col items-center justify-center transition-all hover:border-gold/30 overflow-hidden">
-              {preview ? (
-                <>
-                  <img
-                    src={preview}
-                    alt="preview"
-                    className="w-full h-full object-cover rounded-[2.4rem] transition-transform group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                    <Upload className="text-gold" size={32} />
-                  </div>
-                </>
-              ) : (
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                    <Upload
-                      className="text-gray-500 group-hover:text-gold"
-                      size={24}
-                    />
-                  </div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">
-                    Click to Upload
-                  </p>
-                </div>
-              )}
-              <input
-                type="file"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setImage(file);
-                    setPreview(URL.createObjectURL(file));
-                  }
-                }}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-            </div>
+            <ImageUpload
+              label={t.photo}
+              preview={preview}
+              onFileSelect={(file) => {
+                setImage(file);
+                setPreview(URL.createObjectURL(file));
+              }}
+              icon={Upload}
+              rounded="rounded-[2.5rem]"
+              triggerClassName="min-h-[200px] flex-1"
+              uploadText="Click to Upload"
+              changeText="Change Photo"
+              showHelperText={false}
+            />
           </div>
 
           {/* Full Width Content Area */}

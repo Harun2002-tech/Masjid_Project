@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Loader2, MapPin, Upload, CheckCircle, AlertCircle, Building2, Globe } from "lucide-react";
 import { useLanguage } from "../../../contexts/language-context";
+import ImageUpload from "../../../components/ui/ImageUpload";
 
 export default function AddMasjid() {
   const { language, t } = useLanguage();
@@ -14,13 +15,14 @@ export default function AddMasjid() {
     city: "Kombolcha",
   });
   const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: "", msg: "" });
 
-  const handleFileChange = (e) => {
-    const selected = e.target.files[0];
+  const handleFileChange = (selected) => {
     if (selected) {
       setFile(selected);
+      setPreview(URL.createObjectURL(selected));
       setStatus({ type: "", msg: "" });
     }
   };
@@ -45,6 +47,7 @@ export default function AddMasjid() {
       setStatus({ type: "success", msg: "መስጂዱ በትክክል ተመዝግቧል!" });
       setFormData({ name: "", latitude: "", longitude: "", city: "Kombolcha" });
       setFile(null);
+      setPreview(null);
     } catch (error) {
       const msg = error.response?.data?.message || error.response?.data?.error || "መስጂዱን መመዝገብ አልተቻለም";
       setStatus({ type: "error", msg });
@@ -132,36 +135,17 @@ export default function AddMasjid() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-text/40 uppercase ml-4 tracking-widest">
-                የመስጂድ ፎቶ
-              </label>
-              <div className="relative border-2 border-dashed rounded-[2rem] p-10 text-center transition-all border-glass-border hover:border-gold/30">
-                <input
-                  type="file"
-                  className="absolute inset-0 opacity-0 cursor-pointer z-20"
-                  onChange={handleFileChange}
-                  accept="image/*"
-                />
-                <div className="flex flex-col items-center gap-4">
-                  {file ? (
-                    <div className="flex items-center gap-4 bg-[#0b1220]/60 px-6 py-4 rounded-2xl border border-glass-border">
-                      <Upload className="text-gold" size={28} />
-                      <p className="text-sm font-bold text-text truncate max-w-[180px]">
-                        {file.name}
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center border border-glass-border">
-                        <Upload className="h-7 w-7 text-text/40" />
-                      </div>
-                      <p className="text-[12px] text-text/60 font-bold uppercase tracking-tight">
-                        ፎቶ ምረጥ
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
+              <ImageUpload
+                label="የመስጂድ ፎቶ"
+                preview={preview}
+                onFileSelect={handleFileChange}
+                icon={Upload}
+                rounded="rounded-[2rem]"
+                triggerClassName="min-h-[180px]"
+                uploadText="ፎቶ ምረጥ"
+                changeText="ፎቶ ለውጥ"
+                showHelperText={false}
+              />
             </div>
 
             {status.msg && (

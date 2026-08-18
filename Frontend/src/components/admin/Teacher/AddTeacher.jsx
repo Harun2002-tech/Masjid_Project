@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   User,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import teacherService from "../../../services/teacherService";
 import { useLanguage } from "../../../contexts/language-context";
+import ImageUpload from "../../../components/ui/ImageUpload";
 
 const translations = {
   am: {
@@ -380,13 +381,17 @@ export default function AddTeacherPage({ editMode = false }) {
                 isRTL ? "md:flex-row-reverse" : ""
               }`}
             >
-              <FileUpload
+              <ImageUpload
                 label={t.photo}
-                name="photo"
                 preview={previews.photo}
-                onChange={handleFileChange}
+                onFileSelect={(file) =>
+                  handleFileChange({ target: { name: "photo", files: [file] } })
+                }
                 icon={Camera}
                 disabled={isViewOnly}
+                rounded="rounded-[2rem]"
+                triggerClassName="w-40 h-40 shrink-0"
+                emptyClassName=""
               />
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 <InputField
@@ -590,36 +595,23 @@ export default function AddTeacherPage({ editMode = false }) {
               </div>
             </div>
             <div className="mt-8 space-y-3">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 px-2">
-                {t.idCard}
-              </label>
-              <div className="relative h-32 glass border-dashed border-white/10 rounded-2xl flex items-center justify-center overflow-hidden group transition-all hover:border-gold/30">
-                {previews.idCard ? (
-                  <img
-                    src={previews.idCard}
-                    alt="ID"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-center">
-                    <FileText
-                      size={24}
-                      className="mx-auto text-white/10 mb-2"
-                    />
-                    <span className="text-[9px] font-bold uppercase text-white/20">
-                      {t.idUpload}
-                    </span>
-                  </div>
-                )}
-                {!isViewOnly && (
-                  <input
-                    type="file"
-                    name="idCard"
-                    onChange={handleFileChange}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                  />
-                )}
-              </div>
+              <ImageUpload
+                label={t.idCard}
+                preview={previews.idCard}
+                onFileSelect={(file) =>
+                  handleFileChange({
+                    target: { name: "idCard", files: [file] },
+                  })
+                }
+                icon={FileText}
+                disabled={isViewOnly}
+                rounded="rounded-2xl"
+                triggerClassName="min-h-[128px] flex items-center justify-center bg-white/5"
+                previewClassName="w-full h-32 object-contain rounded-xl"
+                uploadText={t.idUpload}
+                changeText={t.idUpload}
+                showHelperText={false}
+              />
             </div>
           </Section>
 
@@ -678,14 +670,19 @@ export default function AddTeacherPage({ editMode = false }) {
                 isRTL ? "md:flex-row-reverse" : ""
               }`}
             >
-              <FileUpload
+              <ImageUpload
                 label={t.emergencyPhoto}
-                name="emergencyPhoto"
                 preview={previews.emergencyPhoto}
-                onChange={handleFileChange}
+                onFileSelect={(file) =>
+                  handleFileChange({
+                    target: { name: "emergencyPhoto", files: [file] },
+                  })
+                }
                 icon={ImageIcon}
-                isRed
                 disabled={isViewOnly}
+                rounded="rounded-[2rem]"
+                triggerClassName="w-40 h-40 shrink-0"
+                emptyClassName=""
               />
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 <InputField
@@ -762,48 +759,6 @@ function Section({ title, icon: Icon, children, isRTL, isRed = false }) {
         {title}
       </h3>
       {children}
-    </div>
-  );
-}
-
-function FileUpload({
-  label,
-  name,
-  preview,
-  onChange,
-  icon: Icon,
-  isRed = false,
-  disabled = false,
-}) {
-  const activeClass = isRed ? "hover:border-red/50" : "hover:border-gold/50";
-  return (
-    <div className="relative group shrink-0">
-      <div
-        className={`w-40 h-40 glass border-2 border-dashed border-white/10 rounded-[2rem] flex items-center justify-center overflow-hidden transition-all ${
-          !disabled && activeClass
-        }`}
-      >
-        {preview ? (
-          <img
-            src={preview}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <Icon size={40} className="text-white/10" />
-        )}
-      </div>
-      {!disabled && (
-        <input
-          type="file"
-          name={name}
-          onChange={onChange}
-          className="absolute inset-0 opacity-0 cursor-pointer"
-        />
-      )}
-      <p className="text-center mt-3 text-[9px] font-bold uppercase text-white/30">
-        {label}
-      </p>
     </div>
   );
 }

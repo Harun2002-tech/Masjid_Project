@@ -63,7 +63,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
+    <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10 h-20 flex items-center justify-between overflow-hidden">
       <div className="w-full flex h-20 items-center justify-between px-4 lg:px-8 max-w-[1400px] mx-auto">
         {/* Logo Section - shrink-0 ታክሎበታል እንዳይጨፈለቅ */}
         <Link to="/" className="flex items-center gap-3 group shrink-0 mr-4">
@@ -153,7 +153,7 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 p-1 pr-3 rounded-full border border-white/10 hover:bg-white/5 text-white shrink-0"
+                  className="flex items-center gap-3 p-1 pr-3 rounded-full border border-white/10 hover:bg-white/5 text-white shrink-0"
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold text-black font-bold shrink-0">
                     {user?.name?.charAt(0).toUpperCase()}

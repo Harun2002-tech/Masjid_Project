@@ -1,7 +1,6 @@
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
-  Upload,
   ArrowLeft,
   BookOpen,
   Save,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import { COURSE_URL, BASE_URL } from "@/config/api";
 import { useLanguage } from "../../../contexts/language-context";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 export default function AddCoursePage() {
   const { id } = useParams();
@@ -171,43 +171,26 @@ export default function AddCoursePage() {
               <ImageIcon size={22} className="text-gold" /> {t("course_photo")}
             </h2>
             <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="w-full md:w-80 h-52 bg-black/40 rounded-3xl border-2 border-dashed border-glass-border flex items-center justify-center overflow-hidden">
-                {thumbnail ? (
-                  <img
-                    src={URL.createObjectURL(thumbnail)}
-                    className="w-full h-full object-cover"
-                    alt="Preview"
-                  />
-                ) : existingThumbnail ? (
-                  <img
-                    src={
-                      existingThumbnail.startsWith("http")
-                        ? existingThumbnail
-                        : `${BASE_URL}/${existingThumbnail.replace(/^\//, "")}`
-                    }
-                    className="w-full h-full object-cover"
-                    alt="Existing"
-                  />
-                ) : (
-                  <div className="text-center opacity-30">
-                    <ImageIcon className="mx-auto mb-2 text-text" size={48} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-text">
-                      {t("no_image")}
-                    </p>
-                  </div>
-                )}
-              </div>
-              {!isViewMode && (
-                <label className="btn-gold flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest cursor-pointer shadow-xl">
-                  <Upload size={18} /> {t("select_photo")}
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => setThumbnail(e.target.files[0])}
-                  />
-                </label>
-              )}
+              <ImageUpload
+                preview={
+                  thumbnail
+                    ? URL.createObjectURL(thumbnail)
+                    : existingThumbnail
+                    ? existingThumbnail.startsWith("http")
+                      ? existingThumbnail
+                      : `${BASE_URL}/${existingThumbnail.replace(/^\//, "")}`
+                    : null
+                }
+                disabled={isViewMode}
+                onFileSelect={(file) => setThumbnail(file)}
+                icon={ImageIcon}
+                rounded="rounded-3xl"
+                triggerClassName="w-full md:w-80 h-52"
+                previewClassName="w-full h-full object-cover"
+                uploadText={t("select_photo")}
+                changeText={t("select_photo")}
+                showHelperText={false}
+              />
             </div>
           </section>
 

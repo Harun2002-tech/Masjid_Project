@@ -132,30 +132,40 @@ export default function StudentListPage() {
   return (
     // 'w-full' እና 'overflow-hidden' መጨመሩ ለ RTL ችግር ወሳኝ ነው
     <div
-      className={`w-full min-h-screen overflow-x-hidden ${
+      className={`p-6 md:p-12 min-h-screen text-white overflow-x-hidden ${
         isRTL ? "text-right" : "text-left"
       }`}
       dir={isRTL ? "rtl" : "ltr"}
     >
-      <div className="max-w-7xl mx-auto p-6 md:p-10 space-y-10">
+      <div className="max-w-7xl mx-auto space-y-12">
         {/* HEADER AREA */}
         <div
-          className={`flex flex-col md:flex-row justify-between items-start gap-8`}
+          className={`flex flex-col md:flex-row justify-between items-start md:items-end gap-6 ${
+            isRTL ? "md:flex-row-reverse" : ""
+          }`}
         >
-          <div className="space-y-3">
-            <div className={`flex items-center gap-2 text-gold`}>
+          <div className="space-y-4">
+            <div
+              className={`flex items-center gap-3 text-gold-glow ${
+                isRTL ? "flex-row-reverse" : ""
+              }`}
+            >
               <Users size={20} />
-              <span className="text-[10px] font-black tracking-widest uppercase">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">
                 {t.admin}
               </span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-tight text-white">
+            <h1 className="text-4xl font-serif font-black italic tracking-tight uppercase text-gold-glow">
               {t.title}{" "}
               <span className="text-gold-glow italic">{t.subtitle}</span>
             </h1>
-            <div className="flex items-center gap-3">
-              <div className="h-[2px] w-12 bg-gold/50 rounded-full"></div>
-              <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em]">
+            <div
+              className={`flex items-center gap-3 glass px-4 py-2 rounded-full w-fit ${
+                isRTL ? "flex-row-reverse" : ""
+              }`}
+            >
+              <span className="w-2 h-2 bg-gold rounded-full animate-pulse shadow-[0_0_10px_#fbbf24]"></span>
+              <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest">
                 {t.total} <span className="text-white">{students.length}</span>{" "}
                 {t.registered}
               </p>
@@ -164,9 +174,9 @@ export default function StudentListPage() {
 
           <button
             onClick={() => navigate("/admin/add-student")}
-            className="btn-gold px-10 py-5 rounded-2xl flex items-center gap-3 font-black uppercase text-xs tracking-[0.2em] shadow-2xl active:scale-95 transition-all whitespace-nowrap"
+            className="btn-gold px-10 py-5 rounded-2xl flex items-center gap-3 font-black uppercase tracking-[0.2em] text-xs shadow-2xl"
           >
-            <UserPlus size={20} /> {t.addBtn}
+            <UserPlus size={18} /> {t.addBtn}
           </button>
         </div>
 

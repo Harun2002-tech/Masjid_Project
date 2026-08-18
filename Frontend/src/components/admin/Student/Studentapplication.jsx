@@ -24,6 +24,7 @@ import {
   Clock3,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ImageUpload from "../../../components/ui/ImageUpload";
 
 // FormField Component (same pattern used across the app)
 const FormField = ({
@@ -428,17 +429,22 @@ export default function StudentApplication() {
                     </div>
                   )}
                 </div>
-                <label className="absolute bottom-1 right-1 p-3 btn-gold rounded-xl cursor-pointer hover:scale-110 shadow-lg">
-                  <Camera size={18} />
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={(e) =>
-                      handleFileChange(e, setPhoto, setPhotoPreview)
-                    }
-                    accept="image/*"
-                  />
-                </label>
+                <ImageUpload
+                  preview={photoPreview}
+                  label=""
+                  uploadText={t.upload}
+                  changeText={t.change}
+                  icon={Camera}
+                  rounded="rounded-full"
+                  triggerClassName="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity"
+                  previewClassName="rounded-full"
+                  cameraFacing="user"
+                  showHelperText={false}
+                  onFileSelect={(file) => {
+                    setPhoto(file);
+                    setPhotoPreview(URL.createObjectURL(file));
+                  }}
+                />
               </div>
               <div className="space-y-3 text-left">
                 <label
@@ -448,32 +454,22 @@ export default function StudentApplication() {
                 >
                   {t.idCard}
                 </label>
-                <div
-                  className={`glass rounded-3xl p-4 flex flex-col items-center min-h-[180px] justify-center border-dashed ${
-                    idPreview ? "border-gold/50" : "border-white/10"
-                  }`}
-                >
-                  {idPreview ? (
-                    <img
-                      src={idPreview}
-                      className="w-full h-32 object-contain rounded-xl mb-2"
-                      alt="ID"
-                    />
-                  ) : (
-                    <FileText size={40} className="text-white/10 mb-2" />
-                  )}
-                  <label className="cursor-pointer text-gold text-[10px] font-black uppercase tracking-tighter flex items-center gap-2">
-                    <Camera size={14} /> {idPreview ? t.change : t.upload}
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) =>
-                        handleFileChange(e, setStudentIDPhoto, setIdPreview)
-                      }
-                      accept="image/*"
-                    />
-                  </label>
-                </div>
+                <ImageUpload
+                  preview={idPreview}
+                  label=""
+                  uploadText={t.upload}
+                  changeText={t.change}
+                  helperText={t.idCard}
+                  icon={FileText}
+                  rounded="rounded-3xl"
+                  triggerClassName="min-h-[180px] flex items-center justify-center bg-white/5"
+                  previewClassName="w-full h-32 object-contain rounded-xl mb-2"
+                  showHelperText={false}
+                  onFileSelect={(file) => {
+                    setStudentIDPhoto(file);
+                    setIdPreview(URL.createObjectURL(file));
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -733,30 +729,22 @@ export default function StudentApplication() {
                     isRTL={isRTL}
                   />
                 </div>
-                <div className="glass bg-white/5 border border-red-500/20 rounded-[2rem] p-6 flex flex-col items-center">
-                  {emergencyIdPreview && (
-                    <img
-                      src={emergencyIdPreview}
-                      className="h-32 object-contain rounded-xl mb-4"
-                      alt="Emergency ID"
-                    />
-                  )}
-                  <label className="cursor-pointer bg-red-500/20 text-red-400 px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
-                    {t.emergencyID}{" "}
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) =>
-                        handleFileChange(
-                          e,
-                          setEmergencyIDPhoto,
-                          setEmergencyIdPreview
-                        )
-                      }
-                      accept="image/*"
-                    />
-                  </label>
-                </div>
+                <ImageUpload
+                  preview={emergencyIdPreview}
+                  label=""
+                  uploadText={t.emergencyID}
+                  changeText={t.change}
+                  helperText={t.emergencyID}
+                  icon={FileText}
+                  rounded="rounded-[2rem]"
+                  triggerClassName="min-h-[180px] flex items-center justify-center bg-white/5 border border-red-500/20"
+                  previewClassName="h-32 object-contain rounded-xl mb-4"
+                  showHelperText={false}
+                  onFileSelect={(file) => {
+                    setEmergencyIDPhoto(file);
+                    setEmergencyIdPreview(URL.createObjectURL(file));
+                  }}
+                />
               </section>
 
               <button
