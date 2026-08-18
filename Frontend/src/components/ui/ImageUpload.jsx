@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Check,
 } from "lucide-react";
+import compressImage from "../../lib/compressImage";
 
 const isMobileDevice = () => {
   if (typeof navigator === "undefined") return false;
@@ -39,9 +40,15 @@ export default function ImageUpload({
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
-  const handleSelect = (file) => {
+  const handleSelect = async (file) => {
     if (!file) return;
-    onFileSelect(file);
+    // Resize/compress high-res photos (camera + gallery) before upload to cut
+    // payload size and server processing time.
+    const optimized =
+      file.type && file.type.startsWith("image/")
+        ? await compressImage(file).catch(() => file)
+        : file;
+    onFileSelect(optimized);
     setOpen(false);
     setShowCamera(false);
     if (fileInputRef.current) fileInputRef.current.value = "";

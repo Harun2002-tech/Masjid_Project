@@ -1,5 +1,10 @@
 import { getDoc, getDocs, addDoc, setDoc, deleteDoc, findOne, generateId, collections } from "../utils/firestore.js";
 
+const TEACHER_LIST_FIELDS = [
+  "firstName", "lastName", "email", "phone", "photo", "teacherID",
+  "subjects", "experienceYears", "rating", "isActive", "createdAt",
+];
+
 export const createTeacher = async (req, res) => {
   try {
     const { firstName, lastName, email, phone, bio, password, subjects, availableDays, experienceYears } = req.body;
@@ -69,7 +74,11 @@ export const deleteTeacher = async (req, res) => {
 
 export const getAllTeachers = async (req, res) => {
   try {
-    const teachers = await getDocs(collections.teachers, { orderBy: "createdAt", orderDir: "desc" });
+    const teachers = await getDocs(collections.teachers, {
+      orderBy: "createdAt",
+      orderDir: "desc",
+      select: TEACHER_LIST_FIELDS,
+    });
     res.status(200).json({ success: true, count: teachers.length, data: teachers });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "../../../contexts/language-context";
 import {
   User,
@@ -330,9 +331,16 @@ export default function AddStudent() {
   const [actionLoading, setActionLoading] = useState(""); // "approve" | "reject" | ""
   const [msg, setMsg] = useState({ type: "", text: "" });
 
+  const queryClient = useQueryClient();
+
   const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
   const authHeader = {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  };
+
+  const refreshLists = () => {
+    queryClient.invalidateQueries({ queryKey: ["students"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
   };
 
   useEffect(() => {
@@ -428,6 +436,7 @@ export default function AddStudent() {
         applicationStatus: "approved",
         studentID: res.data?.data?.studentID || prev.studentID,
       }));
+      refreshLists();
       setMsg({ type: "success", text: t.approvedMsg });
     } catch (err) {
       setMsg({ type: "error", text: err.response?.data?.message || t.actionError });
@@ -448,6 +457,7 @@ export default function AddStudent() {
         authHeader
       );
       setFormData((prev) => ({ ...prev, applicationStatus: "rejected" }));
+      refreshLists();
       setMsg({ type: "success", text: t.rejectedMsg });
     } catch (err) {
       setMsg({ type: "error", text: err.response?.data?.message || t.actionError });
@@ -505,6 +515,7 @@ export default function AddStudent() {
           text: `${t.successMsg} ID: ${generatedID} 🎉`,
         });
       }
+      refreshLists();
       setTimeout(() => navigate("/admin/students"), 2500);
     } catch (err) {
       setMsg({

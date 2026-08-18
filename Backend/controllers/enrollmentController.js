@@ -1,5 +1,5 @@
 import { getDoc, getDocs, addDoc, setDoc, deleteDoc, findOne, collections } from "../utils/firestore.js";
-import sendEmail from "../utils/sendEmail.js";
+import notifyEmail from "../utils/notify.js";
 
 export const submitEnrollment = async (req, res) => {
   try {
@@ -20,17 +20,16 @@ export const submitEnrollment = async (req, res) => {
       progress: 0, completedLessons: [],
     });
 
-    try {
-      await sendEmail({
-        email: req.user.email,
-        subject: "የምዝገባ ጥያቄዎ ደርሶናል - Ruhama Academy",
-        html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:1px solid #eee;padding:20px;">
-          <h2 style="color:#064e3b;">ሰላም ${fullName}፣</h2>
-          <p>ለ <b>${targetCourse.title}</b> ኮርስ ያቀረቡት የምዝገባ ጥያቄ ደርሶናል።</p>
-          <p>አድሚኑ መረጃዎን መርምሮ ሲያጸድቅ እናሳውቅዎታለን።</p>
-          <br/><p>መልካም ጊዜ!<br/>Ruhama Academy</p></div>`,
-      });
-    } catch (emailErr) { console.error("Email Failed:", emailErr); }
+    // Non-blocking confirmation email.
+    notifyEmail({
+      email: req.user.email,
+      subject: "የምዝገባ ጥያቄዎ ደርሶናል - Ruhama Academy",
+      html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:1px solid #eee;padding:20px;">
+        <h2 style="color:#064e3b;">ሰላም ${fullName}፣</h2>
+        <p>ለ <b>${targetCourse.title}</b> ኮርስ ያቀረቡት የምዝገባ ጥያቄ ደርሶናል።</p>
+        <p>አድሚኑ መረጃዎን መርምሮ ሲያጸድቅ እናሳውቅዎታለን።</p>
+        <br/><p>መልካም ጊዜ!<br/>Ruhama Academy</p></div>`,
+    });
 
     res.status(201).json({
       success: true,
@@ -69,19 +68,18 @@ export const approveEnrollment = async (req, res) => {
     const updated = await getDoc(collections.enrollments, req.params.id);
 
     let userData = null;
-    try { userData = await getDoc(collections.users, enrollment.user); } catch {}
+    try { userData = await getDoc(collections.users, enrollment.user, ["email", "name"]); } catch {}
     if (userData) {
-      try {
-        await sendEmail({
-          email: userData.email,
-          subject: "እንኳን ደስ አለዎት! የምዝገባ ጥያቄዎ ጸድቋል",
-          html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:2px solid #064e3b;padding:20px;border-radius:15px;">
-            <h2 style="color:#064e3b;">እንኳን ደስ አለዎት!</h2>
-            <p>ሰላም <b>${enrollment.fullName}</b>፣</p>
-            <p>ለ Ruhama Academy ያቀረቡት የምዝገባ ጥያቄ ተቀባይነት አግኝቷል።</p>
-            <br/><p>ከሰላምታ ጋር፣<br/>Ruhama Academy</p></div>`,
-        });
-      } catch (emailErr) { console.error("Approval Email Failed:", emailErr); }
+      // Non-blocking approval email.
+      notifyEmail({
+        email: userData.email,
+        subject: "እንኳን ደስ አለዎት! የምዝገባ ጥያቄዎ ጸድቋል",
+        html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:2px solid #064e3b;padding:20px;border-radius:15px;">
+          <h2 style="color:#064e3b;">እንኳን ደስ አለዎት!</h2>
+          <p>ሰላም <b>${enrollment.fullName}</b>፣</p>
+          <p>ለ Ruhama Academy ያቀረቡት የምዝገባ ጥያቄ ተቀባይነት አግኝቷል።</p>
+          <br/><p>ከሰላምታ ጋር፣<br/>Ruhama Academy</p></div>`,
+      });
     }
 
     res.status(200).json({ success: true, message: "ማመልከቻው ጸድቋል", data: updated });

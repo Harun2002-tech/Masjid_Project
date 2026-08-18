@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   Mail,
   Phone,
@@ -111,30 +112,22 @@ const StudentProfile = () => {
   const t = translations[language || "am"];
   const isRTL = language === "ar";
 
-  const [student, setStudent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Cached detail: shows instantly when returning to a previously opened profile.
+  const {
+    data: student,
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["student", id],
+    queryFn: async () => {
+      const res = await studentService.getStudentById(id);
+      if (!res.success) throw new Error(res.message || t.error);
+      return res.data;
+    },
+    enabled: !!id,
+  });
 
   const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
-
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      try {
-        setLoading(true);
-        const res = await studentService.getStudentById(id);
-        if (res.success) {
-          setStudent(res.data);
-        } else {
-          setError(t.error);
-        }
-      } catch (err) {
-        setError(t.error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (id) fetchStudentData();
-  }, [id, t.error]);
 
   const getUrl = (path) =>
     path ? (path.startsWith("http") ? path : `${API_BASE_URL}/${path.replace(/\\/g, "/")}`) : null;
@@ -167,7 +160,7 @@ const StudentProfile = () => {
         <div className="glass p-12 rounded-[3rem] space-y-6 max-w-md border-red-500/20">
           <ShieldAlert size={80} className="mx-auto text-red/20" />
           <h2 className="text-3xl font-black uppercase tracking-tighter text-white">
-            {error}
+            {error?.message || t.error}
           </h2>
           <Link
             to="/admin/students"

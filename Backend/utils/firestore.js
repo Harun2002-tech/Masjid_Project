@@ -19,8 +19,10 @@ const collections = {
   achievements: "achievements",
 };
 
-const getDoc = async (col, id) => {
-  const snap = await db.collection(col).doc(id).get();
+const getDoc = async (col, id, select = null) => {
+  let ref = db.collection(col).doc(id);
+  if (select && select.length > 0) ref = ref.select(...select);
+  const snap = await ref.get();
   if (!snap.exists) return null;
   return { id: snap.id, ...snap.data() };
 };
@@ -34,8 +36,39 @@ const getDocs = async (col, opts = {}) => {
       query = query.where(w.field, w.op || "==", w.value);
     });
   }
+  // Field mask: fetch only the requested fields to cut payload + latency.
+  if (opts.select && opts.select.length > 0) {
+    query = query.select(...opts.select);
+  }
   const snap = await query.get();
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+};
+
+// Batch-fetch documents by their Firestore document IDs (chunks of 10, the
+// Firestore `in` limit). Avoids loading entire collections just to filter in JS.
+const getDocsIn = async (col, ids, opts = {}) => {
+  if (!ids || ids.length === 0) return [];
+  const unique = [...new Set(ids)];
+  const chunks = [];
+  for (let i = 0; i < unique.length; i += 10) {
+    chunks.push(unique.slice(i, i + 10));
+  }
+  const results = await Promise.all(
+    chunks.map(async (chunk) => {
+      let query = db
+        .collection(col)
+        .where("__name__", "in", chunk);
+      if (opts.select && opts.select.length > 0) {
+        query = query.select(...opts.select);
+      }
+      const snap = await query.get();
+      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    })
+  );
+  // Preserve the request order.
+  return unique
+    .map((id) => results.flat().find((d) => d.id === id))
+    .filter(Boolean);
 };
 
 const addDoc = async (col, data) => {
@@ -119,6 +152,7 @@ export {
   collections,
   getDoc,
   getDocs,
+  getDocsIn,
   addDoc,
   setDoc,
   updateDoc,

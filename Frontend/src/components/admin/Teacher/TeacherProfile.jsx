@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
   Mail,
@@ -78,28 +79,21 @@ const TeacherProfile = () => {
   const t = translations[language || "am"];
   const isRTL = language === "ar";
 
-  const [teacher, setTeacher] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [selectedImg, setSelectedImg] = useState(null);
 
   const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
 
-  useEffect(() => {
-    const fetchTeacher = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${API_BASE_URL}/api/teachers/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        setTeacher(res.data.data || res.data);
-      } catch (err) {
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (id) fetchTeacher();
-  }, [id]);
+  // Cached detail: shows instantly when returning to a previously opened profile.
+  const { data: teacher, isLoading: loading } = useQuery({
+    queryKey: ["teacher", id],
+    queryFn: async () => {
+      const res = await axios.get(`${API_BASE_URL}/api/teachers/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      return res.data.data || res.data;
+    },
+    enabled: !!id,
+  });
 
   const getUrl = (path) =>
     path ? (path.startsWith("http") ? path : `${API_BASE_URL}/${path.replace(/\\/g, "/")}`) : null;

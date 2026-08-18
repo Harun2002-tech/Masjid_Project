@@ -1,10 +1,20 @@
-import { getDoc, getDocs, addDoc, setDoc, deleteDoc, findOne, generateId, collections } from "../utils/firestore.js";
-import sendEmail from "../utils/sendEmail.js";
+import { getDoc, getDocs, getDocsIn, addDoc, setDoc, deleteDoc, findOne, generateId, collections } from "../utils/firestore.js";
+import notifyEmail from "../utils/notify.js";
+
+// Fields required by the admin list/dashboard — avoid shipping full documents.
+const STUDENT_LIST_FIELDS = [
+  "firstName", "lastName", "email", "phone", "gender", "photo",
+  "studentID", "gradeLevel", "shift", "applicationStatus", "createdAt",
+];
 
 // 🚀 አድሚን በቀጥታ ተማሪ ሲመዘግብ (ወዲያውኑ የጸደቀ ይሆናል)
 export const getAllStudents = async (req, res) => {
   try {
-    const students = await getDocs(collections.students, { orderBy: "createdAt", orderDir: "desc" });
+    const students = await getDocs(collections.students, {
+      orderBy: "createdAt",
+      orderDir: "desc",
+      select: STUDENT_LIST_FIELDS,
+    });
     res.status(200).json({ success: true, count: students.length, data: students });
   } catch (err) {
     res.status(500).json({ success: false, message: "ተማሪዎችን ማምጣት አልተቻለም", error: err.message });
@@ -73,19 +83,18 @@ export const applyAsStudent = async (req, res) => {
 
     const student = await addDoc(collections.students, studentData);
 
-    try {
-      if (req.user?.email) {
-        await sendEmail({
-          email: req.user.email,
-          subject: "የተማሪ ምዝገባ ጥያቄዎ ደርሶናል - Ruhama Academy",
-          html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:1px solid #eee;padding:20px;">
-            <h2 style="color:#064e3b;">ሰላም ${studentData.firstName || ""}፣</h2>
-            <p>የተማሪ ምዝገባ ጥያቄዎ ደርሶናል።</p>
-            <p>አድሚኑ መረጃዎን መርምሮ ሲያጸድቅ በኢሜል እናሳውቅዎታለን።</p>
-            <br/><p>መልካም ጊዜ!<br/>Ruhama Academy</p></div>`,
-        });
-      }
-    } catch (emailErr) { console.error("Email Failed:", emailErr); }
+    // Non-blocking: acknowledge by email without delaying the HTTP response.
+    if (req.user?.email) {
+      notifyEmail({
+        email: req.user.email,
+        subject: "የተማሪ ምዝገባ ጥያቄዎ ደርሶናል - Ruhama Academy",
+        html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:1px solid #eee;padding:20px;">
+          <h2 style="color:#064e3b;">ሰላም ${studentData.firstName || ""}፣</h2>
+          <p>የተማሪ ምዝገባ ጥያቄዎ ደርሶናል።</p>
+          <p>አድሚኑ መረጃዎን መርምሮ ሲያጸድቅ በኢሜል እናሳውቅዎታለን።</p>
+          <br/><p>መልካም ጊዜ!<br/>Ruhama Academy</p></div>`,
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -118,19 +127,18 @@ export const approveStudent = async (req, res) => {
     });
     const updated = await getDoc(collections.students, req.params.id);
 
-    try {
-      if (updated.email) {
-        await sendEmail({
-          email: updated.email,
-          subject: "እንኳን ደስ አለዎት! የተማሪ ምዝገባዎ ጸድቋል - Ruhama Academy",
-          html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:2px solid #064e3b;padding:20px;border-radius:15px;">
-            <h2 style="color:#064e3b;">እንኳን ደስ አለዎት!</h2>
-            <p>ሰላም <b>${updated.firstName || ""}</b>፣</p>
-            <p>የተማሪ ምዝገባዎ ተቀባይነት አግኝቷል። የተማሪ መታወቂያ ቁጥርዎ፦ <b>${studentID}</b></p>
-            <br/><p>ከሰላምታ ጋር፣<br/>Ruhama Academy</p></div>`,
-        });
-      }
-    } catch (emailErr) { console.error("Approval Email Failed:", emailErr); }
+    // Non-blocking approval email.
+    if (updated.email) {
+      notifyEmail({
+        email: updated.email,
+        subject: "እንኳን ደስ አለዎት! የተማሪ ምዝገባዎ ጸድቋል - Ruhama Academy",
+        html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:2px solid #064e3b;padding:20px;border-radius:15px;">
+          <h2 style="color:#064e3b;">እንኳን ደስ አለዎት!</h2>
+          <p>ሰላም <b>${updated.firstName || ""}</b>፣</p>
+          <p>የተማሪ ምዝገባዎ ተቀባይነት አግኝቷል። የተማሪ መታወቂያ ቁጥርዎ፦ <b>${studentID}</b></p>
+          <br/><p>ከሰላምታ ጋር፣<br/>Ruhama Academy</p></div>`,
+      });
+    }
 
     res.status(200).json({ success: true, message: `ተማሪው ጸድቋል፣ ID: ${studentID}`, data: updated });
   } catch (err) {
@@ -153,19 +161,18 @@ export const rejectStudent = async (req, res) => {
     });
     const updated = await getDoc(collections.students, req.params.id);
 
-    try {
-      if (updated.email) {
-        await sendEmail({
-          email: updated.email,
-          subject: "የተማሪ ምዝገባ ጥያቄዎ ውጤት - Ruhama Academy",
-          html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:1px solid #eee;padding:20px;">
-            <h2 style="color:#991b1b;">ማመልከቻዎ ተመልክቷል</h2>
-            <p>ሰላም <b>${updated.firstName || ""}</b>፣</p>
-            <p>ይቅርታ፣ በአሁኑ ወቅት ማመልከቻዎ ተቀባይነት አላገኘም።${reason ? ` ምክንያት: ${reason}` : ""}</p>
-            <br/><p>ከሰላምታ ጋር፣<br/>Ruhama Academy</p></div>`,
-        });
-      }
-    } catch (emailErr) { console.error("Rejection Email Failed:", emailErr); }
+    // Non-blocking rejection email.
+    if (updated.email) {
+      notifyEmail({
+        email: updated.email,
+        subject: "የተማሪ ምዝገባ ጥያቄዎ ውጤት - Ruhama Academy",
+        html: `<div style="font-family:sans-serif;direction:rtl;text-align:right;border:1px solid #eee;padding:20px;">
+          <h2 style="color:#991b1b;">ማመልከቻዎ ተመልክቷል</h2>
+          <p>ሰላም <b>${updated.firstName || ""}</b>፣</p>
+          <p>ይቅርታ፣ በአሁኑ ወቅት ማመልከቻዎ ተቀባይነት አላገኘም።${reason ? ` ምክንያት: ${reason}` : ""}</p>
+          <br/><p>ከሰላምታ ጋር፣<br/>Ruhama Academy</p></div>`,
+      });
+    }
 
     res.status(200).json({ success: true, message: "ማመልከቻው ውድቅ ተደርጓል", data: updated });
   } catch (err) {
@@ -236,10 +243,12 @@ export const getStudentCourses = async (req, res) => {
   try {
     const enrollments = await getDocs(collections.enrollments, {
       where: [{ field: "studentId", op: "==", value: req.params.id }],
+      select: ["courseId"],
     });
     const courseIds = enrollments.map((e) => e.courseId);
-    const allCourses = await getDocs(collections.courses);
-    const courses = allCourses.filter((c) => courseIds.includes(c.id));
+    const courses = await getDocsIn(collections.courses, courseIds, {
+      select: ["title", "subtitle", "category", "duration", "price", "image", "level", "instructor"],
+    });
     res.status(200).json({ success: true, count: courses.length, data: courses });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

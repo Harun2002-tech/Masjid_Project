@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Eye,
   Edit,
@@ -15,6 +16,7 @@ import {
 import studentService from "../../../services/studentService";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../../contexts/language-context";
+import DataTableSkeleton from "../../ui/DataTableSkeleton";
 
 const translations = {
   am: {
@@ -69,43 +71,50 @@ const translations = {
 
 export default function StudentListPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const context = useLanguage();
   const language = context?.language || "am";
   const t = translations[language] || translations["am"];
   const isRTL = language === "ar";
 
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        setLoading(true);
-        const result = await studentService.getAllStudents();
-        const data = result?.success
-          ? result.data?.data || result.data || []
-          : [];
-        setStudents(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStudents();
-  }, []);
+  // Cached list: renders instantly on revisit while refetching in background.
+  const {
+    data: students = [],
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ["students"],
+    queryFn: async () => {
+      const result = await studentService.getAllStudents();
+      if (!result.success) throw new Error(result.message || "Failed to load");
+      return Array.isArray(result.data) ? result.data : [];
+    },
+  });
+
+  // Optimistic delete: remove from cache immediately, roll back on failure.
+  const deleteMutation = useMutation({
+    mutationFn: (id) => studentService.deleteStudent(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["students"] });
+      const previous = queryClient.getQueryData(["students"]);
+      queryClient.setQueryData(["students"], (old) =>
+        (old || []).filter((s) => s.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(["students"], ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["students"] }),
+  });
 
   const handleDelete = async (id, name) => {
     if (!window.confirm(`${name}: ${t.deleteConfirm}`)) return;
-    try {
-      await studentService.deleteStudent(id);
-      setStudents((prev) => prev.filter((s) => s.id !== id));
-    } catch (err) {
-      console.error(err);
-    }
+    deleteMutation.mutate(id);
   };
 
   const filtered = useMemo(() => {
@@ -118,13 +127,19 @@ export default function StudentListPage() {
     );
   }, [students, searchTerm]);
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-[80vh] w-full flex flex-col items-center justify-center gap-4">
-        <Loader2 className="animate-spin text-gold" size={48} />
-        <p className="text-gold uppercase tracking-[0.3em] text-[10px] font-bold">
-          {t.loadingText}
-        </p>
+      <div
+        className={`p-6 md:p-12 min-h-screen text-white overflow-x-hidden ${
+          isRTL ? "text-right" : "text-left"
+        }`}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="h-10 w-64 rounded-2xl bg-white/5 animate-pulse" />
+          <div className="h-16 w-full rounded-2xl bg-white/5 animate-pulse" />
+          <DataTableSkeleton rows={6} isRTL={isRTL} />
+        </div>
       </div>
     );
   }
@@ -169,6 +184,9 @@ export default function StudentListPage() {
                 {t.total} <span className="text-white">{students.length}</span>{" "}
                 {t.registered}
               </p>
+              {isFetching && !isLoading ? (
+                <Loader2 size={12} className="text-gold/60 animate-spin" />
+              ) : null}
             </div>
           </div>
 

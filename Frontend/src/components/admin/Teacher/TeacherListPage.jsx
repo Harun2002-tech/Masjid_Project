@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Eye,
   Edit,
@@ -15,6 +16,7 @@ import {
 import teacherService from "../../../services/teacherService";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../../contexts/language-context";
+import DataTableSkeleton from "../../ui/DataTableSkeleton";
 
 const translations = {
   am: {
@@ -81,46 +83,50 @@ export default function TeacherListPage() {
   const t = translations[language || "am"];
   const isRTL = language === "ar";
 
-  const [teachers, setTeachers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
 
   const navigate = useNavigate();
   const API_BASE_URL = "https://api.ruhamaislamiccenter.com";
 
-  const fetchTeachers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Cached list: renders instantly on revisit while refetching in background.
+  const {
+    data: teachers = [],
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ["teachers"],
+    queryFn: async () => {
       const result = await teacherService.getAllTeachers();
-      const fetchedData = result?.success
-        ? result.data?.data || result.data || []
-        : [];
-      setTeachers(Array.isArray(fetchedData) ? fetchedData : []);
-    } catch (error) {
-      console.error("Error fetching teachers:", error);
-      setError(t.noData);
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (!result.success) throw new Error(result.message || "Failed to load");
+      return Array.isArray(result.data) ? result.data : [];
+    },
+  });
 
-  useEffect(() => {
-    fetchTeachers();
-  }, []);
+  // Optimistic delete: remove from cache immediately, roll back on failure.
+  const deleteMutation = useMutation({
+    mutationFn: (id) => teacherService.deleteTeacher(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["teachers"] });
+      const previous = queryClient.getQueryData(["teachers"]);
+      queryClient.setQueryData(["teachers"], (old) =>
+        (old || []).filter((tc) => tc.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(["teachers"], ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["teachers"] }),
+  });
 
   const handleDelete = async (id, fullName) => {
     if (!window.confirm(t.confirmDelete.replace("{name}", fullName))) {
       return;
     }
-    try {
-      await teacherService.deleteTeacher(id);
-      setTeachers((prev) => prev.filter((t) => t.id !== id));
-      alert(t.deleteSuccess);
-    } catch (error) {
-      alert("Error!");
-    }
+    deleteMutation.mutate(id);
+    alert(t.deleteSuccess);
   };
 
   const filteredTeachers = teachers.filter((teacher) => {
@@ -142,14 +148,18 @@ export default function TeacherListPage() {
     );
   });
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="animate-spin text-gold" size={50} />
-          <p className="text-white/40 font-black tracking-[0.2em] uppercase text-[10px]">
-            {t.loading}
-          </p>
+      <div
+        className={`p-6 md:p-12 min-h-screen text-white ${
+          isRTL ? "text-right" : "text-left"
+        }`}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="h-10 w-64 rounded-2xl bg-white/5 animate-pulse" />
+          <div className="h-16 w-full rounded-2xl bg-white/5 animate-pulse" />
+          <DataTableSkeleton rows={6} isRTL={isRTL} />
         </div>
       </div>
     );
@@ -192,6 +202,9 @@ export default function TeacherListPage() {
               <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest">
                 {t.total.replace("{count}", teachers.length)}
               </p>
+              {isFetching && !isLoading ? (
+                <Loader2 size={12} className="text-gold/60 animate-spin" />
+              ) : null}
             </div>
           </div>
 

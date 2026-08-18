@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -25,9 +26,7 @@ import {
 // ኮንቴክስት እና ሰርቪሶች
 import { useLanguage } from "../../../contexts/language-context";
 import { useAuth } from "../../../contexts/auth-context";
-import teacherService from "../../../services/teacherService";
-import studentService from "../../../services/studentService";
-import courseService from "../../../services/courseService";
+import adminService from "../../../services/adminService";
 import scheduleService from "../../../services/scheduleService";
 
 const translations = {
@@ -123,90 +122,66 @@ const translations = {
 export default function AdminDashboard() {
   const { language: lang } = useLanguage();
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [recentTeachers, setRecentTeachers] = useState([]);
-  const [recentStudents, setRecentStudents] = useState([]);
-  const [todaySchedules, setTodaySchedules] = useState([]);
-  const [counts, setCounts] = useState({
-    students: 0,
-    teachers: 0,
-    courses: 0,
-    newStudents: 0,
-  });
 
   const t = (key) => translations[lang][key] || key;
   const isRTL = lang === "ar";
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      const [teacherRes, studentRes, courseRes, scheduleRes] =
-        await Promise.all([
-          teacherService.getAllTeachers(),
-          studentService.getAllStudents(),
-          courseService.getAllCourses(),
-          scheduleService.getAllSchedules(),
-        ]);
-
-      const daysAm = ["እሁድ", "ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "አርብ", "ቅዳሜ"];
-      const daysEn = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ];
-      const todayIndex = new Date().getDay();
-
-      const allSchedules = Array.isArray(scheduleRes)
-        ? scheduleRes
-        : scheduleRes?.data || [];
-      const filtered = allSchedules.filter(
-        (s) =>
-          (s.day && s.day.trim() === daysAm[todayIndex]) ||
-          (s.dayEn &&
-            s.dayEn.trim().toLowerCase() === daysEn[todayIndex].toLowerCase())
+  // Lightweight dashboard: aggregate counts + recent 5 only (cached).
+  const {
+    data: stats,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: async () => {
+      const data = await adminService.getDashboardStats();
+      return (
+        data || {
+          counts: { students: 0, teachers: 0, courses: 0, newStudents: 0 },
+          recentStudents: [],
+          recentTeachers: [],
+        }
       );
-      setTodaySchedules(filtered);
+    },
+  });
 
-      if (studentRes?.success) {
-        const students = studentRes.data || [];
-        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        setCounts((prev) => ({
-          ...prev,
-          students: students.length,
-          newStudents: students.filter((s) => new Date(s.createdAt) > oneDayAgo)
-            .length,
-        }));
-        setRecentStudents(students.slice(0, 5));
-      }
+  const counts = useMemo(
+    () => stats?.counts || { students: 0, teachers: 0, courses: 0, newStudents: 0 },
+    [stats]
+  );
+  const recentStudents = stats?.recentStudents || [];
+  const recentTeachers = stats?.recentTeachers || [];
 
-      if (teacherRes?.success) {
-        const teachers = teacherRes.data || [];
-        setCounts((prev) => ({ ...prev, teachers: teachers.length }));
-        setRecentTeachers(teachers.slice(0, 5));
-      }
+  // Today's schedules (cached separately).
+  const { data: allSchedules = [] } = useQuery({
+    queryKey: ["schedules"],
+    queryFn: async () => {
+      const res = await scheduleService.getAllSchedules();
+      return Array.isArray(res) ? res : res?.data || [];
+    },
+  });
 
-      if (courseRes?.success) {
-        setCounts((prev) => ({
-          ...prev,
-          courses: (courseRes.data || []).length,
-        }));
-      }
-    } catch (err) {
-      console.error("Dashboard Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const todaySchedules = useMemo(() => {
+    const daysAm = ["እሁድ", "ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "አርብ", "ቅዳሜ"];
+    const daysEn = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const todayIndex = new Date().getDay();
+    return allSchedules.filter(
+      (s) =>
+        (s.day && s.day.trim() === daysAm[todayIndex]) ||
+        (s.dayEn &&
+          s.dayEn.trim().toLowerCase() === daysEn[todayIndex].toLowerCase())
+    );
+  }, [allSchedules]);
 
-  if (loading)
+  if (isLoading)
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-bg">
         <Loader2 className="w-10 h-10 text-gold animate-spin mb-4" />
@@ -573,10 +548,12 @@ function DataSection({ title, items, type, tViewAll, isRTL }) {
       </div>
       <div className="space-y-3">
         {items.length > 0 ? (
-          items.map((item, idx) => (
+          items.map((item, idx) => {
+            const docId = item._id || item.id;
+            return (
             <Link
-              key={item._id || idx}
-              to={`/admin/${type}/view/${item._id}`}
+              key={docId || idx}
+              to={`/admin/${type}/view/${docId}`}
               className={`flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] transition-all ${
                 isRTL ? "flex-row-reverse" : ""
               }`}
@@ -619,7 +596,8 @@ function DataSection({ title, items, type, tViewAll, isRTL }) {
                 className={`text-white/10 ${isRTL ? "rotate-180" : ""}`}
               />
             </Link>
-          ))
+            );
+          })
         ) : (
           <p className="text-center py-4 text-[10px] opacity-20 uppercase tracking-widest">
             No Data

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   User,
   Mail,
@@ -179,6 +180,7 @@ export default function AddTeacherPage({ editMode = false }) {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { language } = useLanguage();
   const t = translations[language || "am"];
   const isRTL = language === "ar";
@@ -326,6 +328,8 @@ export default function AddTeacherPage({ editMode = false }) {
         ? await teacherService.updateTeacher(id, data)
         : await teacherService.createTeacher(data);
       if (response.success) {
+        queryClient.invalidateQueries({ queryKey: ["teachers"] });
+        queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
         alert(actualEditMode ? t.successEdit : t.successAdd);
         navigate("/admin/teachers");
       }
